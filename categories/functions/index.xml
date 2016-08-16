@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Functions on Ryan A. Chapman</title>
-    <link>http://test2.ryanchapman.com/categories/functions/</link>
+    <link>http://test2.rchapman.org/categories/functions/</link>
     <description>Recent content in Functions on Ryan A. Chapman</description>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Sat, 07 Nov 2015 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://test2.ryanchapman.com/categories/functions/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://test2.rchapman.org/categories/functions/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>ASA: DAP LUA function list</title>
-      <link>http://test2.ryanchapman.com/posts/ASA_DAP_Lua_function_list/</link>
+      <link>http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/</link>
       <pubDate>Sat, 07 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.ryanchapman.com/posts/ASA_DAP_Lua_function_list/</guid>
+      <guid>http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/</guid>
       <description>&lt;p&gt;&lt;em&gt;ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
 
 &lt;p&gt;
