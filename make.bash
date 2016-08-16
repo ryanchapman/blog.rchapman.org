@@ -56,6 +56,7 @@ function local
 function deploy
 {
     run hugo
+    run cp CNAME public
     run git add -A
     if [[ $# == 1 ]]; then
         git commit -m "changes"

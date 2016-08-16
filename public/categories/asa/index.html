@@ -7,17 +7,17 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <base href="http://test2.ryanchapman.com">
+    <base href="http://test2.rchapman.org">
     <title> Asa </title>
-    <link rel="canonical" href="http://test2.ryanchapman.com/categories/asa/">
+    <link rel="canonical" href="http://test2.rchapman.org/categories/asa/">
     
 
-<link rel="stylesheet" href="http://test2.ryanchapman.com/css/poole.css">
-<link rel="stylesheet" href="http://test2.ryanchapman.com/css/syntax.css">
-<link rel="stylesheet" href="http://test2.ryanchapman.com/css/lanyon.css">
+<link rel="stylesheet" href="http://test2.rchapman.org/css/poole.css">
+<link rel="stylesheet" href="http://test2.rchapman.org/css/syntax.css">
+<link rel="stylesheet" href="http://test2.rchapman.org/css/lanyon.css">
 <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700|PT+Sans:400">
-<link rel="stylesheet" href="http://test2.ryanchapman.com/css/highlightjs.min.css">
-<script src="http://test2.ryanchapman.com/js/highlight.min.js"></script>
+<link rel="stylesheet" href="http://test2.rchapman.org/css/highlightjs.min.css">
+<script src="http://test2.rchapman.org/js/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
 </head>
@@ -33,9 +33,9 @@
 <div class="sidebar" id="sidebar">
 
   <nav class="sidebar-nav">
-    <a class="sidebar-nav-item" href="http://test2.ryanchapman.com/">Home</a>
+    <a class="sidebar-nav-item" href="http://test2.rchapman.org/">Home</a>
 
-    <a class="sidebar-nav-item" href="http://test2.ryanchapman.com/posts">Blog</a>
+    <a class="sidebar-nav-item" href="http://test2.rchapman.org/posts">Blog</a>
   </nav>
 
   <div class="sidebar-item">
@@ -51,7 +51,7 @@
     <div class="masthead">
       <div class="container">
         <h3 class="masthead-title">
-          <a href="http://test2.ryanchapman.com/posts" title="Blog">Blog Posts</a>
+          <a href="http://test2.rchapman.org/posts" title="Blog">Blog Posts</a>
         </h3>
       </div>
     </div>
@@ -61,20 +61,20 @@
       <h1 class="post-title">Recent Posts</h1>
         <section id="main">
           <div>
-            <h5><a href="http://test2.ryanchapman.com/categories">Full Category Index</a></h5>
+            <h5><a href="http://test2.rchapman.org/categories">Full Category Index</a></h5>
             <h2>Posts in &ldquo;Asa&rdquo;</h2>
             
             
 
 <article class="post">
     <header>
-      <h2><a href='http://test2.ryanchapman.com/posts/ASA_DAP_Lua_function_list/'> ASA: DAP LUA function list</a> </h2>
+      <h2><a href='http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/'> ASA: DAP LUA function list</a> </h2>
       <div class="meta">Sat, Nov 7, 2015</div>
     </header>
 
     ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS On the internets, I haven't been able to locate a list of Lua functions available for use with Dynamic Access Policies (DAP) on Cisco's ASA firewall. So I decided to just use Lua running on the ASA to tell me what functions and variables are in global scope. Not quite as good as documentation, but it works for now. To set it up it, open ASDM and Go to Configuration Remote Access VPN Dynamic Access Policies Add Policy Name: list_globals Description: prints a list of Lua globals to the ASA CLI ACL Priority: 50 (or whatever priority you want to assign) User had ALL of the following AAA Attribute values...
     <footer>
-        <a href='http://test2.ryanchapman.com/posts/ASA_DAP_Lua_function_list/'><nobr>Read more →</nobr></a>
+        <a href='http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/'><nobr>Read more →</nobr></a>
     </footer>
 </article>
 
@@ -83,13 +83,13 @@
 
 <article class="post">
     <header>
-      <h2><a href='http://test2.ryanchapman.com/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/'> ASA: Deny IP due to Land Attack from a.b.c.d to a.b.c.d</a> </h2>
+      <h2><a href='http://test2.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/'> ASA: Deny IP due to Land Attack from a.b.c.d to a.b.c.d</a> </h2>
       <div class="meta">Wed, Oct 28, 2015</div>
     </header>
 
     ASA 5516-X in HA pair, ASA 9.5(1) On an ASA I help manage, the logs were full of messages like &ldquo;Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4&rdquo;. A Land attack is defined as when a packet is received that has the same source and destination IP addresses. Some definitions also say that the source and destination ports will match, but that was not true in my case. Reproducing the issue To reproduce the issue, I first got my public IP address, which is 1.2.3.4 rchapman@linux:~$ curl icanhazip.com 1.2.3.4 Next, I set up the ASA to capture all packets it drops fw1/pri/act# capture cap1 type asp-drop all circular-buffer fw1/pri/act# Then I set up a loop to attempt a connect to my public IP address on a strange port (8955) so that I can search for it in the packet capture on the ASA later.
     <footer>
-        <a href='http://test2.ryanchapman.com/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/'><nobr>Read more →</nobr></a>
+        <a href='http://test2.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/'><nobr>Read more →</nobr></a>
     </footer>
 </article>
 
@@ -109,7 +109,7 @@
 <footer>
   <div>
     <p class="right credit">
-    Fancy footer here. Link to <a href="http://test2.ryanchapman.com/">Home Page</a>
+    Fancy footer here. Link to <a href="http://test2.rchapman.org/">Home Page</a>
     </p>
   </div>
 </footer>

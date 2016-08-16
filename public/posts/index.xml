@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Ryan A. Chapman</title>
-    <link>http://test2.ryanchapman.com/posts/</link>
+    <link>http://test2.rchapman.org/posts/</link>
     <description>Recent content in Posts on Ryan A. Chapman</description>
     <generator>Hugo -- gohugo.io</generator>
     <lastBuildDate>Sat, 07 Nov 2015 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://test2.ryanchapman.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://test2.rchapman.org/posts/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>ASA: DAP LUA function list</title>
-      <link>http://test2.ryanchapman.com/posts/ASA_DAP_Lua_function_list/</link>
+      <link>http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/</link>
       <pubDate>Sat, 07 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.ryanchapman.com/posts/ASA_DAP_Lua_function_list/</guid>
+      <guid>http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/</guid>
       <description>&lt;p&gt;&lt;em&gt;ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
 
 &lt;p&gt;
@@ -209,10 +209,10 @@ DAP_TRACE: Username: rchapmandap, DAP_close: A4
     
     <item>
       <title>ASA: Deny IP due to Land Attack from a.b.c.d to a.b.c.d</title>
-      <link>http://test2.ryanchapman.com/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</link>
+      <link>http://test2.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</link>
       <pubDate>Wed, 28 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.ryanchapman.com/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</guid>
+      <guid>http://test2.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</guid>
       <description>
 
 &lt;p&gt;&lt;em&gt;ASA 5516-X in HA pair, ASA 9.5(1)&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
@@ -574,10 +574,10 @@ fw1/pri/act#
     
     <item>
       <title>Just another sample post</title>
-      <link>http://test2.ryanchapman.com/posts/newest/</link>
+      <link>http://test2.rchapman.org/posts/newest/</link>
       <pubDate>Sat, 29 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.ryanchapman.com/posts/newest/</guid>
+      <guid>http://test2.rchapman.org/posts/newest/</guid>
       <description>
 
 &lt;h2 id=&#34;first-heading:912493bb798d2cf24137bef8b4adb6f6&#34;&gt;First Heading&lt;/h2&gt;
@@ -596,10 +596,10 @@ fw1/pri/act#
     
     <item>
       <title>Second Post</title>
-      <link>http://test2.ryanchapman.com/posts/middle/</link>
+      <link>http://test2.rchapman.org/posts/middle/</link>
       <pubDate>Fri, 28 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.ryanchapman.com/posts/middle/</guid>
+      <guid>http://test2.rchapman.org/posts/middle/</guid>
       <description>
 
 &lt;h2 id=&#34;sample-post-1:5d41645769bc0f1237f2300a661d7e18&#34;&gt;Sample Post 1&lt;/h2&gt;
@@ -623,10 +623,10 @@ proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&g
     
     <item>
       <title>First Post</title>
-      <link>http://test2.ryanchapman.com/posts/oldest/</link>
+      <link>http://test2.rchapman.org/posts/oldest/</link>
       <pubDate>Thu, 27 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.ryanchapman.com/posts/oldest/</guid>
+      <guid>http://test2.rchapman.org/posts/oldest/</guid>
       <description>
 
 &lt;h2 id=&#34;sample-post-1:5be75e971689338db5c820fd71089689&#34;&gt;Sample Post 1&lt;/h2&gt;

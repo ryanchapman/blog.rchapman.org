@@ -2,33 +2,33 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://test2.ryanchapman.com/</loc>
+    <loc>http://test2.rchapman.org/</loc>
     <lastmod>2015-11-07T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://test2.ryanchapman.com/posts/ASA_DAP_Lua_function_list/</loc>
+    <loc>http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/</loc>
     <lastmod>2015-11-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://test2.ryanchapman.com/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</loc>
+    <loc>http://test2.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</loc>
     <lastmod>2015-10-28T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://test2.ryanchapman.com/posts/newest/</loc>
+    <loc>http://test2.rchapman.org/posts/newest/</loc>
     <lastmod>2014-03-29T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://test2.ryanchapman.com/posts/middle/</loc>
+    <loc>http://test2.rchapman.org/posts/middle/</loc>
     <lastmod>2014-03-28T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://test2.ryanchapman.com/posts/oldest/</loc>
+    <loc>http://test2.rchapman.org/posts/oldest/</loc>
     <lastmod>2014-03-27T00:00:00+00:00</lastmod>
   </url>
   
