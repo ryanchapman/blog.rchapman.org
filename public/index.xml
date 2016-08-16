@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ryan A. Chapman</title>
+    <link>http://test2.ryanchapman.com/</link>
+    <description>Recent content on Ryan A. Chapman</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Sat, 07 Nov 2015 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://test2.ryanchapman.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>ASA: DAP LUA function list</title>
+      <link>http://test2.ryanchapman.com/posts/ASA_DAP_Lua_function_list/</link>
+      <pubDate>Sat, 07 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.ryanchapman.com/posts/ASA_DAP_Lua_function_list/</guid>
+      <description>&lt;p&gt;&lt;em&gt;ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;p&gt;
+On the internets, I haven&#39;t been able to locate a list of Lua functions available for use with Dynamic Access Policies (DAP) on Cisco&#39;s ASA firewall. So I decided to just use Lua running on the ASA to tell me what functions and variables are in global scope.  Not quite as good as documentation, but it works for now.
+&lt;/p&gt;
+
+&lt;p&gt;
+To set it up it, open ASDM and
+&lt;ul&gt;
+&lt;li&gt;Go to Configuration &gt; Remote Access VPN &gt; Dynamic Access Policies&lt;/li&gt;
+&lt;li&gt;Add&lt;/li&gt;
+&lt;li&gt;Policy Name: list_globals&lt;/li&gt;
+&lt;li&gt;Description: prints a list of Lua globals to the ASA CLI&lt;/li&gt;
+&lt;li&gt;ACL Priority: 50 (or whatever priority you want to assign)&lt;/li&gt;
+&lt;li&gt;User had ALL of the following AAA Attribute values...&lt;/li&gt;
+&lt;li&gt;Add (AAA attribute)&lt;/li&gt;
+&lt;li&gt;AAA Attribute Type: Cisco&lt;/li&gt;
+&lt;li&gt;Username: rchapmandap (replace with the username you use to sign into AnyConnect)&lt;/li&gt;
+&lt;li&gt;OK&lt;/li&gt;
+&lt;li&gt;Click Advanced below the AAA Attributes&lt;/li&gt;
+&lt;li&gt;Paste in this code:&lt;br/&gt;
+&lt;pre&gt;
+assert(function()
+
+  DEBUG_DAP_TRACE(&#34;============\n&#34;)
+  DEBUG_DAP_TRACE(&#34;GLOBALS\n&#34;)
+
+  for k,v in pairs(_G) do
+    msg = &#34;k=&#34; .. print_value(k) .. &#34;, v=&#34;
+    if (type(v) == &#34;function&#34; or type(v) == &#34;table&#34;) then
+      msg = msg .. tostring(v)
+    elseif (type(v) == &#34;string&#34; or type(v) == &#34;number&#34;) then
+      msg = msg .. v
+    elseif (type(v) == &#34;boolean&#34;) then
+      if (v) then
+        msg = msg .. &#34;true&#34;
+      else
+        msg = msg .. &#34;false&#34;
+      end
+    end
+    msg = msg .. &#34; (&#34; .. type(v) .. &#34;)\n&#34;
+    DEBUG_DAP_TRACE(msg)
+  end
+
+  return true
+
+end)()
+&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;For Action, make sure Continue is selected&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Now that you have it set up, just need to turn dap tracing on in the CLI and log into AnyConnect one time
+&lt;ul&gt;
+&lt;li&gt;Log into the ASA CLI&lt;/li&gt;
+&lt;li&gt;Enable dap trace debugging&lt;br/&gt;
+&lt;pre&gt;
+fw1/pri/act# debug dap trace
+debug dap trace enabled at level 1
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;Open AnyConnect VPN Client on a device and log in to the VPN so that the DAP rules fire once. Log in make take longer than normal as the DAP trace logs to the CLI.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;
+
+&lt;p&gt;In the ASA CLI, you&#39;ll see something like this:&lt;br/&gt;
+&lt;pre&gt;
+fw1/pri/act# DAP_TRACE: DAP_open: New DAP Request: A4
+DAP_TRACE: Username: rchapmandap, DAP_add_SCEP: scep required = [FALSE]
+DAP_TRACE: Username: rchapmandap, DAP_add_AC:
+endpoint.anyconnect.clientversion = &#34;4.0.03016&#34;;
+endpoint.anyconnect.platform = &#34;apple-ios&#34;;
+endpoint.anyconnect.devicetype = &#34;iPhone7,2&#34;;
+endpoint.anyconnect.platformversion = &#34;9.0.2&#34;;
+endpoint.anyconnect.deviceuniqueid = &#34;XXXXXXXXXXXXXXXXXXXXXXXXXXXX&#34;;
+endpoint.anyconnect.phoneid = &#34;UNKNOWN:unknown&#34;;
+endpoint.anyconnect.macaddress[&#34;0&#34;] = &#34;unknown&#34;;
+endpoint.anyconnect.useragent = &#34;AnyConnect AppleSSLVPN_Darwin_ARM (iPhone) 4.0.03016&#34;;
+
+DAP_TRACE: aaa.radius[&#34;18&#34;][&#34;1&#34;] = &#34;debug_print&#34;
+DAP_TRACE: aaa.radius[&#34;25&#34;][&#34;1&#34;] = &#34;OU=Test_VPN;&#34;
+DAP_TRACE: aaa[&#34;cisco&#34;][&#34;grouppolicy&#34;] = &#34;Test_VPN&#34;
+DAP_TRACE: aaa[&#34;cisco&#34;][&#34;class&#34;] = &#34;Test_VPN&#34;
+DAP_TRACE: aaa[&#34;cisco&#34;][&#34;username&#34;] = &#34;rchapmandap&#34;
+DAP_TRACE: aaa[&#34;cisco&#34;][&#34;username1&#34;] = &#34;rchapmandap&#34;
+DAP_TRACE: aaa[&#34;cisco&#34;][&#34;username2&#34;] = &#34;&#34;
+DAP_TRACE: aaa[&#34;cisco&#34;][&#34;tunnelgroup&#34;] = &#34;SplitTunnel&#34;
+DAP_TRACE: aaa[&#34;cisco&#34;][&#34;sceprequired&#34;] = &#34;false&#34;
+DAP_TRACE: endpoint[&#34;application&#34;][&#34;clienttype&#34;] = &#34;AnyConnect&#34;
+DAP_TRACE: endpoint.anyconnect.clientversion  = &#34;4.0.03016&#34;
+DAP_TRACE: endpoint.anyconnect.platform  = &#34;apple-ios&#34;
+DAP_TRACE: endpoint.anyconnect.devicetype  = &#34;iPhone7,2&#34;
+DAP_TRACE: endpoint.anyconnect.platformversion  = &#34;9.0.2&#34;
+DAP_TRACE: endpoint.anyconnect.deviceuniqueid  = &#34;XXXXXXXXXXXXXXXXXXXXXXXXXXXX&#34;
+DAP_TRACE: endpoint.anyconnect.phoneid  = &#34;UNKNOWN:unknown&#34;
+DAP_TRACE: endpoint.anyconnect.macaddress[&#34;0&#34;]  = &#34;unknown&#34;
+DAP_TRACE: endpoint.anyconnect.useragent  = &#34;AnyConnect AppleSSLVPN_Darwin_ARM (iPhone) 4.0.03016&#34;
+DAP_TRACE: ============
+DAP_TRACE: GLOBALS
+DAP_TRACE: k=EVAL, v=function: 0x00007fffc7c31cb0 (function)
+DAP_TRACE: k=tostring, v=function: 0x00007fffc5b9f8c0 (function)
+DAP_TRACE: k=gcinfo, v=function: 0x00007fffc5ba03b0 (function)
+DAP_TRACE: k=InCommaList, v=function: 0x00007fffc6019f20 (function)
+DAP_TRACE: k=os, v=table: 0x00007fffc5ba1480 (table)
+DAP_TRACE: k=dap_records, v=table: 0x00007fffac3b0210 (table)
+DAP_TRACE: k=smart_table, v=function: 0x00007fffac3b28c0 (function)
+DAP_TRACE: k=eval_LT, v=function: 0x00007fffc601b800 (function)
+DAP_TRACE: k=getfenv, v=function: 0x00007fffc5b9f310 (function)
+DAP_TRACE: k=p, v=Test_VPN (string)
+DAP_TRACE: k=pairs, v=function: 0x00007fffc5b9f650 (function)
+DAP_TRACE: k=_TRACEBACK, v=function: 0x00007fffc5ba6e60 (function)
+DAP_TRACE: k=assert, v=function: 0x00007fffc5b9fa60 (function)
+DAP_TRACE: k=eval_NE, v=function: 0x00007fffc5723950 (function)
+DAP_TRACE: k=tonumber, v=function: 0x00007fffc5b9f7f0 (function)
+DAP_TRACE: k=print_dap_trees, v=function: 0x00007fffc5627ec0 (function)
+DAP_TRACE: k=io, v=table: 0x00007fffc5ba2c90 (table)
+DAP_TRACE: k=count, v=1 (number)
+DAP_TRACE: k=escape_string, v=function: 0x00007fffac6901d0 (function)
+DAP_TRACE: k=lxp, v=table: 0x00007fffc5ba7900 (table)
+DAP_TRACE: k=_LOADED, v=table: 0x00007fffc5ba1330 (table)
+DAP_TRACE: k=_G, v=table: 0x00007fffc5a73950 (table)
+DAP_TRACE: k=coroutine, v=table: 0x00007fffc5ba0d50 (table)
+DAP_TRACE: k=install_name_value_pair, v=function: 0x00007fffac690240 (function)
+DAP_TRACE: k=versionCompare, v=function: 0x00007fffc6019eb0 (function)
+DAP_TRACE: k=eval_GT, v=function: 0x00007fffc5bbc810 (function)
+DAP_TRACE: k=loadstring, v=function: 0x00007fffc5ba0620 (function)
+DAP_TRACE: k=soap, v=table: 0x00007fffc5baec10 (table)
+DAP_TRACE: k=CheckAndMsg, v=function: 0x00007fffb97f4140 (function)
+DAP_TRACE: k=string, v=table: 0x00007fffc5ba47a0 (table)
+DAP_TRACE: k=xpcall, v=function: 0x00007fffc5a73be0 (function)
+DAP_TRACE: k=evaluate_dap_record, v=function: 0x00007fffb9223990 (function)
+DAP_TRACE: k=_VERSION, v=Lua 5.0.2 (string)
+DAP_TRACE: k=endpoint, v=table: 0x00007fffb973d760 (table)
+DAP_TRACE: k=unpack, v=function: 0x00007fffc5b9fb30 (function)
+DAP_TRACE: k=oper, v=table: 0x00007fffac68b840 (table)
+DAP_TRACE: k=require, v=function: 0x00007fffc5ba06f0 (function)
+DAP_TRACE: k=ret, v=true (boolean)
+DAP_TRACE: k=install_endpoint_data, v=function: 0x00007fffc63e8350 (function)
+DAP_TRACE: k=setmetatable, v=function: 0x00007fffc5b9f240 (function)
+DAP_TRACE: k=next, v=function: 0x00007fffc5b9f4b0 (function)
+DAP_TRACE: k=indent, v=function: 0x00007fffc646b290 (function)
+DAP_TRACE: k=aaa, v=table: 0x00007fffb97f5530 (table)
+DAP_TRACE: k=ipairs, v=function: 0x00007fffc5b9f580 (function)
+DAP_TRACE: k=init_session_tables, v=function: 0x00007fffac3b3de0 (function)
+DAP_TRACE: k=msg, v=k=init_session_tables, v=function: 0x00007fffac3b3de0 (function)
+ (string)
+DAP_TRACE: k=rawequal, v=function: 0x00007fffc5b9fc00 (function)
+DAP_TRACE: k=lua_dap_debug_trace, v=function: 0x00007fffc5baeda0 (function)
+DAP_TRACE: k=collectgarbage, v=function: 0x00007fffc5ba02e0 (function)
+DAP_TRACE: k=result, v=true (boolean)
+DAP_TRACE: k=newproxy, v=function: 0x00007fffc5ba0c70 (function)
+DAP_TRACE: k=matchcount, v=1 (number)
+DAP_TRACE: k=eval_EQ, v=function: 0x00007fffac171d30 (function)
+DAP_TRACE: k=print_table, v=function: 0x00007fffc6355300 (function)
+DAP_TRACE: k=dap_names, v=table: 0x00007fffac3b0290 (table)
+DAP_TRACE: k=dap_messages, v=table: 0x00007fffb9f8bb60 (table)
+DAP_TRACE: k=eval_LE, v=function: 0x00007fffc5730180 (function)
+DAP_TRACE: k=rawset, v=function: 0x00007fffc5a73a40 (function)
+DAP_TRACE: k=EVALone, v=function: 0x00007fffc7c31c40 (function)
+DAP_TRACE: k=_, v=1 (number)
+DAP_TRACE: k=getmetatable, v=function: 0x00007fffc5b9f170 (function)
+DAP_TRACE: k=callbacks, v=table: 0x00007fffac5f8400 (table)
+DAP_TRACE: k=mt, v=table: 0x00007fffac5f5e80 (table)
+DAP_TRACE: k=table, v=table: 0x00007fffc5ba5550 (table)
+DAP_TRACE: k=pcall, v=function: 0x00007fffc5a73b10 (function)
+DAP_TRACE: k=print_tree, v=function: 0x00007fffc5627e50 (function)
+DAP_TRACE: k=DEBUG_DAP_TRACE, v=function: 0x00007fffc64fd1b0 (function)
+DAP_TRACE: k=type, v=function: 0x00007fffc5b9f990 (function)
+DAP_TRACE: k=print_value, v=function: 0x00007fffc6571520 (function)
+DAP_TRACE: k=dump_lua, v=function: 0x00007fffc6525ae0 (function)
+DAP_TRACE: k=get_selected_daps, v=function: 0x00007fffc6525a70 (function)
+DAP_TRACE: k=eval_GE, v=function: 0x00007fffc64690c0 (function)
+DAP_TRACE: k=dapxmlxlate, v=function: 0x00007fffac3b3e50 (function)
+DAP_TRACE: k=rawget, v=function: 0x00007fffc5b9fcd0 (function)
+DAP_TRACE: k=application, v=table: 0x00007fffbbff7210 (table)
+DAP_TRACE: k=debug, v=table: 0x00007fffc5ba0900 (table)
+DAP_TRACE: k=print, v=function: 0x00007fffc5b9f720 (function)
+DAP_TRACE: k=setfenv, v=function: 0x00007fffc5b9f3e0 (function)
+DAP_TRACE: k=sign, v=table: 0x00007fffac170bc0 (table)
+DAP_TRACE: k=dofile, v=function: 0x00007fffc5ba0550 (function)
+DAP_TRACE: k=error, v=function: 0x00007fffc5b9f0a0 (function)
+DAP_TRACE: k=loadfile, v=function: 0x00007fffc5ba0480 (function)
+DAP_TRACE: Username: rchapmandap, Selected DAPs: ,msg_Welcome,msg_tunnel_type,list_globals
+DAP_TRACE: dap_process_selected_daps: selected 3 records
+DAP_TRACE: Username: rchapmandap, dap_aggregate_attr: rec_count = 3
+DAP_TRACE: Username: rchapmandap, DAP_close: A4
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;I&#39;m sure there is more info to be found, but this is all I have time for now.  If you find more, please share in the comments...&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ASA: Deny IP due to Land Attack from a.b.c.d to a.b.c.d</title>
+      <link>http://test2.ryanchapman.com/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</link>
+      <pubDate>Wed, 28 Oct 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.ryanchapman.com/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</guid>
+      <description>
+
+&lt;p&gt;&lt;em&gt;ASA 5516-X in HA pair, ASA 9.5(1)&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;p&gt;On an ASA I help manage, the logs were full of messages like &amp;ldquo;Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4&amp;rdquo;.  A Land attack is defined as when a packet is received that has the same source and destination IP addresses.  Some definitions also say that the source and destination ports will match, but that was not true in my case.&lt;/p&gt;
+
+&lt;h2 id=&#34;reproducing-the-issue:ead1605ebea36965434aa7c8f30d2c49&#34;&gt;Reproducing the issue&lt;/h2&gt;
+
+&lt;p&gt;To reproduce the issue, I first got my public IP address, which is 1.2.3.4&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;code class=&#34;bash&#34;&gt;
+rchapman@linux:~$ curl icanhazip.com
+1.2.3.4
+&lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;Next, I set up the ASA to capture all packets it drops&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;code class=&#34;language&#34;&gt;
+fw1/pri/act# capture cap1 type asp-drop all circular-buffer
+fw1/pri/act#
+&lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;Then I set up a loop to attempt a connect to my public IP address on a strange port (8955) so that I can search for it in the packet capture on the ASA later.&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;code class=&#34;language&#34;&gt;
+rchapman@linux:~$ while true; do date; nc -w 1 1.2.3.4 8955; sleep 1s; done
+Wed Oct 28 20:20:07 EDT 2015
+Wed Oct 28 20:20:09 EDT 2015
+Wed Oct 28 20:20:11 EDT 2015
+[...]
+^C
+rchapman@linux:~$
+&lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;The logs confirm that I reproduced the issue&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;code class=&#34;language&#34;&gt;
+fw1/pri/act# sh log | i Land
+Oct 28 2015 20:20:07: %ASA-2-106017: Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4
+Oct 28 2015 20:44:09: %ASA-2-106017: Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4
+Oct 28 2015 20:44:11: %ASA-2-106017: Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4
+[...]
+&lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;Looking for the dropped packets, I would expect the ASA to say the reason was a Land Attack since that&amp;rsquo;s what the logs say.  Nope, it just says the reason is sp-security-failed.&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;code class=&#34;language&#34;&gt;
+fw1/pri/act# sh capture cap1 | i 8955
+   28: 20:20:07.518924       172.16.230.24.33730 &gt; 1.2.3.4.8955: S 2198057225:2198057225(0) win 29200 &lt;mss 1460,sackOK,timestamp 349841117 0,nop,wscale 7&gt; Drop-reason: (sp-security-failed) Slowpath security checks failed
+  207: 20:20:09.527835       172.16.230.24.33736 &gt; 1.2.3.4.8955: S 4274950959:4274950959(0) win 29200 &lt;mss 1460,sackOK,timestamp 349841619 0,nop,wscale 7&gt; Drop-reason: (sp-security-failed) Slowpath security checks failed
+  290: 20:20:11.536089       172.16.230.24.33742 &gt; 1.2.3.4.8955: S 4072781874:4072781874(0) win 29200 &lt;mss 1460,sackOK,timestamp 349842121 0,nop,wscale 7&gt; Drop-reason: (sp-security-failed) Slowpath security checks failed
+[...]
+&lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;The packet capture shows the source interface before any NAT happened.  Let&amp;rsquo;s check packet tracer to see if the ASA is NATing the session&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;code class=&#34;language&#34;&gt;
+fw1/pri/act# packet-tracer input inside tcp 172.16.230.24 33885 1.2.3.4 8955
+
+Phase: 1
+Type: ACCESS-LIST
+Subtype:
+Result: ALLOW
+Config:
+Implicit Rule
+Additional Information:
+ Forward Flow based lookup yields rule:
+  in  id=0x7fd461841850, priority=1, domain=permit, deny=false
+    hits=12075132, user_data=0x0, cs_id=0x0, l3_type=0x8
+        src mac=0000.0000.0000, mask=0000.0000.0000
+            dst mac=0000.0000.0000, mask=0100.0000.0000
+                input_ifc=inside, output_ifc=any
+
+Phase: 2
+Type: ROUTE-LOOKUP
+Subtype: Resolve Egress Interface
+Result: ALLOW
+Config:
+Additional Information:
+found next-hop 1.2.3.1 using egress ifc  outside
+
+Phase: 3
+Type: CONN-SETTINGS
+Subtype:
+Result: ALLOW
+Config:
+class-map class-default
+ match any
+ policy-map global_policy
+  class class-default
+    set connection decrement-ttl
+    service-policy global_policy global
+    Additional Information:
+     Forward Flow based lookup yields rule:
+      in  id=0x7fd46c7677f0, priority=7, domain=conn-set, deny=false
+        hits=1797218, user_data=0x7fd46e3bcdf0, cs_id=0x0, use_real_addr, flags=0x0, protocol=0
+            src ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any
+                dst ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any, dscp=0x0
+                    input_ifc=inside, output_ifc=any
+
+Phase: 4
+Type: NAT
+Subtype:
+Result: ALLOW
+Config:
+object network ny-monitor
+ nat (inside,outside) static PAT_Pool
+ Additional Information:
+ Static translate 172.16.230.24/33885 to 1.2.3.4/33885
+  Forward Flow based lookup yields rule:
+   in  id=0x7fd461ab94f0, priority=6, domain=nat, deny=false
+    hits=19022, user_data=0x7fd461ab5c00, cs_id=0x0, flags=0x0, protocol=0
+        src ip/id=172.16.230.24, mask=255.255.255.254, port=0, tag=any
+            dst ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any, dscp=0x0
+                input_ifc=inside, output_ifc=outside
+
+Phase: 5
+Type: NAT
+Subtype: per-session
+Result: ALLOW
+Config:
+Additional Information:
+ Forward Flow based lookup yields rule:
+  in  id=0x7fd4611bf480, priority=0, domain=nat-per-session, deny=false
+    hits=874821, user_data=0x0, cs_id=0x0, reverse, use_real_addr, flags=0x0, protocol=6
+        src ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any
+            dst ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any, dscp=0x0
+                input_ifc=any, output_ifc=any
+
+Phase: 6
+Type: IP-OPTIONS
+Subtype:
+Result: ALLOW
+Config:
+Additional Information:
+ Forward Flow based lookup yields rule:
+  in  id=0x7fd46146a980, priority=0, domain=inspect-ip-options, deny=true
+    hits=98075, user_data=0x0, cs_id=0x0, reverse, flags=0x0, protocol=0
+        src ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any
+            dst ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any, dscp=0x0
+                input_ifc=inside, output_ifc=any
+
+Phase: 7
+Type: FOVER
+Subtype: standby-update
+Result: ALLOW
+Config:
+Additional Information:
+ Forward Flow based lookup yields rule:
+  in  id=0x7fd461b92d20, priority=20, domain=lu, deny=false
+    hits=804138, user_data=0x0, cs_id=0x0, flags=0x0, protocol=6
+        src ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any
+            dst ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any, dscp=0x0
+                input_ifc=inside, output_ifc=any
+
+Phase: 8
+Type: USER-STATISTICS
+Subtype: user-statistics
+Result: ALLOW
+Config:
+Additional Information:
+ Forward Flow based lookup yields rule:
+  out id=0x7fd46e3b3df0, priority=0, domain=user-statistics, deny=false
+    hits=1843176, user_data=0x7fd4611d29a0, cs_id=0x0, reverse, flags=0x0, protocol=0
+        src ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any
+            dst ip/id=0.0.0.0, mask=0.0.0.0, port=0, tag=any, dscp=0x0
+                input_ifc=any, output_ifc=outside
+
+Result:
+input-interface: inside
+input-status: up
+input-line-status: up
+output-interface: outside
+output-status: up
+output-line-status: up
+Action: drop
+Drop-reason: (sp-security-failed) Slowpath security checks failed
+
+fw1/pri/act#
+&lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;It is. Phase 4 of the packet trace shows a translation from &lt;tt&gt;172.16.230.24 / 33885&lt;/tt&gt; to &lt;tt&gt;1.2.3.4 / 33885&lt;/tt&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;the-fix:ead1605ebea36965434aa7c8f30d2c49&#34;&gt;The fix&lt;/h2&gt;
+
+&lt;p&gt;Put a NONAT (NAT exemption) rule in place&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;code class=&#34;language&#34;&gt;
+fw1/pri/act# sh run object id ny-monitor
+object network linux1
+ subnet 172.16.230.24 255.255.255.254
+fw1/pri/act#
+fw1/pri/act# sh run object id PAT_Pool
+ object network PAT_Pool
+  range 1.2.3.4 1.2.3.90
+fw1/pri/act#
+fw1/pri/act# nat (inside,outside) source static linux1 linux1 destination static PAT_Pool PAT_Pool no-proxy-arp route-lookup
+&lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;What this says is &amp;ldquo;if the source ip address is 172.16.230.24 and the destination ip address is in the range 1.2.3.4 through 1.2.3.90,&amp;rdquo; then ignore this NAT rule:&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;code class=&#34;language&#34;&gt;
+fw1/pri/act# sh run nat
+[...]
+  object network linux1
+   nat (inside,outside) static PAT_Pool
+&lt;/code&gt;
+&lt;/pre&gt;
+
+&lt;p&gt;I tested by again creating lots of connections to 1.2.3.4 from the linux machine and now I don&amp;rsquo;t see Land Attack messages in the ASA system log.  Another packet trace confirms that the NAT exclusion is working.&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;code class=&#34;language&#34;&gt;
+fw1/sec/act# packet-tracer input inside tcp 172.16.230.24 33885 1.2.3.4 80
+
+Phase: 1
+Type: ACCESS-LIST
+Subtype:
+Result: ALLOW
+Config:
+Implicit Rule
+Additional Information:
+MAC Access list
+
+Phase: 2
+Type: ROUTE-LOOKUP
+Subtype: Resolve Egress Interface
+Result: ALLOW
+Config:
+Additional Information:
+found next-hop 1.2.3.1 using egress ifc  outside
+
+Phase: 3
+Type: UN-NAT
+Subtype: static
+Result: ALLOW
+Config:
+nat (inside,outside) source static linux1 linux1 destination static PAT_Pool PAT_Pool no-proxy-arp route-lookup
+Additional Information:
+NAT divert to egress interface outside
+Untranslate 1.2.3.4/8955 to 1.2.3.4/8955
+
+Phase: 4
+Type: CONN-SETTINGS
+Subtype:
+Result: ALLOW
+Config:
+class-map class-default
+ match any
+ policy-map global_policy
+  class class-default
+    set connection decrement-ttl
+    service-policy global_policy global
+    Additional Information:
+
+Phase: 5
+Type: NAT
+Subtype:
+Result: ALLOW
+Config:
+nat (inside,outside) source static linux1 linux1 destination static PAT_Pool PAT_Pool no-proxy-arp route-lookup
+Additional Information:
+Static translate 172.16.230.24/33885 to 172.16.230.24/33885
+
+Phase: 6
+Type: NAT
+Subtype: per-session
+Result: ALLOW
+Config:
+Additional Information:
+
+Phase: 7
+Type: IP-OPTIONS
+Subtype:
+Result: ALLOW
+Config:
+Additional Information:
+
+Phase: 8
+Type: FOVER
+Subtype: standby-update
+Result: ALLOW
+Config:
+Additional Information:
+
+Phase: 9
+Type: NAT
+Subtype: rpf-check
+Result: ALLOW
+Config:
+nat (inside,outside) source static linux1 linux1 destination static PAT_Pool PAT_Pool no-proxy-arp route-lookup
+Additional Information:
+
+Phase: 10
+Type: USER-STATISTICS
+Subtype: user-statistics
+Result: ALLOW
+Config:
+Additional Information:
+
+Phase: 11
+Type: NAT
+Subtype: per-session
+Result: ALLOW
+Config:
+Additional Information:
+
+Phase: 12
+Type: IP-OPTIONS
+Subtype:
+Result: ALLOW
+Config:
+Additional Information:
+
+Phase: 13
+Type: USER-STATISTICS
+Subtype: user-statistics
+Result: ALLOW
+Config:
+Additional Information:
+
+Phase: 14
+Type: FLOW-CREATION
+Subtype:
+Result: ALLOW
+Config:
+Additional Information:
+New flow created with id 2160780, packet dispatched to next module
+
+Result:
+input-interface: inside
+input-status: up
+input-line-status: up
+output-interface: outside
+output-status: up
+output-line-status: up
+Action: allow
+
+fw1/pri/act#
+&lt;/code&gt;
+&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Just another sample post</title>
+      <link>http://test2.ryanchapman.com/posts/newest/</link>
+      <pubDate>Sat, 29 Mar 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.ryanchapman.com/posts/newest/</guid>
+      <description>
+
+&lt;h2 id=&#34;first-heading:912493bb798d2cf24137bef8b4adb6f6&#34;&gt;First Heading&lt;/h2&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus, consequatur aspernatur omnis iste. Voluptates, id inventore ea natus ab sed amet ipsa ratione sunt dignissimos. Soluta illum aliquid repellendus recusandae.&lt;/p&gt;
+
+&lt;h3 id=&#34;sub:912493bb798d2cf24137bef8b4adb6f6&#34;&gt;Sub&lt;/h3&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio, perferendis saepe voluptatem a nesciunt architecto voluptas deleniti dolor tempora quasi quidem odit rem fugit magnam minima quam dolores vel id?&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion:912493bb798d2cf24137bef8b4adb6f6&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Corporis, numquam ipsa ad! Quasi, deleniti quae sint consequatur error corporis dicta inventore alias soluta dignissimos? Molestias, quia ab deserunt repellat ut.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Second Post</title>
+      <link>http://test2.ryanchapman.com/posts/middle/</link>
+      <pubDate>Fri, 28 Mar 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.ryanchapman.com/posts/middle/</guid>
+      <description>
+
+&lt;h2 id=&#34;sample-post-1:5d41645769bc0f1237f2300a661d7e18&#34;&gt;Sample Post 1&lt;/h2&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+
+&lt;h3 id=&#34;sub-heading:5d41645769bc0f1237f2300a661d7e18&#34;&gt;Sub-heading&lt;/h3&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est, non, ratione, molestiae illo optio quia sequi id fuga natus nihil ad architecto dolor alias ex sunt iste aperiam eius itaque.&lt;/p&gt;
+
+&lt;h2 id=&#34;foo:5d41645769bc0f1237f2300a661d7e18&#34;&gt;foo&lt;/h2&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo, neque, eveniet voluptate eos debitis illum qui nostrum eius maxime ratione assumenda suscipit impedit deserunt voluptatibus odio ducimus non. Ex, ratione.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>First Post</title>
+      <link>http://test2.ryanchapman.com/posts/oldest/</link>
+      <pubDate>Thu, 27 Mar 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.ryanchapman.com/posts/oldest/</guid>
+      <description>
+
+&lt;h2 id=&#34;sample-post-1:5be75e971689338db5c820fd71089689&#34;&gt;Sample Post 1&lt;/h2&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+
+&lt;h3 id=&#34;sub-heading:5be75e971689338db5c820fd71089689&#34;&gt;Sub-heading&lt;/h3&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est, non, ratione, molestiae illo optio quia sequi id fuga natus nihil ad architecto dolor alias ex sunt iste aperiam eius itaque.&lt;/p&gt;
+
+&lt;h2 id=&#34;foo:5be75e971689338db5c820fd71089689&#34;&gt;foo&lt;/h2&gt;
+
+&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quo, neque, eveniet voluptate eos debitis illum qui nostrum eius maxime ratione assumenda suscipit impedit deserunt voluptatibus odio ducimus non. Ex, ratione.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

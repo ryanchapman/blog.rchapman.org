@@ -1,0 +1,11 @@
+---
+contentdir: "content"
+layoutdir: "layouts"
+publishdir: "public"
+indexes:
+  category: "categories"
+baseurl: "http://test2.ryanchapman.com"
+title: "Ryan A. Chapman"
+canonifyurls: true
+theme: "Lanyon"
+...
