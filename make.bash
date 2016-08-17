@@ -58,7 +58,7 @@ function deploy
     run hugo
     run cp CNAME public
     run git add -A
-    if [[ $# == 1 ]]; then
+    if ! git diff-index --cached --quiet HEAD --ignore-submodules; then
         git commit -m "changes"
     fi
     run git status
