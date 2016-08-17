@@ -7,5 +7,5 @@ indexes:
 baseurl: "http://test2.rchapman.org"
 title: "Ryan A. Chapman"
 canonifyurls: true
-theme: "Lanyon"
+theme: "ghostwriter"
 ...

@@ -50,7 +50,7 @@ function _run
 
 function local
 {
-    run hugo server
+    run hugo server --renderToDisk -v
 }
 
 function deploy
@@ -61,6 +61,7 @@ function deploy
     if [[ $# == 1 ]]; then
         git commit -m "changes"
     fi
+    run git status
     run git push origin master
     logit "Checking if we need to delete remote gh-pages branch"
     run git branch -r | grep gh-pages >/dev/null 
