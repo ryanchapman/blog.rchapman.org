@@ -17,11 +17,11 @@ disqusShortname = "blog-rchapman-org"
     intro = true
     headline = "blog.rchapman.org"
     description = ""
-    github = "https://github.com/XXX"
-    linkedin = "https://linkedin.com/in/XXX/"
-    gplus = "https://google.com/+XXX"
-    twitter = "https://twitter.com/XXX"
-    stackoverflow = "http://stackoverflow.com/users/XXX/YYY"
+    github = "https://github.com/ryanchapman"
+    linkedin = "https://linkedin.com/in/ryanachapman/"
+    gplus = "https://plus.google.com/u/0/116175235833210820781"
+    twitter = "https://twitter.com/ryanchapman"
+#    stackoverflow = "http://stackoverflow.com/users/XXX/YYY"
 
 [Permalinks]
     post = "/:year/:month/:day/:filename/"
