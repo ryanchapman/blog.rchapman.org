@@ -50,7 +50,8 @@ function _run
 
 function local
 {
-    run hugo server --renderToDisk -v
+    run hugo
+    run hugo server --baseUrl=http://localhost:1313/ --renderToDisk --verbose
 }
 
 function deploy

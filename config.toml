@@ -4,7 +4,7 @@ theme = "ghostwriter"
 languageCode = "en-us"
 copyright = "Ryan A. Chapman"
 googleAnalytics = "XXX"
-DisqusShortname = "blog-rchapman-org"
+disqusShortname = "blog-rchapman-org"
 
 [Author]
     name = "Ryan A. Chapman"

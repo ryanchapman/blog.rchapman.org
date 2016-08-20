@@ -223,7 +223,7 @@ DAP_TRACE: Username: rchapmandap, DAP_close: A4
 
 &lt;p&gt;On an ASA I help manage, the logs were full of messages like &amp;ldquo;Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4&amp;rdquo;.  A Land attack is defined as when a packet is received that has the same source and destination IP addresses.  Some definitions also say that the source and destination ports will match, but that was not true in my case.&lt;/p&gt;
 
-&lt;h2 id=&#34;reproducing-the-issue:ead1605ebea36965434aa7c8f30d2c49&#34;&gt;Reproducing the issue&lt;/h2&gt;
+&lt;h2 id=&#34;reproducing-the-issue&#34;&gt;Reproducing the issue&lt;/h2&gt;
 
 &lt;p&gt;To reproduce the issue, I first got my public IP address, which is 1.2.3.4&lt;/p&gt;
 
@@ -412,7 +412,7 @@ fw1/pri/act#
 
 &lt;p&gt;It is. Phase 4 of the packet trace shows a translation from &lt;tt&gt;172.16.230.24 / 33885&lt;/tt&gt; to &lt;tt&gt;1.2.3.4 / 33885&lt;/tt&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;the-fix:ead1605ebea36965434aa7c8f30d2c49&#34;&gt;The fix&lt;/h2&gt;
+&lt;h2 id=&#34;the-fix&#34;&gt;The fix&lt;/h2&gt;
 
 &lt;p&gt;Put a NONAT (NAT exemption) rule in place&lt;/p&gt;
 
