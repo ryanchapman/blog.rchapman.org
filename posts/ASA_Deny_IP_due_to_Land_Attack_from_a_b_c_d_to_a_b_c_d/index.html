@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.16-DEV" />
+        <meta name="generator" content="Hugo 0.17-DEV" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
@@ -103,7 +103,7 @@ ga('send', 'pageview');
 
 <p>On an ASA I help manage, the logs were full of messages like &ldquo;Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4&rdquo;.  A Land attack is defined as when a packet is received that has the same source and destination IP addresses.  Some definitions also say that the source and destination ports will match, but that was not true in my case.</p>
 
-<h2 id="reproducing-the-issue:ead1605ebea36965434aa7c8f30d2c49">Reproducing the issue</h2>
+<h2 id="reproducing-the-issue">Reproducing the issue</h2>
 
 <p>To reproduce the issue, I first got my public IP address, which is 1.2.3.4</p>
 
@@ -292,7 +292,7 @@ fw1/pri/act#
 
 <p>It is. Phase 4 of the packet trace shows a translation from <tt>172.16.230.24 / 33885</tt> to <tt>1.2.3.4 / 33885</tt></p>
 
-<h2 id="the-fix:ead1605ebea36965434aa7c8f30d2c49">The fix</h2>
+<h2 id="the-fix">The fix</h2>
 
 <p>Put a NONAT (NAT exemption) rule in place</p>
 
@@ -479,6 +479,26 @@ fw1/pri/act#
         </a>
     </div>
 </footer>
+        
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d\/';
+    var disqus_title = 'ASA: Deny IP due to Land Attack from a.b.c.d to a.b.c.d';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+        
     </article>
 </div>
 
