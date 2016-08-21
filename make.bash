@@ -58,6 +58,7 @@ function deploy
 {
     run hugo
     run cp CNAME public
+    run cp _config.yml public
     run git add -A
     if ! git diff-index --cached --quiet HEAD --ignore-submodules; then
         git commit -m "changes"
