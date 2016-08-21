@@ -17,7 +17,6 @@
       
       <guid>http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/</guid>
       <description>&lt;p&gt;&lt;em&gt;ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
-XXX
 
 &lt;p&gt;
 On the internets, I haven&#39;t been able to locate a list of Lua functions available for use with Dynamic Access Policies (DAP) on Cisco&#39;s ASA firewall. So I decided to just use Lua running on the ASA to tell me what functions and variables are in global scope.  Not quite as good as documentation, but it works for now.

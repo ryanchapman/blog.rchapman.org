@@ -21,6 +21,7 @@ disqusShortname = "blog-rchapman-org"
     linkedin = "https://linkedin.com/in/ryanachapman/"
     gplus = "https://plus.google.com/u/0/116175235833210820781"
     twitter = "https://twitter.com/ryanchapman"
+    blogsource = "https://github.com/ryanchapman/test2"
 #    stackoverflow = "http://stackoverflow.com/users/XXX/YYY"
 
 [Permalinks]
