@@ -1,0 +1,464 @@
+---
+redirect_from: /post/123062600894/troubleshooting-eap-tls-with-freeradius
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Troubleshooting EAP-TLS with freeradius &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Troubleshooting EAP-TLS with freeradius</h1>
+    
+    Published Thu, Jul 2, 2015<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <p><em>Ubuntu 14.04 (Linux 3.13.0-53), freeradius 2.1.12, wpa_supplicant 2.4, </em></p>
+
+<p>I'm in the process of setting up wifi to use one of the more secure authentication methods, EAP-TLS (well, more secure than WPA-PSK or WPA2-PSK). WPA-Enterprise with 802.1x using EAP-TLS uses the same mechanism that protects web sites, TLS.  Anyway, I followed the great instructions Thomas Hruska put together at http://cubicspot.blogspot.com/2013/04/setting-up-wpa2-enterprise-aes-with.html but it wouldn't work.  After figuring out the problem, I set out to document here the troubleshooting steps.</p>
+
+<p>First, I stopped freeradius with <code>service freeradius stop</code> and restarted it with <code>freeradius -X</code> (you can also start it with <code>freeradius -Xx</code> to get even more debugging info).</p>
+
+<p>Attempting authentication with a Windows computer was becoming time-consuming, so I downloaded wpa_supplicant and compiled the eapol_test program, which can simulate a client authentication attempt from the same machine freeradius is running on.</p>
+
+<p>
+To compile eapol_test:
+<ul>
+<li>Download wpa_supplicant
+<pre>root@freeradius-vagrant:/tmp# wget http://w1.fi/releases/wpa_supplicant-2.4.tar.gz
+--2015-07-02 16:17:56--  http://w1.fi/releases/wpa_supplicant-2.4.tar.gz
+Resolving w1.fi (w1.fi)... 212.71.239.96
+Connecting to w1.fi (w1.fi)|212.71.239.96|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 2525648 (2.4M) [application/x-gzip]
+Saving to: ‘wpa_supplicant-2.4.tar.gz’
+
+100%[=======================================================================================================================================>] 2,525,648    419KB/s   in 6.3s
+
+2015-07-02 16:18:03 (392 KB/s) - ‘wpa_supplicant-2.4.tar.gz’ saved [2525648/2525648]
+</pre>
+<li>Decompress
+<pre>
+root@freeradius-vagrant:/tmp# tar zxvf wpa_supplicant-2.4.tar.gz
+wpa_supplicant-2.4/
+wpa_supplicant-2.4/wpa_supplicant/
+wpa_supplicant-2.4/wpa_supplicant/wpas_glue.c
+[...]
+wpa_supplicant-2.4/wpa_supplicant/eapol_test.c
+[...]
+</pre>
+<li>Change to the wpa_supplicant directory where eapol_test.c lives
+<pre>
+root@freeradius-vagrant:/tmp# cd wpa_supplicant-2.4/wpa_supplicant/
+</pre>
+<li>Copy the default config to .config, which is where make(1) expects it to be
+<pre>
+root@freeradius-vagrant:/tmp/wpa_supplicant-2.4/wpa_supplicant# cp defconfig .config
+</pre>
+<li>Compile eapol_test
+<pre>root@freeradius-vagrant:/tmp/wpa_supplicant-2.4/wpa_supplicant# make eapol_test
+  CC  config.c
+  CC  notify.c
+[...]
+  CC  ../src/utils/ip_addr.c
+  LD  eapol_test
+</pre>
+<li>Copy eapol_test to root's home directory
+<pre>
+root@freeradius-vagrant:/tmp/wpa_supplicant-2.4/wpa_supplicant# cp eapol_test ~
+</pre>
+</ul>
+</p>
+
+<p>
+Now that you have the eapol_test binary compiled, you need a config file to feed to it.  Following Thomas' directory scheme (see above for his tutorial), we'll put it in /var/certs/freeradius/
+<pre>
+root@freeradius-vagrant:/tmp/wpa_supplicant-2.4/wpa_supplicant# cd /var/certs/freeradius/
+root@freeradius-vagrant:/var/certs/freeradius# USER_NAME=`grep emailAddress client.cnf | grep '@' | sed 's/.*=//;s/^ *//'`; PASSWORD_CLIENT=`grep output_password client.cnf | sed 's/.*=//;s/^ *//'`; cat <<EOF >eapol_test-eaptls.conf
+> network={
+>     ssid="DoesNotMatterForThisTest"
+>     key_mgmt=WPA-EAP
+>     eap-TLS
+>     identity="${USER_NAME}"
+>     ca_cert="/var/certs/freeradius/ca.pem"
+>     client_cert="/var/certs/freeradius/${USER_NAME}.pem"
+>     private_key="/var/certs/freeradius/client.key"
+>     private_key_passwd="${PASSWORD_CLIENT}"
+>     eapol_flags=3
+> }
+> EOF
+</pre>
+</p>
+
+<p>
+In a different terminal, start up freeradius with
+<pre>freeradius -X</pre>
+</p>
+
+<p>
+Attempt an authentication
+<pre>
+root@freeradius-vagrant:/var/certs/freeradius# ~/eapol_test -a10.0.2.15 -p1812 -sSEKRET -ceapol_test-eaptls.conf -r0
+Reading configuration file 'eapol_test-eaptls.conf'
+Line: 1 - start of a new network block
+ssid - hexdump_ascii(len=24):
+     44 6f 65 73 4e 6f 74 4d 61 74 74 65 72 46 6f 72   DoesNotMatterFor
+     54 68 69 73 54 65 73 74                           ThisTest
+key_mgmt: 0x1
+[...]
+EAP: deinitialize previously used EAP method (13, TLS) at EAP deinit
+ENGINE: engine deinit
+MPPE keys OK: 0  mismatch: 1
+FAILURE
+</pre>
+</p>
+
+<p>
+So we got a FAILURE.  Back in the freeradius window, I see that the cert could not be verified
+<pre>
+rlm_eap_tls: Certificate CN (rchapman@XXXX.com) fails external verification!
+[tls] chain-depth=0,
+[tls] error=0
+[tls] --> User-Name = rchapman@XXXXX.com
+[tls] --> BUF-Name = rchapman@XXXXX.com
+[tls] --> subject = /C=US/ST=Montana/O=XXXXX, Inc./CN=rchapman@XXXXX.com/emailAddress=rchapman@XXXXX.com
+[tls] --> issuer  = /C=US/ST=Montana/L=XXXXX/O=XXXXX, Inc./emailAddress=XXXXX@XXXXX.com/CN=XXXXX Wifi Certificate Authority
+[tls] --> verify return:0
+[tls] >>> TLS 1.0 Alert [length 0002], fatal certificate_unknown
+TLS Alert write:fatal:certificate unknown
+    TLS_accept: error in SSLv3 read client certificate B
+rlm_eap: SSL error error:140890B2:SSL routines:SSL3_GET_CLIENT_CERTIFICATE:no certificate returned
+SSL: SSL_read failed in a system call (-1), TLS session fails.
+TLS receive handshake failed during operation
+[tls] eaptls_process returned 4
+[eap] Handler failed in EAP/tls
+[eap] Failed in EAP select
+++[eap] returns invalid
+Failed to authenticate the user.
+Using Post-Auth-Type Reject
+# Executing group from file /etc/freeradius/sites-enabled/ruckusAP1
++- entering group REJECT {...}
+[attr_filter.access_reject]     expand: %{User-Name} -> rchapman@XXXXX.com
+attr_filter: Matched entry DEFAULT at line 11
+++[attr_filter.access_reject] returns updated
+Delaying reject of request 8 for 1 seconds
+Going to the next request
+Waking up in 0.9 seconds.
+Sending delayed reject for request 8
+Sending Access-Reject of id 8 to 10.0.2.15 port 34071
+    EAP-Message = 0x04080004
+    Message-Authenticator = 0x00000000000000000000000000000000
+</pre>
+</p>
+
+<p>I wonder why.  My certs are in /etc/freeradius
+<pre>
+root@freeradius-vagrant:/etc/freeradius/certs# ls -l
+total 4
+lrwxrwxrwx 1 root freerad  28 Jun 24 20:08 ca.pem -> /var/certs/freeradius/ca.pem
+-rw-r--r-- 1 root freerad 245 Jun 22 22:15 dh
+lrwxrwxrwx 1 root freerad  32 Jun 24 20:08 server.key -> /var/certs/freeradius/server.key
+lrwxrwxrwx 1 root freerad  32 Jun 24 20:08 server.pem -> /var/certs/freeradius/server.pem
+</pre>
+and they can be read by the freerad user (the user the freeradius daemon is running as)
+<pre>
+root@freeradius-vagrant:/etc/freeradius/certs# ls -l /var/certs/freeradius/ca.pem /var/certs/freeradius/server.key /var/certs/freeradius/server.pem
+-rw-r----- 1 root ssl-cert 2419 Jun 24 23:25 /var/certs/freeradius/ca.pem
+-rw-r----- 1 root ssl-cert 3394 Jun 24 23:26 /var/certs/freeradius/server.key
+-rw-r----- 1 root ssl-cert 5878 Jun 24 23:26 /var/certs/freeradius/server.pem
+</pre>
+The freerad user is a member of the ssl-cert group, so it can read the certs directory files ok
+<pre>
+root@freeradius-vagrant:/etc/freeradius/certs# groups freerad
+freerad : freerad shadow <b>ssl-cert</b>
+</pre>
+</p>
+
+<p>
+Next step is to travel down the rabbit hole of why freeradius cannot verify the client certificate.  I do know that freeradius relies on the openssl package to do cert verification, so maybe it is executing openssl.  If it is, then strace will catch the command freeradius is running.
+<pre>
+root@freeradius-vagrant:/etc/freeradius/certs# strace -eexecve -ttvfo /tmp/tt -s 1024 freeradius -X
+FreeRADIUS Version 2.1.12, for host x86_64-pc-linux-gnu, built on Feb 24 2014 at 14:57:57
+Copyright (C) 1999-2009 The FreeRADIUS server project and contributors.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+You may redistribute copies of FreeRADIUS under the terms of the
+GNU General Public License v2.
+Starting - reading configuration files ...
+[...]
+</pre>
+</p>
+
+<p>
+and execute eapol_test again
+<pre>
+root@freeradius-vagrant:/var/certs/freeradius# ~/eapol_test -a10.0.2.15 -p1812 -sSEKRET -ceapol_test-eaptls.conf -r0
+Reading configuration file 'eapol_test-eaptls.conf'
+Line: 1 - start of a new network block
+ssid - hexdump_ascii(len=24):
+     44 6f 65 73 4e 6f 74 4d 61 74 74 65 72 46 6f 72   DoesNotMatterFor
+     54 68 69 73 54 65 73 74                           ThisTest
+key_mgmt: 0x1
+[...]
+EAP: deinitialize previously used EAP method (13, TLS) at EAP deinit
+ENGINE: engine deinit
+MPPE keys OK: 0  mismatch: 1
+FAILURE
+</pre>
+</p>
+
+<p>
+Excellent, another failure
+</p>
+
+<p>
+Back in the window where freeradius and strace are running, looking at the file /tmp/tt where strace wrote all execve(2) system call invocations, I see that it did in fact execute openssl to verify the client cert.
+<pre>
+[...]
+Waking up in 1.0 seconds.
+Cleaning up request 8 ID 8 with timestamp +64
+Ready to process requests.
+^C
+root@freeradius-vagrant:/etc/freeradius/certs# cat /tmp/tt
+11101 21:18:50.164298 execve("/usr/sbin/freeradius", ["freeradius", "-X"], ["XDG_SESSION_ID=7", "SHELL=/bin/bash", "TERM=xterm-256color", "USER=root", "LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*"..., "MAIL=/var/mail/root", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "PWD=/etc/freeradius/certs", "LANG=en_US.UTF-8", "SHLVL=1", "HOME=/root", "LOGNAME=root", "LESSOPEN=| /usr/bin/lesspipe %s", "XDG_RUNTIME_DIR=/run/user/1000", "LESSCLOSE=/usr/bin/lesspipe %s %s", "_=/usr/bin/strace", "OLDPWD=/etc/freeradius"]) = 0
+11122 21:19:54.483582 <b>execve("/usr/bin/openssl", ["/usr/bin/openssl", "verify", "-CApath", "/etc/freeradius/certs", "/var/tmp/radiusd/freeradius.client.XXnZcbyR"]</b>, ["USER_NAME=\"rchapman@XXXXX.com\"", "NAS_IP_ADDRESS=127.0.0.1", "CALLING_STATION_ID=\"02-00-00-00-00-01\"", "FRAMED_MTU=1400", "NAS_PORT_TYPE=Wireless-802.11", "CONNECT_INFO=\"CONNECT 11Mbps 802.11b\"", "EAP_MESSAGE=0x020804420d002da2bc70b9dabd6e808364e70cce8f29bca839f5f3f8fa79ce502fccef2fa978810e659ad88b4ef09c854c505afba4ad58d46bb84868cbdc720899b49e4ce7cba798fa33fdd30691b4d076f6899b52a40bb2f887b82ddff9bbb0dc774ff3e04b5565d0340a626df5bf48cc4cddb06d551826199248d6e32f091b1f51d9878e83b49809c0e3524df0a7159e17fe7b0131fee3a1af74d81f8b655fcd275612ae2517835c6c408f14b0d849f33e1efdc3db483a832818a10eb783cb204bda90a7d7349ae660daaec59f78b1713028dc4a6e47e3c01eb43757b82d1fbfe90cec33dc0ba3f0936986b4cb1c9e3b939c64976634c3577a5b6c71", "EAP_MESSAGE=0x71265f3525c485df48f7816eb18dbf6f9a85561413c37283b3bb0dea51f8654122ee549c0a3f6fbbf5916cae5f9055bc19669da55005f21b827bf99dcfc5effbe38890a6f80231759786993a9e33288bcdb6d2838964d77513bd66eb303dafaa0ccbecf501f11f3b9e40d42b37b3e6c67ca154a5f9a129e72fd381e24e46d52cfedc970fbc9b28031b850eecf8ceca78c0eaf4bbae72c6b037e86f8e1150b2f799d0f587d029812d046e0b61b1d4d2726ee66dc31603010046100000424104acd3f28e5f69bdc07945db523a44066d74aa73648e448631f0eb67c11d6b5fc42f2e42f2fbfa9ee0d993f843bb2b756de1f8dfede848b6485834659d69ab", "EAP_MESSAGE=0x4c6e16030102060f0002020200d05242c896fd7ac6a483cde001e4ab4ba1de4e7d7340d618ba3b9e57419fc9b9d4d76cf9a7855bb81821b8469ec50e3c06475f71652c10e0f790d3f112236fbf82c14c2a4a4eeb8c7889bc517eff3768478a6099ea4c81a1133945a45afb6d3c031f034899edc9e93403a580ef8028cc5d2052559c747eb60d831a590c26e9ea748a89835f50de617ea8dfce6e9cd23fdfdcb9949bf1facfa907b1e11e06230e3a0fdf5230ddcfdc1962d394bfa373c6aab10e9e8e10574cec7c6fc5ca1f42cb4f8df2ce92cbfad6e2e10413795d5c2231dad82c30f485a641073e2267e5edfdae45ba62b923a19d2f0d7cf7641bdba1", "EAP_MESSAGE=0x883ed91d6b2e271940f9793025052b2270742cd0cdda10ff3d371af52dc7fd9e7f7259310fa9cb000f1dcc453413e2c203d5f26d50d002c88a3886f61128b214e7c9458af2b719fd37f07b91a09a407b4c72311a12d974cdd93b15675ac681d3c89981151cc6a4c6a4477a8e9dea42b388df96870980405f3af7ea73cfaa8cbf537941f8517e134cbb74dbf4e7658456f23f92a29440142b419c61b8a6be1a0e018a35f1924bd7a4763b476d3e9d9e2a6946ad6fc6f0dad9fb76b2ce305ccfbf3db1f22b19541d96148e46327f4790ad797673148c99d09d7e2e74cb6b3638c469e4950e75f3e26e721f9e17781c06c577be5a9ff68aee5ca66bdd7452", "EAP_MESSAGE=0x677a2de333d1ed17017156a3ad712576535db214030100010116030100302f898135f257599f9fdb3acc07d390f14d03057670c64c1a3faec01fa15cf11ba5b5642b20646e065d7d8b56ce7b7d9d", "STATE=0x91dd759796d5782502cfcac1e7c999b0", "MESSAGE_AUTHENTICATOR=0x6c6da037ca70fffeb5c047426910ce4f", "EAP_TYPE=EAP-TLS", "TLS_CLIENT_CERT_FILENAME=\"/var/tmp/radiusd/freeradius.client.XXnZcbyR\""]) = 0
+11122 21:19:54.487938 +++ exited with 2 +++
+11101 21:19:54.488045 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=11122, si_status=2, si_utime=0, si_stime=0} ---
+11101 21:21:39.983570 --- SIGINT {si_signo=SIGINT, si_code=SI_KERNEL, si_value={int=2, ptr=0x2}} ---
+11101 21:21:39.984023 +++ killed by SIGINT +++
+</pre>
+</p>
+
+<p>
+Now I can do the exact same thing freeradius did, by asking openssl to verify my client cert.  Let's see what it says
+<pre>
+root@freeradius-vagrant:/var/certs/freeradius# USER_NAME=`grep emailAddress client.cnf | grep '@' | sed 's/.*=//;s/^ *//'`; /usr/bin/openssl verify -CApath /etc/freeradius/certs ${USER_NAME}.pem
+rchapman@XXXX.com.pem: C = US, ST = Montana, O = "XXXXXX, Inc.", CN = rchapman@XXXXXX.com, emailAddress = rchapman@XXXX.com
+error 20 at 0 depth <b>lookup:unable to get local issuer certificate</b>
+</pre>
+</p>
+
+<p>
+Searching Google for <b>openssl unable to get local issuer certificate</b> returns the page <a href="https://www.openssl.org/docs/apps/verify.html">https://www.openssl.org/docs/apps/verify.html</a>.  That page is simply the man page for openssl verify, and the -CApath option tells me the problem and the solution:
+<pre>
+-CApath directory
+A directory of trusted certificates. <b>The certificates should have names of the form: hash.0 or have symbolic links to them of this form</b> ("hash" is the hashed certificate subject name: see the -hash option of the x509 utility). <b>Under Unix the c_rehash script will automatically create symbolic links to a directory of certificates</b>.
+</pre>
+</p>
+
+<p>
+It can't really be that simple.  Let's try running c_rehash in /etc/freeradius/certs
+<pre>
+root@freeradius-vagrant:/etc/freeradius/certs# c_rehash .
+Doing .
+server.pem => 6eacae23.0
+server.pem => d01a9214.0
+ca.pem => 433869d5.0
+ca.pem => c34814f6.0
+root@freeradius-vagrant:/etc/freeradius/certs# cd /var/certs/freeradius/
+root@freeradius-vagrant:/var/certs/freeradius# USER_NAME=`grep emailAddress client.cnf | grep '@' | sed 's/.*=//;s/^ *//'`; /usr/bin/openssl verify -CApath /etc/freeradius/certs ${USER_NAME}.pem
+rchapman@XXX.com.pem: <b>OK</b>
+</pre>
+</p>
+
+<p>
+Woohoo! That seems to be it.  Let's try a eapol_test again just to make sure
+<pre>
+root@freeradius-vagrant:/var/certs/freeradius# ~/eapol_test -a10.0.2.15 -p1812 -sSEKRET -ceapol_test-eaptls.conf -r0
+Reading configuration file 'eapol_test-eaptls.conf'
+Line: 1 - start of a new network block
+ssid - hexdump_ascii(len=24):
+     44 6f 65 73 4e 6f 74 4d 61 74 74 65 72 46 6f 72   DoesNotMatterFor
+     54 68 69 73 54 65 73 74                           ThisTest
+key_mgmt: 0x1
+[...]
+EAPOL: SUPP_PAE entering state AUTHENTICATED
+EAPOL: SUPP_BE entering state RECEIVE
+EAPOL: SUPP_BE entering state SUCCESS
+EAPOL: SUPP_BE entering state IDLE
+eapol_sm_cb: result=1
+EAPOL: Successfully fetched key (len=32)
+PMK from EAPOL - hexdump(len=32): 74 07 88 20 6e e5 a9 9c 21 33 d7 eb e3 3a 0b c2 f6 7a f7 98 a5 ff 3b fb 9d 4f 8b 49 ee 13 c6 93
+No EAP-Key-Name received from server
+EAP: deinitialize previously used EAP method (13, TLS) at EAP deinit
+ENGINE: engine deinit
+MPPE keys OK: 1  mismatch: 0
+SUCCESS
+</pre>
+</p>
+
+<p>
+Yep, it works now.
+</p>
+
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Troubleshooting%20EAP-TLS%20with%20freeradius&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fTroubleshooting_EAP-TLS_with_freeradius%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fTroubleshooting_EAP-TLS_with_freeradius%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fTroubleshooting_EAP-TLS_with_freeradius%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Troubleshooting_EAP-TLS_with_freeradius\/';
+    var disqus_title = 'Troubleshooting EAP-TLS with freeradius';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Troubleshooting_EAP-TLS_with_freeradius\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+

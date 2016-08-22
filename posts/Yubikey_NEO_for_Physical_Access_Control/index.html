@@ -1,9 +1,13 @@
+---
+redirect_from: /post/145951044949/yubikey-neo-for-physical-access-control
+---
+
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Ryan A. Chapman &middot; Ryan A. Chapman</title>
+        <title>Yubikey NEO for Physical Access Control &middot; Ryan A. Chapman</title>
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
@@ -87,23 +91,99 @@ ga('send', 'pageview');
             <div id="container">
 
 
-<div id="post-index" class="container" itemscope="" itemtype="http://schema.org/Blog">
-    
+<div class="container">
+    <article class="post-container">
         <header class="post-header">
-            <h1 class="post-title" itemprop="name">blog.rchapman.org</h1>
-            <p></p>
-        </header>
+    <h1 class="post-title">Yubikey NEO for Physical Access Control</h1>
+    
+    Published Wed, Jun 15, 2016<br/>
+</header>
+
+
+        <div class="post-content clearfix">
     
 
-    <ol class="post-list">
-        
-        
-    </ol>
+    <p>
+After discovering that many physical access control systems are not secure (for example, proximity cards based on 125kHz), I wanted to figure out if there was a system based on public key crypto, which would be secure.  Turns out there is.  The U.S. Government has been using physical access control systems based on public key crypto for years.  NIST designed the system and called it PIV for Personal Identity Verification.  Unfortunately, information on this technology is extremely hard to come by.  I started by trying to get info from the PIV card manufacturers, but found they have no interest in speaking to anyone unless they are purchasing a large quantity of cards.  Even though I had $1000 in hand I was willing to spend to get a PIV card software dev kit, my requests went unanswered.
+</p>
 
-    <div class="post-navigation">
-        
+<p>
+I continued to research options and realized that the YubiKey NEO is actually a Java Card, same as the PIV cards being used by government.  Yubico had the foresight to realize PIV could be useful, and they include a PIV applet with the NEO.  So after some reading of the NIST specs and some help from the excellent people at HID Global and Yubico, I was able to glue the pieces together and get a system working.  It's been a fun hobby for the past six months.
+</p>
 
+<p>
+It could probably be done with any number of vendor's solutions, but I used HID's pivCLASS system along with Genetec for the physical access control system.
+</p>
+
+<p>
+A full write-up with detailed instructions is available at https://docs.google.com/document/d/1fOFzxfpgi8P-HVRdtnWiTNGCDRgeXcvorEqoSXA_4sE
+</p>
+
+<p>
+Some code for generating the certificates and populating a YubiKey NEO can be found on <a href="https://github.com/ryanchapman/piv-pacs-poc">GitHub</a>.
+</p>
+
+<p>
+Video of the NEO opening a door protected by pivCLASS:<br/>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/i031nExD-LM" frameborder="0" allowfullscreen></iframe>
+</p>
+
+<p>
+I also made a video of a traditional PIV card opening the same pivCLASS system:<br/>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rCUCtAM5m8I" frameborder="0" allowfullscreen></iframe>
+</p>
+
+<p>
+Enjoy.  If you have questions or suggestions for improvement, please send me a message.
+</p>
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Yubikey%20NEO%20for%20Physical%20Access%20Control&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fYubikey_NEO_for_Physical_Access_Control%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fYubikey_NEO_for_Physical_Access_Control%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fYubikey_NEO_for_Physical_Access_Control%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
     </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Yubikey_NEO_for_Physical_Access_Control\/';
+    var disqus_title = 'Yubikey NEO for Physical Access Control';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Yubikey_NEO_for_Physical_Access_Control\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
 </div>
 
             </div>
@@ -136,3 +216,4 @@ ga('send', 'pageview');
         <script src="http://test2.rchapman.org/js/scripts.js"></script>
     </body>
 </html>
+

@@ -1,9 +1,13 @@
+---
+redirect_from: /post/82092881937/eclipse-remote-system-explorer-fails-to-connect-via-ssh
+---
+
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Ryan A. Chapman &middot; Ryan A. Chapman</title>
+        <title>Eclipse Remote System Explorer fails to connect via ssh with algorithm negotiation failure &middot; Ryan A. Chapman</title>
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
@@ -87,23 +91,108 @@ ga('send', 'pageview');
             <div id="container">
 
 
-<div id="post-index" class="container" itemscope="" itemtype="http://schema.org/Blog">
-    
+<div class="container">
+    <article class="post-container">
         <header class="post-header">
-            <h1 class="post-title" itemprop="name">blog.rchapman.org</h1>
-            <p></p>
-        </header>
+    <h1 class="post-title">Eclipse Remote System Explorer fails to connect via ssh with algorithm negotiation failure</h1>
+    
+    Published Tue, Apr 8, 2014<br/>
+</header>
+
+
+        <div class="post-content clearfix">
     
 
-    <ol class="post-list">
-        
-        
-    </ol>
+    <i>Windows 7 SP1, Java JRE 1.7.0_51-b13 (32-bit), Eclipse Kepler Service Release 2 build 20140224-0627, Eclipse Plugin RSE SSH Services 3.2.100.201305201712</i><br/><br/>
 
-    <div class="post-navigation">
-        
+If you use a Java IDE or any other Java program that makes ssh connections to a server that has anything over 128 bit encryption turned on, then you'll see that it fails with the error:
 
+<pre>
+    RSEG1066
+
+    Failed to connect sshd on HMSWEBXX01.ZZZ.LAN:22
+
+    Algorithm negotiation failed
+</pre>
+
+<p>
+By default, the Java Development Kit and Java Runtime Environment do not offer ciphers larger than 128 bits. To fix, all you need to do is download the strong encryption JAR files for your version of the JDK/JRE and restart your Java app.
+</p>
+
+<br/>
+<p>
+Java Cryptography Extension Unlimited Strength Downloads
+</p>
+
+<p>
+JDK/JRE 1.6<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html">http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html</a><br/><br/>
+
+JDK/JRE 1.7<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html">http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html</a><br/><br/>
+</p>
+<br/>
+
+<p>
+Copy <code>local_policy.jar</code> and <code>US_export_policy.jar</code> to your JRE/JDK's lib\security directory
+</p>
+
+<pre>
+Examples of possible destination folders:
+    JRE 1.6, 32-bit         C:\Program Files (x86)\Java\jre6\lib\security
+    JRE 1.7, 32-bit         C:\Program Files (x86)\Java\jre7\lib\security
+    JRE 1.6, 64-bit         C:\Program Files\Java\jre6\lib\security
+    JRE 1.7, 64-bit         C:\Program Files\Java\jre7\lib\security
+    JDK 1.7.0.51, 64-bit    C:\Program Files\Java\jdk1.7.0_51\jre\lib\security
+</pre>
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Eclipse%20Remote%20System%20Explorer%20fails%20to%20connect%20via%20ssh%20with%20algorithm%20negotiation%20failure&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fEclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fEclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fEclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
     </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure\/';
+    var disqus_title = 'Eclipse Remote System Explorer fails to connect via ssh with algorithm negotiation failure';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
 </div>
 
             </div>
@@ -136,3 +225,4 @@ ga('send', 'pageview');
         <script src="http://test2.rchapman.org/js/scripts.js"></script>
     </body>
 </html>
+

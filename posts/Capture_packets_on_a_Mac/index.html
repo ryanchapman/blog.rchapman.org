@@ -1,9 +1,13 @@
+---
+redirect_from: /post/4921798404/capture-packets-on-a-mac
+---
+
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Ryan A. Chapman &middot; Ryan A. Chapman</title>
+        <title>Capture packets on a Mac &middot; Ryan A. Chapman</title>
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
@@ -87,23 +91,68 @@ ga('send', 'pageview');
             <div id="container">
 
 
-<div id="post-index" class="container" itemscope="" itemtype="http://schema.org/Blog">
-    
+<div class="container">
+    <article class="post-container">
         <header class="post-header">
-            <h1 class="post-title" itemprop="name">blog.rchapman.org</h1>
-            <p></p>
-        </header>
+    <h1 class="post-title">Capture packets on a Mac</h1>
+    
+    Published Tue, Aug 26, 2008<br/>
+</header>
+
+
+        <div class="post-content clearfix">
     
 
-    <ol class="post-list">
-        
-        
-    </ol>
+    <i>Mac OS X 10.5.4</i><br /><br />For some reason, Wireshark keeps crashing X11 on my machine, so it isn't an option.  If you have the same problem, here is how to capture and decode HTTP traffic from the command line, using tcpdump:<br /><br /><tt>tcpdump -n -i en1 -s 0 -A port 80 and host www.yahoo.com</tt><br /><br /><p>Options:<br/><br /><table border=0><br /><tr><td>-n</td><td>Don't convert addresses to hostnames</td></tr><br /><tr><td>-i en1</td><td>Interface to listen on. en0 is the wired interface and en1 is the wireless on a MacBook Pro</td></tr><br /><tr><td>-s 0</td><td>Snarf the required length to catch whole packets</td></tr><br /><tr><td>-A</td><td>Print each packet (minus its link level header) in ASCII</td></tr><br /><tr><td>&lt;expr&gt;</td><td>Packet match expression.  My example of <tt>port 80 and host www.yahoo.com</tt> says to only print packets that have a source or destination port of 80 and a source or destination host of www.yahoo.com.  There are many other qualifiers, such as portrange, net, src, dst, inbound, outbound, ether, fddi, ip, ip6, arp, tcp, udp.  See the <a href="http://www.tcpdump.org/tcpdump_man.html">manual page</a> for more info. </td></tr><br /></table><br /><br />For more info, at the terminal, type <tt>man tcpdump</tt>&nbsp;</div>
 
-    <div class="post-navigation">
-        
 
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Capture%20packets%20on%20a%20Mac&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fCapture_packets_on_a_Mac%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fCapture_packets_on_a_Mac%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fCapture_packets_on_a_Mac%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
     </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Capture_packets_on_a_Mac\/';
+    var disqus_title = 'Capture packets on a Mac';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Capture_packets_on_a_Mac\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
 </div>
 
             </div>
@@ -136,3 +185,4 @@ ga('send', 'pageview');
         <script src="http://test2.rchapman.org/js/scripts.js"></script>
     </body>
 </html>
+

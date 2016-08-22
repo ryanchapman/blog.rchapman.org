@@ -1,9 +1,13 @@
+---
+redirect_from: /post/16690892045/create-eager-zero-hard-disks-from-powercli-powershell
+---
+
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Ryan A. Chapman &middot; Ryan A. Chapman</title>
+        <title>Create eager zero hard disks from PowerCLI (PowerShell) &middot; Ryan A. Chapman</title>
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
@@ -87,23 +91,78 @@ ga('send', 'pageview');
             <div id="container">
 
 
-<div id="post-index" class="container" itemscope="" itemtype="http://schema.org/Blog">
-    
+<div class="container">
+    <article class="post-container">
         <header class="post-header">
-            <h1 class="post-title" itemprop="name">blog.rchapman.org</h1>
-            <p></p>
-        </header>
+    <h1 class="post-title">Create eager zero hard disks from PowerCLI (PowerShell)</h1>
+    
+    Published Sun, Jan 29, 2012<br/>
+</header>
+
+
+        <div class="post-content clearfix">
     
 
-    <ol class="post-list">
-        
-        
-    </ol>
+    <p><em><em>Microsoft PowerShell 2.0, </em>VMware PowerCLI  5.0.0.3501, VMware ESXi 4.1.0</em></p>
+<p><strong>New-EagerZeroHardDisk</strong> is a PowerShell function I wrote to create hard disks that are eagerly scrubbed, meaning that ESX will create the hard disk in Thick format and then write zeroes to the disk.  The ESX SDK refers to this as eagerlyScrub, while other documents refer to the process as eagerzero.</p>
+<p>Zeroing disks at creation time <em>should</em> create a vmdk in a contiguous region on the physical hard disks, preventing fragmentation and seek times versus a hard disk that is thin.  <strike>I say <em>should</em>, but I'm not sure if this is true.  If you have knowledge on this, please leave a message in the comments.</strike> Update: according to a <a href="http://www.ntpro.nl/blog/archives/2233-Mythbusting-goes-virtual-Dutch-VMUG-2012.html">presentation given by Eric Sloof and Mattias Sundling on ntpro.nl</a>, eager zeroed disks have (slides 41-43) 651% faster throughput and 4.5x faster seeks than lazy zeroed disks.  Compared to thin provisioned disks, eagered zero disks have 632% faster throughput and 4.8x faster seeks.</p>
+<p>The function is available on github:</p>
+<p><a href="https://github.com/ryanchapman/vmware_scripts">https://github.com/ryanchapman/vmware_scripts</a></p>
+<p>git clone git@github.com:ryanchapman/vmware_scripts.git</p>
+<p>Once you clone the git repository, source the script in PowerShell with:</p>
+<pre>PS C:\TEMP\vmware_scripts&gt; . .\New-EagerZeroDisk.ps1</pre>
+<p>Documentation on the function can be had by using the help command:</p>
+<pre>PS C:\TEMP\vmware_scripts&gt; help New-EagerZeroHardDisk -Full</pre>
+<p> </p>
+<a href="http://farm8.staticflickr.com/7034/6781425441_c7ff4eab42_b.jpg"><img src="http://farm8.staticflickr.com/7034/6781425441_c7ff4eab42.jpg"></a>
 
-    <div class="post-navigation">
-        
 
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Create%20eager%20zero%20hard%20disks%20from%20PowerCLI%20%28PowerShell%29&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fCreate_eager_zero_hard_disks_from_PowerCLI_%2528PowerShell%2529%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fCreate_eager_zero_hard_disks_from_PowerCLI_%2528PowerShell%2529%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fCreate_eager_zero_hard_disks_from_PowerCLI_%2528PowerShell%2529%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
     </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Create_eager_zero_hard_disks_from_PowerCLI_%28PowerShell%29\/';
+    var disqus_title = 'Create eager zero hard disks from PowerCLI (PowerShell)';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Create_eager_zero_hard_disks_from_PowerCLI_%28PowerShell%29\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
 </div>
 
             </div>
@@ -136,3 +195,4 @@ ga('send', 'pageview');
         <script src="http://test2.rchapman.org/js/scripts.js"></script>
     </body>
 </html>
+

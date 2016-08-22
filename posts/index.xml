@@ -7,8 +7,540 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Ryan A. Chapman</copyright>
-    <lastBuildDate>Sat, 07 Nov 2015 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 22 Jun 2016 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://test2.rchapman.org/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>SSH with Yubikey NEO</title>
+      <link>http://test2.rchapman.org/posts/SSH_with_Yubikey_NEO/</link>
+      <pubDate>Wed, 22 Jun 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/SSH_with_Yubikey_NEO/</guid>
+      <description>&lt;p&gt;&lt;em&gt;&lt;/em&gt;YubiKey NEO, openssh 6.9, Mac OS X 10.11.5&lt;/p&gt;
+
+&lt;h2&gt;Using a YubiKey NEO to store your ssh private key&lt;/h2&gt;&lt;br/&gt;
+
+&lt;p&gt;
+Install opensc using brew or downloading a .dmg file from GitHub at &lt;a href=&#34;https://github.com/OpenSC/OpenSC/releases&#34;&gt;https://github.com/OpenSC/OpenSC/releases&lt;/a&gt;
+Find where the opensc-pkcs11 library is located.  Linux tends to name the file opensc-pkcs11.so.  Mac installs using brew also name the library file opensc-pkcs11.so.  Another possibility on Mac is opensc-pkcs11.dylib.
+&lt;pre&gt;
+$ find /Library /usr/local/Cellar /lib /lib64 /usr/lib /usr/lib64 -name opensc-pkcs11.dylib -o -name opensc-pkcs11.so 2&gt;/dev/null
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+So that ssh knows to use the YubiKey NEO for authentication, add the following to the top of your ~/.ssh/config file:
+&lt;pre&gt;
+PKCS11Provider /usr/local/Cellar/opensc/0.15.0/lib/opensc-pkcs11.so
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+If you generated the keypair on card rather than importing it, you&#39;ll need to get the public key off the YubiKey NEO so that you can copy it to remote ssh servers in your ~/.ssh/authorized_keys file:
+&lt;pre&gt;
+$ printf &#34;$(ssh-keygen -D /usr/local/Cellar/opensc/0.15.0/lib/opensc-pkcs11.so 2&gt;/dev/null) $USER-yubikey-1\n&#34;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+When attempting to ssh to a machine with your YubiKey public key in the authorized_keys file, you should be prompted to enter your YubiKey PIN, which will cause the YubiKey to sign the nonce (request) and send it back to the ssh server for login:
+&lt;pre&gt;
+$ ssh rchapman@cvs.initech.com
+Enter PIN for &#39;PIV_II (PIV Card Holder pin)&#39;:
+rchapman@cvs.initech.com:~$
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+The order that ssh looks for keys to use when logging into remote servers is:&lt;br/&gt;
+1. public key authentication: PKCS11Providers (for example, YubiKey NEO)&lt;br/&gt;
+2. public key authentication: ~/.ssh/id_dsa&lt;br/&gt;
+3. public key authentication: ~/.ssh/id_ecdsa&lt;br/&gt;
+4. public key authentication: ~/.ssh/id_rsa&lt;br/&gt;
+5. password authentication&lt;br/&gt;
+&lt;/p&gt;
+
+&lt;br/&gt;
+&lt;br/&gt;
+
+&lt;h2&gt;Making Multiple SSH Connections Without Having to Retype PIN Each Time&lt;/h2&gt;
+
+&lt;p&gt;
+Under normal circumstances, when you log into a remote server, the ssh daemon on the server generates a random nonce and sends that to the ssh client to be signed with the private key and the result transmitted back.  The ssh daemon then checks each public key in ~/.ssh/authorized_keys to see if any match.  If they do, you are allowed to log in.  If your private key is stored on disk (in ~/.ssh), then you never realize that a nonce is being signed and sent back to the ssh daemon.  By design, the YubiKey will require you to enter your PIN each time it signs a nonce.  This can become a nuisance when you need to log into the same server many many times (for example when using an automated script).  ssh has a feature called multiplexing which comes in handy when using a YubiKey for ssh authentication.  Once you have signed into a server via ssh, multiplexing will let your subsequent logins to the same machine succeed without having to re-enter the PIN.
+&lt;/p&gt;
+
+&lt;p&gt;
+To enable multiplexing, add this to your ~/.ssh/config file:
+&lt;pre&gt;
+Host *
+  ControlPath ~/.ssh/conns/%r@%h:%p
+  ControlMaster auto
+  ControlPersist 1
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+You&#39;ll need to create the directory multiplexing will use:
+&lt;pre&gt;
+$ mkdir -p ~/.ssh/conns/
+&lt;/pre&gt;
+&lt;/p&gt;
+
+</description>
+    </item>
+    
+    <item>
+      <title>Yubikey NEO for Physical Access Control</title>
+      <link>http://test2.rchapman.org/posts/Yubikey_NEO_for_Physical_Access_Control/</link>
+      <pubDate>Wed, 15 Jun 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Yubikey_NEO_for_Physical_Access_Control/</guid>
+      <description>&lt;p&gt;
+After discovering that many physical access control systems are not secure (for example, proximity cards based on 125kHz), I wanted to figure out if there was a system based on public key crypto, which would be secure.  Turns out there is.  The U.S. Government has been using physical access control systems based on public key crypto for years.  NIST designed the system and called it PIV for Personal Identity Verification.  Unfortunately, information on this technology is extremely hard to come by.  I started by trying to get info from the PIV card manufacturers, but found they have no interest in speaking to anyone unless they are purchasing a large quantity of cards.  Even though I had $1000 in hand I was willing to spend to get a PIV card software dev kit, my requests went unanswered.
+&lt;/p&gt;
+
+&lt;p&gt;
+I continued to research options and realized that the YubiKey NEO is actually a Java Card, same as the PIV cards being used by government.  Yubico had the foresight to realize PIV could be useful, and they include a PIV applet with the NEO.  So after some reading of the NIST specs and some help from the excellent people at HID Global and Yubico, I was able to glue the pieces together and get a system working.  It&#39;s been a fun hobby for the past six months.
+&lt;/p&gt;
+
+&lt;p&gt;
+It could probably be done with any number of vendor&#39;s solutions, but I used HID&#39;s pivCLASS system along with Genetec for the physical access control system.
+&lt;/p&gt;
+
+&lt;p&gt;
+A full write-up with detailed instructions is available at https://docs.google.com/document/d/1fOFzxfpgi8P-HVRdtnWiTNGCDRgeXcvorEqoSXA_4sE
+&lt;/p&gt;
+
+&lt;p&gt;
+Some code for generating the certificates and populating a YubiKey NEO can be found on &lt;a href=&#34;https://github.com/ryanchapman/piv-pacs-poc&#34;&gt;GitHub&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;p&gt;
+Video of the NEO opening a door protected by pivCLASS:&lt;br/&gt;
+&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/i031nExD-LM&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+I also made a video of a traditional PIV card opening the same pivCLASS system:&lt;br/&gt;
+&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/rCUCtAM5m8I&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Enjoy.  If you have questions or suggestions for improvement, please send me a message.
+&lt;/p&gt;
+
+</description>
+    </item>
+    
+    <item>
+      <title>Smart card: installing Hello World on a Gemalto IDPrime PIV 2.0 card</title>
+      <link>http://test2.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</link>
+      <pubDate>Wed, 10 Feb 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</guid>
+      <description>&lt;p&gt;&lt;em&gt;&lt;a href=&#34;https://github.com/martinpaljak/GlobalPlatformPro&#34;&gt;GlobalPlatformPro&lt;/a&gt;, &lt;a href=&#34;http://www.smartcardfocus.us/shop/ilp/id~680/gemalto-idprime-piv-card-v2/p/index.shtml&#34;&gt;Gemalto IDPrime PIV 2.0 card&lt;/a&gt;, &lt;a href=&#34;http://www.smartcardfocus.com/shop/ilp/id~478/gemalto-prox-du-idbridge-cl3000-/p/index.shtml&#34;&gt;Gemalto IDBridge CL3000 Dual Interface Smart Card Reader&lt;/a&gt;, Ubuntu 14.4&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;p&gt;
+Information on how to load your own applets onto a Gemalto PIV card are hard to come by, so below is a quick write up of how to do it.  This also gets you GlobalPlatform access to the card, which is difficult to figure out due to little documentation available on the key diversification used.  The spec sheet for the Gemalto IDPrime PIV 2.0 card can be found &lt;a href=&#34;http://www.gemalto.com/products/piv_card/download/IDPrime_PIV_Card_v2_0_SCP01_OTP_Data_Model_Samples.pdf&#34;&gt;here&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;p&gt;
+Make sure your smart card reader is attached. If it isn&#39;t you may have to restart pcscd to get it to show up:
+
+&lt;pre&gt;
+rchapman@vagrant-ubuntu-trusty-64:~$ opensc-tool -l
+No smart card readers found.
+
+rchapman@vagrant-ubuntu-trusty-64:~$ sudo service pcscd restart
+[sudo] password for rchapman:
+ * Restarting PCSC Lite resource manager pcscd                                                                                                 [ OK ]
+
+rchapman@vagrant-ubuntu-trusty-64:~$ opensc-tool -l
+# Detected readers (pcsc)
+Nr.  Card  Features  Name
+0    No              Gemalto Prox-DU [Prox-DU HID_15100775] 00 00
+1    Yes             Gemalto Prox-DU [Prox-DU HID_15100775] 00 01
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Download GlobalPlatformPro
+
+&lt;pre&gt;
+rchapman@vagrant-ubuntu-trusty-64:~$ wget https://github.com/martinpaljak/GlobalPlatformPro/releases/download/v0.3.6/gp.jar
+--2016-02-10 06:06:51--  https://github.com/martinpaljak/GlobalPlatformPro/releases/download/v0.3.6/gp.jar
+Resolving github.com (github.com)... 192.30.252.131
+Connecting to github.com (github.com)|192.30.252.131|:443... connected.
+[...]
+HTTP request sent, awaiting response... 200 OK
+Length: 995937 (973K) [application/octet-stream]
+Saving to: ‘gp.jar’
+
+100%[============================================================================================================&gt;] 995,937      915KB/s   in 1.1s
+
+2016-02-10 06:06:53 (915 KB/s) - ‘gp.jar’ saved [995937/995937]
+
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Make sure you can list the applets on the card.  Be careful, some cards will lock you out if you fail to authenticate to the card a certain number of times.  From my experience with the Gemalto card I bought from the Gemalto WEB store, it didn&#39;t lock me out even though it took me over a hundred attempts to get the auth working.  The key below works with the Gemalto IDPrime PIV 2.0 cards I purchased from the Gemalto WEB store as well as smartcardfocus.us.
+
+&lt;pre&gt;
+rchapman@vagrant-ubuntu-trusty-64:~$ java -jar ~/gp.jar -visa2 -key 47454D5850524553534F53414D504C45 -mode clr --list
+AID: A000000003000000 (|........|)
+     ISD INITIALIZED: Security Domain, Card lock, Card terminate, CVM (PIN) management
+
+AID: A000000308000010000100 (|...........|)
+     App SELECTABLE: Default selected, CVM (PIN) management
+
+AID: A000000308000010000200 (|...........|)
+     App SELECTABLE: CVM (PIN) management
+
+AID: A0000000620001 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000620002 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000620003 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000620101 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A000000062010101 (|....b...|)
+     ExM LOADED: (none)
+
+AID: A0000000620102 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000620201 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000030000 (|.......|)
+     ExM LOADED: (none)
+
+AID: A0000000620202 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A000000018100106 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100201 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100101 (|........|)
+     ExM LOADED: (none)
+     A000000018534441 (|.....SDA|)
+
+AID: A00000015100 (|....Q.|)
+     ExM LOADED: (none)
+
+AID: A000000018100108 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100109 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100401 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100402 (|........|)
+     ExM LOADED: (none)
+
+AID: A00000030800001000 (|.........|)
+     ExM LOADED: (none)
+     A000000308000010000100 (|...........|)
+     A000000308000010000200 (|...........|)
+
+rchapman@vagrant-ubuntu-trusty-64:~$
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Download gpshell to obtain the hello world applet, already compiled into a cap file:
+
+&lt;pre&gt;
+rchapman@vagrant-ubuntu-trusty-64:~$ curl -Lo gpshell.tar.gz &#39;http://downloads.sourceforge.net/project/globalplatform/GPShell/GPShell-1.4.4/gpshell-1.4.4.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fglobalplatform%2Ffiles%2FGPShell%2FGPShell-1.4.4%2F&amp;ts=1455092038&amp;use_mirror=superb-dca2&#39;
+[...]
+
+rchapman@vagrant-ubuntu-trusty-64:~$ tar zxvf gpshell.tar.gz
+[...]
+gpshell-1.4.4/helloworld.cap
+[...]
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Install the hello world applet:
+
+&lt;pre&gt;
+rchapman@vagrant-ubuntu-trusty-64:~$ java -jar ~/gp.jar -visa2 -key 47454D5850524553534F53414D504C45 -mode clr --install gpshell-1.4.4/helloworld.cap
+CAP loaded
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+List applets again to find AID (applet ID) of hello world.  It should be D0D1D2D3D4D501.
+
+&lt;pre&gt;
+rchapman@vagrant-ubuntu-trusty-64:~$ java -jar ~/gp.jar -visa2 -key 47454D5850524553534F53414D504C45 -mode clr --list | grep -A 4 &#39;AID: D0D1D2D3D4D501 &#39;
+AID: D0D1D2D3D4D501 (|.......|)
+     ExM LOADED: (none)
+     D0D1D2D3D4D50101 (|........|)
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Run the applet on the card by selecting the AID D0D1D2D3D4D501, then send any valid APDU (doesn&#39;t matter what it is, the app will always return &#34;Hello World!&#34;)
+
+&lt;pre&gt;
+rchapman@vagrant-ubuntu-trusty-64:~$ opensc-tool -s &#34;00 A4 04 00 07 D0 D1 D2 D3 D4 D5 01&#34; -s &#34;00:CB:3F:FF:05:5C:03:5F:C1:02:00&#34;
+Using reader with a card: Gemalto Prox-DU [Prox-DU HID_15100775] 00 01
+Sending: 00 A4 04 00 07 D0 D1 D2 D3 D4 D5 01
+Received (SW1=0x90, SW2=0x00)
+Sending: 00 CB 3F FF 05 5C 03 5F C1 02 00
+Received (SW1=0x90, SW2=0x00):
+48 65 6C 6C 6F 20 57 6F 72 6C 64 21 Hello World!
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+If you want to uninstall the applet from the card, run:
+
+&lt;pre&gt;
+rchapman@vagrant-ubuntu-trusty-64:~$ java -jar ~/gp.jar -visa2 -key 47454D5850524553534F53414D504C45 -mode clr --delete D0D1D2D3D4D501 --deletedeps
+rchapman@vagrant-ubuntu-trusty-64:~$
+&lt;/pre&gt;
+&lt;/p&gt;
+
+</description>
+    </item>
+    
+    <item>
+      <title>Securely allowing rancid to back up IOS configs</title>
+      <link>http://test2.rchapman.org/posts/Securely_allowing_rancid_to_back_up_IOS_configs/</link>
+      <pubDate>Wed, 25 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Securely_allowing_rancid_to_back_up_IOS_configs/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Cisco IOS-XE 3.7, rancid-git 2.3.9 on Ubuntu 14.4, git 1.9.1&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;
+I use rancid to back up configs of network devices, but giving an automated process like rancid full access to switches, routers, and firewalls is a horrible idea.  If someone breaks into the Linux rancid account (or wherever the rancid program runs), they pretty much own your network because the rancid scripts either have the password or ssh private key for logging into network devices.
+&lt;/p&gt;
+
+&lt;p&gt;
+You don&#39;t have to give rancid full access to IOS though.  You can configure a privilege level to provide just what rancid needs to backup the configs and nothing more.  There is still a security risk because rancid can see password hashes, so you should make sure your users use strong passwords.  You can just generate random strong passwords for users rather than letting them choose passwords.
+&lt;p&gt;
+
+&lt;p&gt;
+Configure privilege level 2 to allow only the commands rancid needs:
+&lt;pre&gt;
+
+privilege exec level 2 dir /all bootflash:
+privilege exec level 2 dir /all disk0:
+privilege exec level 2 dir /all disk1:
+privilege exec level 2 dir /all disk2:
+privilege exec level 2 dir /all harddisk:
+privilege exec level 2 dir /all harddiska:
+privilege exec level 2 dir /all harddiskb:
+privilege exec level 2 dir /all nvram:
+privilege exec level 2 dir /all sec-bootflash:
+privilege exec level 2 dir /all sec-disk0:
+privilege exec level 2 dir /all sec-disk1:
+privilege exec level 2 dir /all sec-disk2:
+privilege exec level 2 dir /all sec-nvram:
+privilege exec level 2 dir /all sec-slot0:
+privilege exec level 2 dir /all sec-slot1:
+privilege exec level 2 dir /all sec-slot2:
+privilege exec level 2 dir /all slavebootflash:
+privilege exec level 2 dir /all slavedisk0:
+privilege exec level 2 dir /all slavedisk1:
+privilege exec level 2 dir /all slavedisk2:
+privilege exec level 2 dir /all slavenvram:
+privilege exec level 2 dir /all slavenslot0:
+privilege exec level 2 dir /all slavenslot1:
+privilege exec level 2 dir /all slavenslot2:
+privilege exec level 2 dir /all slavesup-bootflash:
+privilege exec level 2 dir /all slavesup-slot0:
+privilege exec level 2 dir /all slavesup-slot1:
+privilege exec level 2 dir /all slavesup-slot2:
+privilege exec level 2 dir /all sup-bootdisk:
+privilege exec level 2 dir /all sup-bootflash:
+privilege exec level 2 dir /all sup-microcode:
+privilege exec level 2 more system:running-config
+privilege exec level 2 show boot
+privilege exec level 2 show bootvar
+privilege exec level 2 show c7200
+privilege exec level 2 show capture
+privilege exec level 2 show controllers
+privilege exec level 2 show controllers cbus
+privilege exec level 2 show crypto pki certificates
+privilege exec level 2 show debug
+privilege exec level 2 show diag
+privilege exec level 2 show diag chassis-info
+privilege exec level 2 show diagbus
+privilege exec level 2 show env all
+privilege exec level 2 show flash
+privilege exec level 2 show gsr chassis
+privilege exec level 2 show idprom backplane
+privilege exec level 2 show install active
+privilege exec level 2 show interface
+privilege exec level 2 show inventory raw
+privilege exec level 2 show ip interface
+privilege exec level 2 show ipv6 interface
+privilege exec level 2 show module
+privilege exec level 2 show redundancy secondary
+privilege exec level 2 show rsp chassis-info
+privilege exec level 2 show running-config
+privilege exec level 2 show running-config view full
+privilege exec level 2 show shun
+privilege exec level 2 show snmp engineID
+privilege exec level 2 show snmp mib ifmib ifindex
+privilege exec level 2 show spe version
+privilege exec level 2 show standby
+privilege exec level 2 show variables boot
+privilege exec level 2 show variables boot
+privilege exec level 2 show version
+privilege exec level 2 show vlan
+privilege exec level 2 show vlan-switch
+privilege exec level 2 show vtp status
+privilege exec level 2 write term
+&lt;/pre&gt;
+&lt;/p&gt;
+
+
+&lt;p&gt;
+Now create the rancid user, generate a random password for the account, and only allow the the account to sign in from 192.168.0.55
+
+&lt;pre&gt;
+access-list 95 permit 192.168.0.55
+username rancid privilege 2 access-class 95 secret 2NANyrnyxRJie1WtGjtTxcXnesLu
+ip ssh pubkey-chain
+ username rancid
+  key-string
+ssh-rsa AAAAB3[...]vv6X rancid
+  exit
+ exit
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+In my testing, this was enough for the rancid program (I use the git fork at https://github.com/dotwaffle/rancid-git) to download the configuration from IOS devices and push them to the git repo.
+&lt;/p&gt;
+
+</description>
+    </item>
+    
+    <item>
+      <title>Loading an openssh pubkey on Cisco IOS</title>
+      <link>http://test2.rchapman.org/posts/Loading_an_openssh_pubkey_on_Cisco_IOS/</link>
+      <pubDate>Sun, 22 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Loading_an_openssh_pubkey_on_Cisco_IOS/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Mac OS X 10.10.5, Cisco IOS-XE 3.7, JunOS 12.3R6.6&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;p&gt;
+I work primarily on a Mac and want to be able to ssh to Cisco IOS equipment with ssh keys; however, Cisco does not make it easy to load keys.  On JunOS, this is as easy as:
+
+&lt;pre&gt;
+Ryans-MacBook-Pro:~ $ ssh 1.2.3.4 -l rac
+--- JUNOS 12.3R6.6 built 2014-03-13 06:57:48 UTC
+{master:0}
+rac&gt; configure
+Entering configuration mode
+
+{master:0}[edit]
+rac# edit system login
+
+{master:0}[edit system login]
+rchapman# set user test class read-only authentication ssh-rsa &#34;AAAAB3NzaC1yc2EAAAADAQABAAABAQDDMRHIzELLQvj06gxqFnZn150T/OicDkBWwojNgSKdnOQIvEU/xu0LtlVUcZaVxVlZeVbm+UwsMdq1c/QuIsbINx18pRByPcwWWbI+4+du6kq8J6wi1qSD3bnBfGpHt2LG3liTTBHzvXFinWn1oB0BPq9q7zEUb2D1gBqyaurLdKs07DsC2T4xgNbJ1aQJFKP3qtfdTC8Fah7F46VK7eztUpPPJ/TEPxXBahwNxxUBnvYtEryhsOspLwVAtA9Uk5CnWt3q77pijtMj2p4gJ6zRKhMLFM0sWEoe98zyYkutlRkGlaLbR6c+0WpY5fuGdPsEibsVXqx/07OfvF6WAsb test@Ryans-MacBook-Pro.local&#34;
+
+{master:0}[edit system login]
+rchapman# commit check
+configuration check succeeds
+
+{master:0}[edit system login]
+rchapman# commit
+configuration check succeeds
+commit complete
+{master:0}[edit system login]
+rchapman# quit
+
+{master:0}[edit]
+rchapman# quit
+Exiting configuration mode
+
+{master:0}
+rchapman&gt; quit
+
+Connection to 1.2.3.4 closed.
+Ryans-MacBook-Pro:~ $
+Ryans-MacBook-Pro:~ $ ssh -i /tmp/id_rsa test@1.2.3.4
+--- JUNOS 12.3R6.6 built 2014-03-13 06:57:48 UTC
+{master:0}
+test&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Cisco IOS is a pain in comparison, requiring you to break the key up into lines of no more than 256 characters. When someone hands me their ssh pubkey, I don&#39;t want to have to manually break it up into appropriately sized lines, so I wrote a quick bash snippet to do it.  This snippet was tested and worked on Mac OS X as well as Ubuntu 14.4 Linux:
+
+&lt;pre&gt;
+IOS_USERNAME=test; KEYFILE=/tmp/id_rsa.pub LANG=C; IOS_PASSWORD=$(cat /dev/random | perl -pe &#39;s/[^A-Za-z0-9]//g&#39; | fold -w $((RANDOM%10+20)) | head -n 1); printf &#34;\nusername $IOS_USERNAME privilege 1 secret $IOS_PASSWORD\nip ssh pubkey-chain\n username $IOS_USERNAME\n  key-string\n&#34;; cat ${KEYFILE} | fold -w200 ; printf &#34;  exit\n exit\n\n&#34;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+That creates an account for the user test, with the pubkey file in /tmp/id_rsa.pub, a random length password (at least 20 characters, but less than 30) for password authentication, and a privilege level of 1. Change the priv to 15 if you want to have all privileges.  It splits the key up into lines that are a max of 200 characters just to be safe, even though the documentation says 256 is the max.
+
+&lt;pre&gt;
+rchapman@Chapmans-Macbook-Pro:/tmp$ IOS_USERNAME=test; KEYFILE=/tmp/id_rsa.pub LANG=C; IOS_PASSWORD=$(cat /dev/random | perl -pe &#39;s/[^A-Za-z0-9]//g&#39; | fold -w $((RANDOM%10+20)) | head -n 1); printf &#34;\nusername $IOS_USERNAME privilege 1 secret $IOS_PASSWORD\nip ssh pubkey-chain\n username $IOS_USERNAME\n  key-string\n&#34;; cat ${KEYFILE} | fold -w200 ; printf &#34;  exit\n exit\n\n&#34;
+
+username test privilege 1 secret 53L9rOkcyBcky4eZZpzxM
+ip ssh pubkey-chain
+ username test
+  key-string
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDMRHIzELLQvj06gxqFnZn150T/OicDkBWwojNgSKdnOQIvEU/xu0LtlVUcZaVxVlZeVbm+UwsMdq1c/QuIsbINx18pRByPcwWWbI+4+du6kq8J6wi1qSD3bnBfGpHt2LG3liTTBHzvXFinWn1oB0BPq9q7zEUb2D1
+gBqyaurLdKs07DsC2T4xgNbJ1aQJFKP3qtfdTC8Fah7F46VK7eztUpPPJ/TEPxXBahwNxxUB+nvYtEryhsOspLwVAtA9Uk5CnWt3q77pijtMj2p4gJ6zRKhMLFM0sWEoe98zyYkutlRkGlaLbR6c+0WpY5fuGdPsEibsVXqx/07OfvF6WAsb test@Ryans-MacBook-
+Pro.local
+  exit
+ exit
+
+rchapman@Chapmans-Macbook-Pro:/tmp$ ssh rac@1.2.3.4
+core1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+core1(config)#username test privilege 1 secret 73L7rOgmyBcky4eoZwzxF
+core1(config)#ip ssh pubkey-chain
+core1(conf-ssh-pubkey)# username test
+core1(conf-ssh-pubkey-user)#  key-string
+core1(conf-ssh-pubkey-data)#ssh AAAAB3NzaC1yc2EAAAADAQABAAABAQDDMRHIzELLQvj06gxqFnZn150T/OicDkBWwojNgSKdnOQIvEU/xu0LtlVUcZaVxVlZeVbm+UwsMdq1c/QuIsbINx18pRByPcwWWbI+4+du6kq8J6wi1qSD3bnBfGpHt2LG3liTTBHzvXFinWn1oB0BPq9q7zEUb2D1
+core1(conf-ssh-pubkey-data)#gBqyaurLdKs07DsC2T4xgNbJ1aQJFKP3qtfdTC8Fah7F46VK7eztUpPPJ/TEPxXBahwNxxUB+nvYtEryhsOspLwVAtA9Uk5CnWt3q77pijtMj2p4gJ6zRKhMLFM0sWEoe98zyYkutlRkGlaLbR6c+0WpY5fuGdPsEibsVXqx/07OfvF6WAsb test@Ryans-MacBook-
+core1(conf-ssh-pubkey-data)#Pro.local
+core1(conf-ssh-pubkey-data)#  exit
+core1(conf-ssh-pubkey-user)# exit
+core1(conf-ssh-pubkey)#exit
+core1(config)#exit
+core1#q
+Shared connection to 1.2.3.4 closed.
+Connection to 1.2.3.4 closed by remote host.
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Now to verify that it works:
+&lt;pre&gt;
+rac@Chapmans-Macbook-Pro:/tmp$ ssh -i /tmp/id_rsa test@1.2.3.4
+core1&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Yep. It works.
+&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>ASA: DAP LUA function list</title>
@@ -16,7 +548,7 @@
       <pubDate>Sat, 07 Nov 2015 00:00:00 +0000</pubDate>
       
       <guid>http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/</guid>
-      <description>&lt;p&gt;&lt;em&gt;ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+      <description>&lt;p&gt;&lt;em&gt;ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;
 On the internets, I haven&#39;t been able to locate a list of Lua functions available for use with Dynamic Access Policies (DAP) on Cisco&#39;s ASA firewall. So I decided to just use Lua running on the ASA to tell me what functions and variables are in global scope.  Not quite as good as documentation, but it works for now.
@@ -206,6 +738,83 @@ DAP_TRACE: Username: rchapmandap, DAP_close: A4
 &lt;/p&gt;
 
 &lt;p&gt;I&#39;m sure there is more info to be found, but this is all I have time for now.  If you find more, please share in the comments...&lt;/p&gt;
+
+</description>
+    </item>
+    
+    <item>
+      <title>ASA: debugging AnyConnect and radius</title>
+      <link>http://test2.rchapman.org/posts/ASA_debugging_AnyConnect_and_radius/</link>
+      <pubDate>Sun, 01 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/ASA_debugging_AnyConnect_and_radius/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Ubuntu 14.04 (Linux 3.13.0-48), freeradius 2.1.12, ASA 9.4.2 (which runs Lua 5.0.2), AnyConnect 4.2&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;p&gt;Setting up communications between an ASA and a radius server can be tricky, because it&#39;s hard to know what attributes the radius server is sending back and are being applied to a user session.  One method is to use wireshark to capture the communications between the ASA and radius server.  Another is to enable debugging on the ASA with &lt;tt&gt;debug dap trace&lt;/tt&gt;. An easier way is to just have the attributes printed out on the end-user device when they log in.&lt;/p&gt;
+
+&lt;p&gt;The dynamic access policy feature of the ASA will let you input Lua functions to get this information. Open ASDM and go to
+&lt;ul&gt;
+&lt;li&gt;Configuration&lt;/li&gt;
+&lt;li&gt;Remote Access VPN&lt;/li&gt;
+&lt;li&gt;Network (Client) Access&lt;/li&gt;
+&lt;li&gt;Dynamic Access Policies&lt;/li&gt;
+&lt;li&gt;Click Add&lt;/li&gt;
+&lt;li&gt;Policy Name: debug&lt;/li&gt;
+&lt;li&gt;Priority: 1 (or whatever works in your environment)&lt;/li&gt;
+&lt;li&gt;In the Selection Criteria area, click Advanced&lt;/li&gt;
+&lt;li&gt;Make sure AND is selected.  In the Logical Expressions box, enter:
+&lt;pre&gt;
+assert(function()
+
+  function print_table(tbl, prefix)
+     if (type(tbl) == &#34;table&#34;) then
+       for k,v in pairs(tbl) do
+         if (type(v) == &#34;table&#34;) then
+           print_table(v, prefix .. &#34;.&#34; .. k)
+         else
+           CheckAndMsg(true, prefix .. &#34;.&#34; .. k .. &#34;=\&#34;&#34; .. v .. &#34;\&#34;&#34;, &#34;&#34;)
+         end
+       end
+     end
+  end
+
+  CheckAndMsg(true, &#34;============&#34;, &#34;&#34;)
+  CheckAndMsg(true, &#34;DEBUG&#34;, &#34;&#34;)
+  print_table(aaa, &#34;aaa&#34;)
+  print_table(endpoint, &#34;endpoint&#34;)
+
+  return true
+
+end)()
+&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;Click OK to close the Add Dynamic Access Policy window, then click Apply&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Now, if you log in to AnyConnect on a device, you&#39;ll notice that a dropdown message box appears and shows you the values of the AV pairs.
+&lt;/p&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://farm6.staticflickr.com/5709/22071016164_aeab29f3b8_b.jpg&#34;&gt;&lt;img src=&#34;https://farm6.staticflickr.com/5709/22071016164_aeab29f3b8.jpg&#34;&gt;&lt;/a&gt;
+&lt;/p&gt;
+
+
+&lt;p&gt;
+You might want to be able to toggle the display of the debug message from a freeradius server.  That will allow you to turn it on when a user calls in and reports problems and you need to know what settings are being applied to their account.
+
+&lt;ul&gt;
+&lt;li&gt;On the freeradius server, change their user record and add &lt;tt&gt;Reply-Message = &#34;debug_print&#34;&lt;/tt&gt;.  Note that you could use any attribute you want, but I know that Reply-Message does work.
+&lt;pre&gt;
+test            Cleartext-Password := &#34;test123&#34;
+                Class = &#34;OU=Test_VPN;&#34;,
+                Reply-Message = &#34;debug_print&#34;
+&lt;/pre&gt;
+&lt;li&gt;Back in ASDM, go to the debug policy you created earlier and change it so that it only fires when &lt;tt&gt;Reply-Message = &#34;debug_print&#34;&lt;/tt&gt;
+&lt;a href=&#34;https://farm6.staticflickr.com/5655/22074947183_2a499cb747_b.jpg&#34;&gt;&lt;img src=&#34;https://farm6.staticflickr.com/5655/22074947183_2a499cb747.jpg&#34;&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;OK and Apply&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;
 
 </description>
     </item>
@@ -572,6 +1181,1717 @@ Action: allow
 fw1/pri/act#
 &lt;/code&gt;
 &lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Getting shell on a RouterBoard</title>
+      <link>http://test2.rchapman.org/posts/Getting_shell_on_a_RouterBoard/</link>
+      <pubDate>Tue, 08 Sep 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Getting_shell_on_a_RouterBoard/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Cloud Router Switch CRS125-24G-1S-RM, RouterOS 6.24, Mac OS X 10.8.5 (dhcpd/tftp running on Mac)&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;p&gt;Ever wondered if you could get a real shell on a RouterBoard? The answer is yes, yes you can. I recently wanted to know how RouterOS on a Mikrotik CRS125-24G-1S-RM actually sets up VLANs internally so that I can duplicate a complicated set up that I already have on a Ubiquiti EdgeRouter. Below is how to get a busybox shell via ssh or the console.  Once you are in, you&#39;ll see that the busybox included is pretty limited; however, you can upload a fully operational busybox via the RouterOS web admin interface (WebFig) and then execute that one.  With the new busybox, things like ifconfig, dmesg, ls, vconfig, and many more will work.&lt;/p&gt;
+
+&lt;p&gt;
+1. Choose a machine that you want to serve the openwrt boot image.
+&lt;/p&gt;
+
+&lt;p&gt;
+2. Configure your wired ethernet interface to have an IP address of 192.168.88.5 and a netmask of 255.255.255.0
+&lt;/p&gt;
+
+&lt;p&gt;
+3. Download the openwrt image I compiled for booting into a CRS125 from &lt;a href=&#34;https://github.com/ryanchapman/openwrt-mikrotik-crs125/raw/master/bin/ar71xx/openwrt-ar71xx-mikrotik-vmlinux-initramfs.elf&#34;&gt;https://github.com/ryanchapman/openwrt-mikrotik-crs125/raw/master/bin/ar71xx/openwrt-ar71xx-mikrotik-vmlinux-initramfs.elf&lt;/a&gt; into /Users/ryan/tftpboot/vmlinux
+&lt;/p&gt;
+
+&lt;p&gt;
+4. Modify your tftp plist file to look like this:&lt;br/&gt;
+&lt;pre&gt;
+Ryans-MacBook-Pro:~ ryan$ cat /System/Library/LaunchDaemons/tftp.plist
+&amp;lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&amp;gt;
+&amp;lt;!DOCTYPE plist PUBLIC &#34;-//Apple Computer//DTD PLIST 1.0//EN&#34; &#34;http://www.apple.com/DTDs/PropertyList-1.0.dtd&#34;&amp;gt;
+&amp;lt;plist version=&#34;1.0&#34;&amp;gt;
+&amp;lt;dict&amp;gt;
+    &amp;lt;key&gt;Disabled&amp;lt;/key&amp;gt;
+    &amp;lt;true/&amp;gt;
+    &amp;lt;key&amp;gt;Label&amp;lt;/key&amp;gt;
+    &amp;lt;string&amp;gt;com.apple.tftpd&amp;lt;/string&amp;gt;
+    &amp;lt;key&amp;gt;ProgramArguments&amp;lt;/key&amp;gt;
+    &amp;lt;array&amp;gt;
+        &amp;lt;string&amp;gt;/usr/libexec/tftpd&amp;lt;/string&amp;gt;
+        &amp;lt;string&amp;gt;-i&amp;lt;string&amp;gt;
+        &amp;lt;string&amp;gt;/Users/ryan/tftpboot&amp;lt;/string&amp;gt;
+    &amp;lt;/array&amp;gt;
+    &amp;lt;key&amp;gt;inetdCompatibility&amp;lt;/key&amp;gt;
+    &amp;lt;dict&amp;gt;
+        &amp;lt;key&amp;gt;Wait&amp;lt;/key&amp;gt;
+        &amp;lt;true/&amp;gt;
+    &amp;lt;/dict&amp;gt;
+    &amp;lt;key&amp;gt;InitGroups&amp;lt;/key&amp;gt;
+    &amp;lt;true/&amp;gt;
+    &amp;lt;key&amp;gt;Sockets&amp;lt;/key&amp;gt;
+    &amp;lt;dict&amp;gt;
+        &amp;lt;key&amp;gt;Listeners&amp;lt;/key&amp;gt;
+        &amp;lt;dict&amp;gt;
+            &amp;lt;key&amp;gt;SockServiceName&amp;lt;/key&amp;gt;
+            &amp;lt;string&amp;gt;tftp&amp;lt;/string&amp;gt;
+            &amp;lt;key&amp;gt;SockType&amp;lt;/key&amp;gt;
+            &amp;lt;string&amp;gt;dgram&amp;lt;/string&amp;gt;
+        &amp;lt;/dict&amp;gt;
+    &amp;lt;/dict&amp;gt;
+&amp;lt;/dict&amp;gt;
+&amp;lt;/plist&amp;gt;
+Ryans-MacBook-Pro:~ ryan$
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+5. Load the tftp plist file and start the tftp server:
+&lt;pre&gt;sudo launchctl load -F /System/Library/LaunchDaemons/tftp.plist
+sudo launchctl start com.apple.tftpd
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+6. Create a dhcpd config file
+&lt;pre&gt;Ryans-MacBook-Pro:~ ryan$ cat /etc/dhcpd.conf
+ddns-update-style interim;
+
+# option definitions common to all supported networks...
+#default-lease-time 600;
+default-lease-time 14400;
+max-lease-time 7200;
+authoritative;
+
+allow bootp;
+allow booting;
+
+subnet 192.168.88.0 netmask 255.255.255.0 {
+    filename &#34;vmlinux&#34;;
+    next-server 192.168.88.5;
+    range dynamic-bootp 192.168.88.15 192.168.88.254;
+}
+
+Ryans-MacBook-Pro:~ ryan$
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+7. Start the dhcp daemon with &lt;pre&gt;sudo dhcpd -d en0&lt;/pre&gt; (replace en0 with your wired ethernet interface on your Mac, use &lt;code&gt;ifconfig&lt;/code&gt; if unsure)
+&lt;pre&gt;Ryans-MacBook-Pro:~ ryan$ sudo dhcpd -d en0
+dyld: DYLD_ environment variables being ignored because main executable (/usr/bin/sudo) is setuid or setgid
+Internet Systems Consortium DHCP Server 4.1-ESV-R4
+Copyright 2004-2011 Internet Systems Consortium.
+All rights reserved.
+For info, please visit https://www.isc.org/software/dhcp/
+Wrote 3 leases to leases file.
+Listening on BPF/en0/00:XX:XX:XX:XX:XX/192.168.88.0/24
+Sending on   BPF/en0/00:XX:XX:XX:XX:XX/192.168.88.0/24
+Sending on   Socket/fallback/fallback-net
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+If you see output like above and no errors, exit dhcpd with &lt;b&gt;Ctrl-C&lt;/b&gt; then type &lt;code&gt;sudo dhcpd en0 &amp;&lt;/code&gt; to get it to run in the background.  You may have to press enter a few times to get a prompt to show up again.
+&lt;/p&gt;
+
+&lt;p&gt;
+8. Attach an ethernet cable to port 1 on the CRS125 and plug the other end into your Mac running dhcpd
+&lt;/p&gt;
+
+&lt;p&gt;
+9. Connect a cable to the console port of the CRS125 and the other end to a serial port on your Mac (I&#39;m using a Asunflower FTDI USB-to-console cable which you can find on Amazon for less than $20)
+&lt;/p&gt;
+
+&lt;p&gt;
+10. Install kermit with &lt;code&gt;brew install kermit&lt;/code&gt; (visit http://brew.sh if you don&#39;t have brew)
+&lt;/p&gt;
+
+&lt;p&gt;
+11. Start kermit and connect to the console port.
+&lt;pre&gt;
+Ryans-MacBook-Pro:~ ryan$ ls -l /dev/tty.usbserial*
+crw-rw-rw-  1 root  wheel   33,  10 Sep  7 23:34 /dev/tty.usbserial-AL00B1FN
+Ryans-MacBook-Pro:~ ryan$
+Ryans-MacBook-Pro:~ ryan$ kermit
+C-Kermit 9.0.302 OPEN SOURCE:, 20 Aug 2011, for Mac OS X 10.8.2 (64-bit)
+ Copyright (C) 1985, 2011,
+  Trustees of Columbia University in the City of New York.
+Type ? or HELP for help.
+(/Users/ryan/) C-Kermit&gt;set line /dev/tty.usbserial-AL00B1FN
+(/Users/ryan/) C-Kermit&gt;set speed 115200
+/dev/tty.usbserial-AL00B1FN, 115200 bps
+(/Users/ryan/) C-Kermit&gt;set carrier-watch off
+(/Users/ryan/) C-Kermit&gt;connect
+Connecting to /dev/tty.usbserial-AL00B1FN, speed 115200
+ Escape character: Ctrl-\ (ASCII 28, FS): enabled
+Type the escape character followed by C to get back,
+or followed by ? to see other options.
+----------------------------------------------------
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+12. Now power on your MikroTik CRS125.  You&#39;ll have to press any key when prompted on boot to change the boot order, so be ready.  You&#39;ll change the boot order by pressing &lt;code&gt;o&lt;/code&gt;, &lt;code&gt;e&lt;/code&gt;, &lt;code&gt;x&lt;/code&gt; as you&#39;ll see below.
+&lt;pre&gt;
+----------------------------------------------------
+(/Users/ryan/) C-Kermit&gt;conn
+Connecting to /dev/tty.usbserial-AL00B1FN, speed 115200
+ Escape character: Ctrl-\ (ASCII 28, FS): enabled
+Type the escape character followed by C to get back,
+or followed by ? to see other options.
+----------------------------------------------------
+
+
+RouterBOOT booter 3.19
+
+CRS125-24G-1S
+
+CPU frequency: 600 MHz
+ Memory speed: 200 MHz
+  Memory size: 128 MiB
+    NAND size: 128 MiB
+
+Press any key within 2 seconds to enter setup
+
+RouterBOOT-3.19
+What do you want to configure?
+   d - boot delay
+   k - boot key
+   s - serial console
+   n - silent boot
+   o - boot device
+   f - cpu frequency
+   r - reset booter configuration
+   e - format nand
+   w - repartition nand
+   g - upgrade firmware
+   i - board info
+   p - boot protocol
+   b - booter options
+   t - do memory testing
+   x - exit setup
+your choice: o - boot device
+
+Select boot device:
+   e - boot over Ethernet
+   n - boot from NAND, if fail then Ethernet
+   1 - boot Ethernet once, then NAND
+ * o - boot from NAND only
+   b - boot chosen device
+   f - boot Flash Configure Mode
+   3 - boot Flash Configure Mode once, then NAND
+your choice: e - boot over Ethernet
+
+RouterBOOT-3.19
+What do you want to configure?
+   d - boot delay
+   k - boot key
+   s - serial console
+   n - silent boot
+   o - boot device
+   f - cpu frequency
+   r - reset booter configuration
+   e - format nand
+   w - repartition nand
+   g - upgrade firmware
+   i - board info
+   p - boot protocol
+   b - booter options
+   t - do memory testing
+   x - exit setup
+your choice: x - exit setup
+
+
+writing settings to flash... OK
+
+
+RouterBOOT booter 3.19
+
+CRS125-24G-1S
+
+CPU frequency: 600 MHz
+ Memory speed: 200 MHz
+  Memory size: 128 MiB
+    NAND size: 128 MiB
+
+Press any key within 2 seconds to enter setup..
+trying bootp protocol................... OK
+Got IP address: 192.168.88.16
+resolved mac address 00:XX:XX:XX:XX:XX
+transfer started .............................*............ transfer ok, time=3.01s
+setting up elf image... OK
+jumping to kernel code
+[    0.000000] Linux version 4.1.6 (root@ny-monitor) (gcc version 4.8.3 (OpenWrt/Linaro GCC 4.8-2014.04 r46796) ) #10 Sun Sep 6 04:19:18 EDT 2015
+[    0.000000] bootconsole [early0] enabled
+[    0.000000] CPU0 revision is: 0001974c (MIPS 74Kc)
+[    0.000000] SoC: Atheros AR9344 rev 2
+[    0.000000] Determined physical RAM map:
+[    0.000000]  memory: 08000000 @ 00000000 (usable)
+[    0.000000] User-defined physical RAM map:
+[    0.000000]  memory: 08000000 @ 00000000 (usable)
+[    0.000000] Initrd not found or empty - disabling initrd
+[    0.000000] Zone ranges:
+[    0.000000]   Normal   [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] Primary instruction cache 64kB, VIPT, 4-way, linesize 32 bytes.
+[    0.000000] Primary data cache 32kB, 4-way, VIPT, cache aliases, linesize 32 bytes
+[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 32512
+[    0.000000] Kernel command line: lcd_ctrl=84 parts=1 boot_part_size=4194304 gpio=233019 HZ=300000000 mem=128M kmac=4C:5E:0C:99:E3:9D board=crs125g ver=3.19 boot=1 mlc=7 console=ttyS0,115200 root=/dev/mtdblock2 rootfstype=squashfs,yaffs,jffs2 noinitrd rootfstype=yaffs noinitrd
+[    0.000000] PID hash table entries: 512 (order: -1, 2048 bytes)
+[    0.000000] Dentry cache hash table entries: 16384 (order: 4, 65536 bytes)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 3, 32768 bytes)
+[    0.000000] Writing ErrCtl register=00000000
+[    0.000000] Readback ErrCtl register=00000000
+[    0.000000] Memory: 124004K/131072K available (2516K kernel code, 152K rwdata, 532K rodata, 2104K init, 184K bss, 7068K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=32, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] NR_IRQS:83
+[    0.000000] Clocks: CPU:600.000MHz, DDR:400.000MHz, AHB:400.000MHz, Ref:25.000MHz
+[    0.000000] clocksource MIPS: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 6370868154 ns
+[    0.000009] sched_clock: 32 bits at 300MHz, resolution 3ns, wraps every 7158278654ns
+[    0.008003] Calibrating delay loop... 299.82 BogoMIPS (lpj=1499136)
+[    0.080747] pid_max: default: 32768 minimum: 301
+[    0.085611] Mount-cache hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.092366] Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.102438] clocksource jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.113071] NET: Registered protocol family 16
+[    0.119033] MIPS: machine is RouterBOARD CRS125-24G-1S
+[    0.354096] Switched to clocksource MIPS
+[    0.359362] NET: Registered protocol family 2
+[    0.364633] TCP established hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.371756] TCP bind hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.378331] TCP: Hash tables configured (established 1024 bind 1024)
+[    0.384913] UDP hash table entries: 256 (order: 0, 4096 bytes)
+[    0.390867] UDP-Lite hash table entries: 256 (order: 0, 4096 bytes)
+[    0.397620] NET: Registered protocol family 1
+[    2.745167] futex hash table entries: 256 (order: -1, 3072 bytes)
+[    2.765559] io scheduler noop registered
+[    2.769538] io scheduler deadline registered (default)
+[    2.775165] Serial: 8250/16550 driver, 1 ports, IRQ sharing disabled
+[    2.782051] console [ttyS0] disabled
+[    2.805831] serial8250.0: ttyS0 at MMIO 0x18020000 (irq = 11, base_baud = 1562500) is a 16550A
+[    2.814658] console [ttyS0] enabled
+[    2.814658] console [ttyS0] enabled
+[    2.821803] bootconsole [early0] disabled
+[    2.821803] bootconsole [early0] disabled
+[    2.834338] nand: device found, Manufacturer ID: 0x98, Chip ID: 0xf1
+[    2.840909] nand: Toshiba NAND 128MiB 3,3V 8-bit
+[    2.845703] nand: 128 MiB, SLC, erase size: 128 KiB, page size: 2048, OOB size: 64
+[    2.853560] Scanning device for bad blocks
+[    2.952681] Creating 3 MTD partitions on &#34;ar934x-nfc&#34;:
+[    2.958010] 0x000000000000-0x000000040000 : &#34;booter&#34;
+[    2.964028] 0x000000040000-0x000000400000 : &#34;kernel&#34;
+[    2.969968] 0x000000400000-0x000008000000 : &#34;rootfs&#34;
+[    2.976146] mtd: device 2 (rootfs) set to be root filesystem
+[    2.983880] mtdsplit: no squashfs found in &#34;rootfs&#34;
+[    2.989578] mtdsplit: no squashfs found in &#34;ar934x-nfc&#34;
+[    3.032821] libphy: ag71xx_mdio: probed
+[    3.625988] eth0: Atheros AG71xx at 0xb9000000, irq 4, mode:RGMII
+[    3.633482] NET: Registered protocol family 17
+[    3.638221] bridge: automatic filtering via arp/ip/ip6tables has been deprecated. Update your scripts to load br_netfilter if you need this.
+[    3.651371] 8021q: 802.1Q VLAN Support v1.8
+[    3.668454] Freeing unused kernel memory: 2104K (80382000 - 80590000)
+[    3.688113] init: Console is alive
+[    3.691857] init: - watchdog -
+[    3.717323] usbcore: registered new interface driver usbfs
+[    3.723071] usbcore: registered new interface driver hub
+[    3.728703] usbcore: registered new device driver usb
+[    3.739186] ehci_hcd: USB 2.0 &#39;Enhanced&#39; Host Controller (EHCI) Driver
+[    3.747402] ehci-platform: EHCI generic platform driver
+[    3.755732] ohci_hcd: USB 1.1 &#39;Open&#39; Host Controller (OHCI) Driver
+[    3.763327] ohci-platform: OHCI generic platform driver
+[    4.695771] init: - preinit -
+[    4.841933] eth0: link up (1000Mbps/Full duplex)
+Press the [f] key and hit [enter] to enter failsafe mode
+Press the [1], [2], [3] or [4] key and hit [enter] to select the debug level
+[    7.988790] eth0: link down
+[    8.001903] procd: - early -
+[    8.005573] procd: - watchdog -
+[    8.552079] procd: - ubus -
+[    9.557472] random: ubusd urandom read with 79 bits of entropy available
+[    9.575446] procd: - init -
+Please press Enter to activate this console.
+[   10.215886] NET: Registered protocol family 10
+[   10.227637] ip6_tables: (C) 2000-2006 Netfilter Core Team
+[   10.246244] Loading modules backported from Linux version master-2015-07-21-0-g47cd203
+[   10.254477] Backport generated by backports.git backports-20150626-0-gc1a4168
+[   10.264958] ip_tables: (C) 2000-2006 Netfilter Core Team
+[   10.280582] nf_conntrack version 0.5.0 (1970 buckets, 7880 max)
+[   10.323471] xt_time: kernel timezone is -0000
+[   10.347230] cfg80211: World regulatory domain updated:
+[   10.352542] cfg80211:  DFS Master region: unset
+[   10.357082] cfg80211:   (start_freq - end_freq @ bandwidth), (max_antenna_gain, max_eirp), (dfs_cac_time)
+[   10.367154] cfg80211:   (2402000 KHz - 2472000 KHz @ 40000 KHz), (N/A, 2000 mBm), (N/A)
+[   10.375429] cfg80211:   (2457000 KHz - 2482000 KHz @ 40000 KHz), (N/A, 2000 mBm), (N/A)
+[   10.383690] cfg80211:   (2474000 KHz - 2494000 KHz @ 20000 KHz), (N/A, 2000 mBm), (N/A)
+[   10.391962] cfg80211:   (5170000 KHz - 5250000 KHz @ 80000 KHz, 160000 KHz AUTO), (N/A, 2000 mBm), (N/A)
+[   10.401765] cfg80211:   (5250000 KHz - 5330000 KHz @ 80000 KHz, 160000 KHz AUTO), (N/A, 2000 mBm), (0 s)
+[   10.411565] cfg80211:   (5490000 KHz - 5730000 KHz @ 160000 KHz), (N/A, 2000 mBm), (0 s)
+[   10.419921] cfg80211:   (5735000 KHz - 5835000 KHz @ 80000 KHz), (N/A, 2000 mBm), (N/A)
+[   10.428194] cfg80211:   (57240000 KHz - 63720000 KHz @ 2160000 KHz), (N/A, 0 mBm), (N/A)
+[   10.511024] PPP generic driver version 2.4.2
+[   10.518067] NET: Registered protocol family 24
+[   17.616533] eth0: link up (1000Mbps/Full duplex)
+[   17.644699] device eth0 entered promiscuous mode
+[   17.650592] IPv6: ADDRCONF(NETDEV_UP): br-lan: link is not ready
+[   18.604159] br-lan: port 1(eth0) entered forwarding state
+[   18.609787] br-lan: port 1(eth0) entered forwarding state
+[   18.644161] IPv6: ADDRCONF(NETDEV_CHANGE): br-lan: link becomes ready
+[   20.604107] br-lan: port 1(eth0) entered forwarding state
+[   40.374123] random: nonblocking pool is initialized
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+12. Press enter and you&#39;ll be greeted with the OpenWRT prompt:
+&lt;pre&gt;
+
+BusyBox v1.23.2 (2015-09-05 23:54:48 EDT) built-in shell (ash)
+
+  _______                     ________        __
+ |       |.-----.-----.-----.|  |  |  |.----.|  |_
+ |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
+ |_______||   __|_____|__|__||________||__|  |____|
+          |__| W I R E L E S S   F R E E D O M
+ -----------------------------------------------------
+ CHAOS CALMER (Bleeding Edge, r46796)
+ -----------------------------------------------------
+  * 1 1/2 oz Gin            Shake with a glassful
+  * 1/4 oz Triple Sec       of broken ice and pour
+  * 3/4 oz Lime Juice       unstrained into a goblet.
+  * 1 1/2 oz Orange Juice
+  * 1 tsp. Grenadine Syrup
+ -----------------------------------------------------
+root@OpenWrt:/#
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+13. Create a temporary mount directory at /mnt2
+&lt;pre&gt;
+root@OpenWrt:/# mkdir -p /mnt2
+root@OpenWrt:/#
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+14. Mount the flash chip on the CRS125 into the directory /mnt2
+&lt;pre&gt;
+root@OpenWrt:/# mount /dev/mtdblock2 /mnt2
+[  297.951244] yaffs: dev is 32505858 name is &#34;mtdblock2&#34; rw
+[  297.956880] yaffs: passed flags &#34;&#34;
+root@OpenWrt:/#
+root@OpenWrt:/# ls -l /mnt2
+drwxrwxr-x    1 root     root          2048 Feb  5  2014 bin
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 boot
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 etc
+drwx------    1 root     root          2048 Sep  4 14:50 lost+found
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 nova
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 rw
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 var
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+15. Touch the file &lt;code&gt;/mnt2/nova/etc/devel-login&lt;/code&gt;.  Credit goes to the person at r00t.cz for discovering this.  See &lt;a href=&#34;www.r00t.cz/Misc/MikrotikBackdoor&#34;&gt;www.r00t.cz/Misc/MikrotikBackdoor&lt;/a&gt; for more info.
+&lt;pre&gt;
+root@OpenWrt:/# touch /mnt2/nova/etc/devel-login
+root@OpenWrt:/# ls -l /mnt2/nova/etc/
+-rw-r--r--    1 root     root             0 Sep  4 14:53 devel-login
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+16. Unmount /mnt2 and reboot
+&lt;pre&gt;
+root@OpenWrt:/# umount /mnt2
+root@OpenWrt:/# reboot
+root@OpenWrt:/# [  466.597039] br-lan: port 1(eth0) entered disabled state
+[  466.614340] device eth0 left promiscuous mode
+[  466.618891] br-lan: port 1(eth0) entered disabled state
+[  466.628785] eth0: link down
+[  466.633361] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[  470.815364] reboot: Restarting system
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+17. Change the boot order back to boot from NAND
+&lt;pre&gt;
+RouterBOOT booter 3.19
+
+CRS125-24G-1S
+
+CPU frequency: 600 MHz
+ Memory speed: 200 MHz
+  Memory size: 128 MiB
+    NAND size: 128 MiB
+
+Press any key within 2 seconds to enter setup
+
+RouterBOOT-3.19
+What do you want to configure?
+   d - boot delay
+   k - boot key
+   s - serial console
+   n - silent boot
+   o - boot device
+   f - cpu frequency
+   r - reset booter configuration
+   e - format nand
+   w - repartition nand
+   g - upgrade firmware
+   i - board info
+   p - boot protocol
+   b - booter options
+   t - do memory testing
+   x - exit setup
+your choice: o - boot device
+
+Select boot device:
+ * e - boot over Ethernet
+   n - boot from NAND, if fail then Ethernet
+   1 - boot Ethernet once, then NAND
+   o - boot from NAND only
+   b - boot chosen device
+   f - boot Flash Configure Mode
+   3 - boot Flash Configure Mode once, then NAND
+your choice: o - boot from NAND only
+
+RouterBOOT-3.19
+What do you want to configure?
+   d - boot delay
+   k - boot key
+   s - serial console
+   n - silent boot
+   o - boot device
+   f - cpu frequency
+   r - reset booter configuration
+   e - format nand
+   w - repartition nand
+   g - upgrade firmware
+   i - board info
+   p - boot protocol
+   b - booter options
+   t - do memory testing
+   x - exit setup
+your choice: x - exit setup
+
+
+writing settings to flash... OK
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+18. The CRS125 will boot again, but this time it will boot RouterOS that is on NAND.  If you see an error message, unplug the CRS125 from power and plug it back in for a fresh boot.  If all goes well, you&#39;ll see a RouterOS login:
+&lt;pre&gt;
+MikroTik 6.24
+MikroTik Login:
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+19. Log in with the username &#39;devel&#39;.  For the password, use the same password as is on the &#39;admin&#39; account, which by default is empty (as in nothing, just press enter):
+&lt;pre&gt;
+MikroTik 6.24
+MikroTik Login: devel
+Password:
+
+
+BusyBox v1.00 (2014.12.09-08:43+0000) Built-in shell (ash)
+Enter &#39;help&#39; for a list of built-in commands.
+
+#
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+20. Interestingly, the BusyBox provided by RouterOS is extremely limited.  It doesn&#39;t even have the &lt;code&gt;ls&lt;/code&gt; command
+&lt;pre&gt;
+# ls
+bash: ls: not found
+#
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+21. No worries, &lt;code&gt;echo *&lt;/code&gt; does the same thing:
+&lt;pre&gt;
+# echo *
+MikroTik-19700102-0016.backup auto-before-reset.backup autosupout.old.rif autosupout.rif pub skins
+# pwd
+/flash/rw/pckg
+#
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+22. This is pretty hard to use, so download a precompiled busybox for the mips architecture that has more applets enabled.
+Download http://www.busybox.net/downloads/binaries/latest/busybox-mips to your Mac
+&lt;/p&gt;
+
+&lt;p&gt;
+23. Log into WebFig by visiting http://192.168.88.1/
+&lt;/p&gt;
+
+&lt;p&gt;
+24. Go to Files on the left hand side, and beside Upload:, press the &lt;b&gt;Choose File&lt;/b&gt; button.  Select the busybox binary you downloaded in step 21.
+&lt;/p&gt;
+
+&lt;p&gt;
+25. Back in the RouterOS console, move busybox to /flash/bin because that is already in the PATH environment variable.  Also set the executable bit on busybox-mips so we can run it
+&lt;pre&gt;
+# echo $PATH
+/sbin:/flash//bin:/bin
+#
+#
+# echo *
+MikroTik-19700102-0016.backup auto-before-reset.backup autosupout.old.rif autosupout.rif busybox-mips pub skins
+#
+# mv busybox-mips /flash/bin
+#
+# cd /flash/bin/
+# chmod +x /flash/bin/busybox-mips
+#
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+26. Now if you run busybox-mips from any directory, you&#39;ll get a list of available applets in this busybox executable
+&lt;pre&gt;
+# busybox-mips
+BusyBox v1.16.1 (2010-03-29 11:53:01 CDT) multi-call binary.
+Copyright (C) 1998-2009 Erik Andersen, Rob Landley, Denys Vlasenko
+and others. Licensed under GPLv2.
+See source distribution for full notice.
+
+Usage: busybox [function] [arguments]...
+   or: function [arguments]...
+
+    BusyBox is a multi-call binary that combines many common Unix
+    utilities into a single executable.  Most people will create a
+    link to busybox for each function they wish to use and BusyBox
+    will act like whatever it was invoked as.
+
+Currently defined functions:
+    [, [[, acpid, addgroup, adduser, adjtimex, arp, arping, ash, awk,
+    basename, bbconfig, beep, blkid, brctl, bunzip2, bzcat, bzip2, cal,
+    cat, catv, chat, chattr, chgrp, chmod, chown, chpasswd, chpst, chroot,
+    chrt, chvt, cksum, clear, cmp, comm, cp, cpio, crond, crontab, cryptpw,
+    cttyhack, cut, date, dc, dd, deallocvt, delgroup, deluser, depmod,
+    devmem, df, dhcprelay, diff, dirname, dmesg, dnsd, dnsdomainname,
+    dos2unix, dpkg, dpkg-deb, du, dumpkmap, dumpleases, echo, ed, egrep,
+    eject, env, envdir, envuidgid, ether-wake, expand, expr, fakeidentd,
+    false, fbset, fbsplash, fdflush, fdformat, fdisk, fgrep, find, findfs,
+    flashcp, fold, free, freeramdisk, fsck, fsck.minix, fsync, ftpd,
+    ftpget, ftpput, fuser, getopt, getty, grep, gunzip, gzip, halt, hd,
+    hdparm, head, hexdump, hostid, hostname, httpd, hush, hwclock, id,
+    ifconfig, ifdown, ifenslave, ifplugd, ifup, inetd, init, insmod,
+    install, ionice, ip, ipaddr, ipcalc, ipcrm, ipcs, iplink, iproute,
+    iprule, iptunnel, kbd_mode, kill, killall, killall5, klogd, lash, last,
+    length, less, linux32, linux64, linuxrc, ln, loadfont, loadkmap,
+    logger, login, logname, logread, losetup, lpd, lpq, lpr, ls, lsattr,
+    lsmod, lspci, lsusb, lzmacat, lzop, lzopcat, makedevs, makemime, man,
+    md5sum, mdev, mesg, microcom, mkdir, mkdosfs, mkfifo, mkfs.minix,
+    mkfs.reiser, mkfs.vfat, mknod, mkpasswd, mkswap, mktemp, modprobe,
+    more, mount, mountpoint, msh, mt, mv, nameif, nc, netstat, nice,
+    nmeter, nohup, nslookup, ntpd, od, openvt, passwd, pgrep, pidof, ping,
+    ping6, pipe_progress, pivot_root, pkill, popmaildir, poweroff,
+    printenv, printf, ps, pscan, pwd, raidautorun, rdate, rdev, readahead,
+    readlink, readprofile, realpath, reboot, reformime, renice, reset,
+    resize, rm, rmdir, rmmod, route, rpm, rpm2cpio, rtcwake, run-parts,
+    runlevel, runsv, runsvdir, rx, script, scriptreplay, sed, sendmail,
+    seq, setarch, setconsole, setfont, setkeycodes, setlogcons, setsid,
+    setuidgid, sh, sha1sum, sha256sum, sha512sum, showkey, slattach, sleep,
+    softlimit, sort, split, start-stop-daemon, stat, strings, stty, su,
+    sulogin, sum, sv, svlogd, swapoff, swapon, switch_root, sync, sysctl,
+    syslogd, tac, tail, tar, tcpsvd, tee, telnet, telnetd, test, tftp,
+    tftpd, time, timeout, top, touch, tr, traceroute, traceroute6, true,
+    tty, ttysize, tunctl, udhcpc, udhcpd, udpsvd, umount, uname,
+    uncompress, unexpand, uniq, unix2dos, unlzma, unlzop, unzip, uptime,
+    usleep, uudecode, uuencode, vconfig, vi, vlock, volname, wall, watch,
+    watchdog, wc, wget, which, who, whoami, xargs, yes, zcat, zcip
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+27. The next part is a pain.  You have to create a symbolic link for each applet you want to be able to use. For example, if you want &lt;code&gt;ls&lt;/code&gt; to work, make sure you are in the &lt;/code&gt;/flash/bin&lt;/code&gt; directory and create a symlink for &lt;code&gt;ls&lt;/code&gt; pointing to &lt;code&gt;busybox-mips&lt;/code&gt;
+&lt;pre&gt;
+# pwd
+/flash/bin
+# ln -s busybox-mips ls
+#
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+28. Now &lt;code&gt;ls&lt;/code&gt; works
+&lt;pre&gt;
+# ls
+busybox-mips  ls
+#
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+29. Let&#39;s do the same for some other interesting commands on a router:
+&lt;pre&gt;
+# ln -s busybox-mips ifconfig
+# ln -s busybox-mips brctl
+# ln -s busybox-mips ps
+# ln -s busybox-mips top
+# ln -s busybox-mips netstat
+# ln -s busybox-mips lspci
+# ln -s busybox-mips route
+# ln -s busybox-mips grep
+# ln -s busybox-mips strings
+# ln -s busybox-mips less
+#
+# ifconfig
+br0       Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9D
+          inet addr:192.168.88.1  Bcast:192.168.88.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:2058 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1081 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:1859490 (1.7 MiB)  TX bytes:534258 (521.7 KiB)
+
+br1       Link encap:Ethernet  HWaddr 00:00:00:00:00:00
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:40 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:4180 (4.0 KiB)
+
+eth0      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9D
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:2075 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1685 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:1903564 (1.8 MiB)  TX bytes:579157 (565.5 KiB)
+
+eth1      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9E
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth10     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A7
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth11     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A8
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth12     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A9
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth13     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AA
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth14     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AB
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth15     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AC
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth16     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AD
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth17     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AE
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth18     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AF
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth19     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B0
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth2      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9F
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth20     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B1
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth21     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B2
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth22     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B3
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth23     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B4
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth24     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B5
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth3      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A0
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth4      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A1
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth5      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A2
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth6      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A3
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth7      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A4
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth8      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A5
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth9      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A6
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:3584  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+switch0   Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
+          UP RUNNING NOARP  MTU:1500  Metric:1
+          RX packets:2070 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1685 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:1913988 (1.8 MiB)  TX bytes:592477 (578.5 KiB)
+
+vlan30    Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9D
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:40 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:4500 (4.3 KiB)
+
+#
+# brctl show
+bridge name bridge id       STP enabled interfaces
+br0     0000.000000000000   yes     eth0
+br1     0000.000000000000   yes
+#
+#
+# ps a
+PID   USER     TIME   COMMAND
+    1 root      17:10 /init
+    2 root       6:30 [kthreadd]
+    3 root      36:47 [ksoftirqd/0]
+    4 root       0:12 [kworker/0:0]
+    5 root     212:23 [kworker/u:0]
+    6 root       0:08 [khelper]
+    7 root      15:36 [kdevtmpfs]
+    8 root       0:04 [netns]
+    9 root       6:00 [sync_supers]
+   10 root       0:38 [bdi-default]
+   11 root       0:08 [kblockd]
+   12 root       0:00 [kswapd0]
+   13 root       0:47 [fsnotify_mark]
+   14 root       0:04 [crypto]
+   18 root       0:00 [mtdblock0]
+   19 root       0:00 [mtdblock1]
+   20 root       0:04 [mtdblock2]
+   21 root     1844:1 [kworker/0:1]
+   31 root       0:08 [kworker/u:1]
+   85 root       0:47 catlog -fs -n 10 backtrace
+  103 root       0:04 [btest]
+  177 root     165:25 /nova/bin/loader
+  189 root       8:01 /nova/bin/mproxy
+  190 root       4:09 /nova/bin/log
+  191 root       2:34 /nova/bin/moduler
+  192 root      44:57 /nova/bin/resolver
+  193 root       2:30 /nova/bin/mactel
+  194 root      38:34 /nova/bin/bridge2
+  195 root       2:13 /nova/bin/macping
+  197 root     130:42 /nova/bin/net
+  198 root      77:48 /nova/bin/sys2
+  199 root       4:17 /nova/bin/btest
+  200 root      10:22 /nova/bin/route
+  202 root       2:00 /nova/bin/sermgr
+  203 root       0:25 /nova/bin/diskd
+  205 root      39:43 /nova/bin/led
+  206 root       2:17 /nova/bin/quickset
+  207 root     276:01 /nova/bin/lcdstat
+  215 root      35:17 /nova/bin/www
+  237 root       1:43 [khubd]
+  304 root      13:10 bash
+  336 root       0:38 [flush-31:1]
+  365 root       0:04 ps a
+#
+#
+# netstat -anp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:8291            0.0.0.0:*               LISTEN      189/mproxy
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      215/www
+tcp        0      0 0.0.0.0:2000            0.0.0.0:*               LISTEN      199/btest
+tcp        0      0 0.0.0.0:21              0.0.0.0:*               LISTEN      202/sermgr
+tcp        0      0 0.0.0.0:53              0.0.0.0:*               LISTEN      192/resolver
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      202/sermgr
+tcp        0      0 0.0.0.0:23              0.0.0.0:*               LISTEN      202/sermgr
+tcp        0      0 0.0.0.0:8728            0.0.0.0:*               LISTEN      202/sermgr
+tcp        0      0 0.0.0.0:8729            0.0.0.0:*               LISTEN      202/sermgr
+netstat: /proc/net/tcp6: No such file or directory
+udp        0      0 0.0.0.0:5678            0.0.0.0:*                           197/net
+udp        0      0 0.0.0.0:53              0.0.0.0:*                           192/resolver
+netstat: /proc/net/udp6: No such file or directory
+netstat: /proc/net/raw6: No such file or directory
+Active UNIX domain sockets (servers and established)
+Proto RefCnt Flags       Type       State         I-Node PID/Program name    Path
+unix  2      [ ACC ]     STREAM     LISTENING        381 177/loader          /ram/novasock
+unix  2      [ ACC ]     STREAM     LISTENING        479 190/log             /ram/logsocket
+unix  3      [ ]         STREAM     CONNECTED        663 190/log             /ram/logsocket
+unix  3      [ ]         STREAM     CONNECTED        662 197/net
+unix  3      [ ]         STREAM     CONNECTED        629 190/log             /ram/logsocket
+unix  3      [ ]         STREAM     CONNECTED        628 200/route
+unix  3      [ ]         STREAM     CONNECTED        527 190/log             /ram/logsocket
+unix  3      [ ]         STREAM     CONNECTED        526 198/sys2
+unix  3      [ ]         STREAM     CONNECTED        502 215/www
+unix  3      [ ]         STREAM     CONNECTED        501 177/loader
+unix  3      [ ]         STREAM     CONNECTED        423 207/lcdstat
+unix  3      [ ]         STREAM     CONNECTED        422 177/loader
+unix  3      [ ]         STREAM     CONNECTED        421 206/quickset
+unix  3      [ ]         STREAM     CONNECTED        420 177/loader
+unix  3      [ ]         STREAM     CONNECTED        419 205/led
+unix  3      [ ]         STREAM     CONNECTED        418 177/loader
+unix  3      [ ]         STREAM     CONNECTED        415 203/diskd
+unix  3      [ ]         STREAM     CONNECTED        414 177/loader
+unix  3      [ ]         STREAM     CONNECTED        413 202/sermgr
+unix  3      [ ]         STREAM     CONNECTED        412 177/loader
+unix  3      [ ]         STREAM     CONNECTED        409 200/route
+unix  3      [ ]         STREAM     CONNECTED        408 177/loader
+unix  3      [ ]         STREAM     CONNECTED        407 199/btest
+unix  3      [ ]         STREAM     CONNECTED        406 177/loader
+unix  3      [ ]         STREAM     CONNECTED        405 198/sys2
+unix  3      [ ]         STREAM     CONNECTED        404 177/loader
+unix  3      [ ]         STREAM     CONNECTED        403 197/net
+unix  3      [ ]         STREAM     CONNECTED        402 177/loader
+unix  3      [ ]         STREAM     CONNECTED        399 195/macping
+unix  3      [ ]         STREAM     CONNECTED        398 177/loader
+unix  3      [ ]         STREAM     CONNECTED        397 194/bridge2
+unix  3      [ ]         STREAM     CONNECTED        396 177/loader
+unix  3      [ ]         STREAM     CONNECTED        395 193/mactel
+unix  3      [ ]         STREAM     CONNECTED        394 177/loader
+unix  3      [ ]         STREAM     CONNECTED        393 192/resolver
+unix  3      [ ]         STREAM     CONNECTED        392 177/loader
+unix  3      [ ]         STREAM     CONNECTED        391 191/moduler
+unix  3      [ ]         STREAM     CONNECTED        390 177/loader
+unix  3      [ ]         STREAM     CONNECTED        389 190/log
+unix  3      [ ]         STREAM     CONNECTED        388 177/loader
+unix  3      [ ]         STREAM     CONNECTED        387 189/mproxy
+unix  3      [ ]         STREAM     CONNECTED        386 177/loader
+#
+#
+# lspci
+#
+# lspci -h
+lspci: invalid option -- h
+BusyBox v1.16.1 (2010-03-29 11:53:01 CDT) multi-call binary.
+
+Usage: lspci [-mk]
+
+List all PCI devices
+
+    -m  Parseable output
+    -k  Show driver
+
+# lspci -k
+#
+#
+# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.88.0    0.0.0.0         255.255.255.0   U     0      0        0 br0
+#
+#
+# strings /nova/bin/resolver | grep dnsmasq
+#
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Hmm, I always thought the DNS resolver on MikroTik was dnsmasq under the covers.  Guess not.
+&lt;/p&gt;
+
+&lt;p&gt;There you go.  Root shell on a MikroTik, step-by-step.  If you uncover interesting details about the underlying system, be sure to let me know.&lt;/p&gt;
+
+
+</description>
+    </item>
+    
+    <item>
+      <title>Troubleshooting EAP-TLS with freeradius</title>
+      <link>http://test2.rchapman.org/posts/Troubleshooting_EAP-TLS_with_freeradius/</link>
+      <pubDate>Thu, 02 Jul 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Troubleshooting_EAP-TLS_with_freeradius/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Ubuntu 14.04 (Linux 3.13.0-53), freeradius 2.1.12, wpa_supplicant 2.4, &lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;I&#39;m in the process of setting up wifi to use one of the more secure authentication methods, EAP-TLS (well, more secure than WPA-PSK or WPA2-PSK). WPA-Enterprise with 802.1x using EAP-TLS uses the same mechanism that protects web sites, TLS.  Anyway, I followed the great instructions Thomas Hruska put together at http://cubicspot.blogspot.com/2013/04/setting-up-wpa2-enterprise-aes-with.html but it wouldn&#39;t work.  After figuring out the problem, I set out to document here the troubleshooting steps.&lt;/p&gt;
+
+&lt;p&gt;First, I stopped freeradius with &lt;code&gt;service freeradius stop&lt;/code&gt; and restarted it with &lt;code&gt;freeradius -X&lt;/code&gt; (you can also start it with &lt;code&gt;freeradius -Xx&lt;/code&gt; to get even more debugging info).&lt;/p&gt;
+
+&lt;p&gt;Attempting authentication with a Windows computer was becoming time-consuming, so I downloaded wpa_supplicant and compiled the eapol_test program, which can simulate a client authentication attempt from the same machine freeradius is running on.&lt;/p&gt;
+
+&lt;p&gt;
+To compile eapol_test:
+&lt;ul&gt;
+&lt;li&gt;Download wpa_supplicant
+&lt;pre&gt;root@freeradius-vagrant:/tmp# wget http://w1.fi/releases/wpa_supplicant-2.4.tar.gz
+--2015-07-02 16:17:56--  http://w1.fi/releases/wpa_supplicant-2.4.tar.gz
+Resolving w1.fi (w1.fi)... 212.71.239.96
+Connecting to w1.fi (w1.fi)|212.71.239.96|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 2525648 (2.4M) [application/x-gzip]
+Saving to: ‘wpa_supplicant-2.4.tar.gz’
+
+100%[=======================================================================================================================================&gt;] 2,525,648    419KB/s   in 6.3s
+
+2015-07-02 16:18:03 (392 KB/s) - ‘wpa_supplicant-2.4.tar.gz’ saved [2525648/2525648]
+&lt;/pre&gt;
+&lt;li&gt;Decompress
+&lt;pre&gt;
+root@freeradius-vagrant:/tmp# tar zxvf wpa_supplicant-2.4.tar.gz
+wpa_supplicant-2.4/
+wpa_supplicant-2.4/wpa_supplicant/
+wpa_supplicant-2.4/wpa_supplicant/wpas_glue.c
+[...]
+wpa_supplicant-2.4/wpa_supplicant/eapol_test.c
+[...]
+&lt;/pre&gt;
+&lt;li&gt;Change to the wpa_supplicant directory where eapol_test.c lives
+&lt;pre&gt;
+root@freeradius-vagrant:/tmp# cd wpa_supplicant-2.4/wpa_supplicant/
+&lt;/pre&gt;
+&lt;li&gt;Copy the default config to .config, which is where make(1) expects it to be
+&lt;pre&gt;
+root@freeradius-vagrant:/tmp/wpa_supplicant-2.4/wpa_supplicant# cp defconfig .config
+&lt;/pre&gt;
+&lt;li&gt;Compile eapol_test
+&lt;pre&gt;root@freeradius-vagrant:/tmp/wpa_supplicant-2.4/wpa_supplicant# make eapol_test
+  CC  config.c
+  CC  notify.c
+[...]
+  CC  ../src/utils/ip_addr.c
+  LD  eapol_test
+&lt;/pre&gt;
+&lt;li&gt;Copy eapol_test to root&#39;s home directory
+&lt;pre&gt;
+root@freeradius-vagrant:/tmp/wpa_supplicant-2.4/wpa_supplicant# cp eapol_test ~
+&lt;/pre&gt;
+&lt;/ul&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Now that you have the eapol_test binary compiled, you need a config file to feed to it.  Following Thomas&#39; directory scheme (see above for his tutorial), we&#39;ll put it in /var/certs/freeradius/
+&lt;pre&gt;
+root@freeradius-vagrant:/tmp/wpa_supplicant-2.4/wpa_supplicant# cd /var/certs/freeradius/
+root@freeradius-vagrant:/var/certs/freeradius# USER_NAME=`grep emailAddress client.cnf | grep &#39;@&#39; | sed &#39;s/.*=//;s/^ *//&#39;`; PASSWORD_CLIENT=`grep output_password client.cnf | sed &#39;s/.*=//;s/^ *//&#39;`; cat &lt;&lt;EOF &gt;eapol_test-eaptls.conf
+&gt; network={
+&gt;     ssid=&#34;DoesNotMatterForThisTest&#34;
+&gt;     key_mgmt=WPA-EAP
+&gt;     eap-TLS
+&gt;     identity=&#34;${USER_NAME}&#34;
+&gt;     ca_cert=&#34;/var/certs/freeradius/ca.pem&#34;
+&gt;     client_cert=&#34;/var/certs/freeradius/${USER_NAME}.pem&#34;
+&gt;     private_key=&#34;/var/certs/freeradius/client.key&#34;
+&gt;     private_key_passwd=&#34;${PASSWORD_CLIENT}&#34;
+&gt;     eapol_flags=3
+&gt; }
+&gt; EOF
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+In a different terminal, start up freeradius with
+&lt;pre&gt;freeradius -X&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Attempt an authentication
+&lt;pre&gt;
+root@freeradius-vagrant:/var/certs/freeradius# ~/eapol_test -a10.0.2.15 -p1812 -sSEKRET -ceapol_test-eaptls.conf -r0
+Reading configuration file &#39;eapol_test-eaptls.conf&#39;
+Line: 1 - start of a new network block
+ssid - hexdump_ascii(len=24):
+     44 6f 65 73 4e 6f 74 4d 61 74 74 65 72 46 6f 72   DoesNotMatterFor
+     54 68 69 73 54 65 73 74                           ThisTest
+key_mgmt: 0x1
+[...]
+EAP: deinitialize previously used EAP method (13, TLS) at EAP deinit
+ENGINE: engine deinit
+MPPE keys OK: 0  mismatch: 1
+FAILURE
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+So we got a FAILURE.  Back in the freeradius window, I see that the cert could not be verified
+&lt;pre&gt;
+rlm_eap_tls: Certificate CN (rchapman@XXXX.com) fails external verification!
+[tls] chain-depth=0,
+[tls] error=0
+[tls] --&gt; User-Name = rchapman@XXXXX.com
+[tls] --&gt; BUF-Name = rchapman@XXXXX.com
+[tls] --&gt; subject = /C=US/ST=Montana/O=XXXXX, Inc./CN=rchapman@XXXXX.com/emailAddress=rchapman@XXXXX.com
+[tls] --&gt; issuer  = /C=US/ST=Montana/L=XXXXX/O=XXXXX, Inc./emailAddress=XXXXX@XXXXX.com/CN=XXXXX Wifi Certificate Authority
+[tls] --&gt; verify return:0
+[tls] &gt;&gt;&gt; TLS 1.0 Alert [length 0002], fatal certificate_unknown
+TLS Alert write:fatal:certificate unknown
+    TLS_accept: error in SSLv3 read client certificate B
+rlm_eap: SSL error error:140890B2:SSL routines:SSL3_GET_CLIENT_CERTIFICATE:no certificate returned
+SSL: SSL_read failed in a system call (-1), TLS session fails.
+TLS receive handshake failed during operation
+[tls] eaptls_process returned 4
+[eap] Handler failed in EAP/tls
+[eap] Failed in EAP select
+++[eap] returns invalid
+Failed to authenticate the user.
+Using Post-Auth-Type Reject
+# Executing group from file /etc/freeradius/sites-enabled/ruckusAP1
++- entering group REJECT {...}
+[attr_filter.access_reject]     expand: %{User-Name} -&gt; rchapman@XXXXX.com
+attr_filter: Matched entry DEFAULT at line 11
+++[attr_filter.access_reject] returns updated
+Delaying reject of request 8 for 1 seconds
+Going to the next request
+Waking up in 0.9 seconds.
+Sending delayed reject for request 8
+Sending Access-Reject of id 8 to 10.0.2.15 port 34071
+    EAP-Message = 0x04080004
+    Message-Authenticator = 0x00000000000000000000000000000000
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;I wonder why.  My certs are in /etc/freeradius
+&lt;pre&gt;
+root@freeradius-vagrant:/etc/freeradius/certs# ls -l
+total 4
+lrwxrwxrwx 1 root freerad  28 Jun 24 20:08 ca.pem -&gt; /var/certs/freeradius/ca.pem
+-rw-r--r-- 1 root freerad 245 Jun 22 22:15 dh
+lrwxrwxrwx 1 root freerad  32 Jun 24 20:08 server.key -&gt; /var/certs/freeradius/server.key
+lrwxrwxrwx 1 root freerad  32 Jun 24 20:08 server.pem -&gt; /var/certs/freeradius/server.pem
+&lt;/pre&gt;
+and they can be read by the freerad user (the user the freeradius daemon is running as)
+&lt;pre&gt;
+root@freeradius-vagrant:/etc/freeradius/certs# ls -l /var/certs/freeradius/ca.pem /var/certs/freeradius/server.key /var/certs/freeradius/server.pem
+-rw-r----- 1 root ssl-cert 2419 Jun 24 23:25 /var/certs/freeradius/ca.pem
+-rw-r----- 1 root ssl-cert 3394 Jun 24 23:26 /var/certs/freeradius/server.key
+-rw-r----- 1 root ssl-cert 5878 Jun 24 23:26 /var/certs/freeradius/server.pem
+&lt;/pre&gt;
+The freerad user is a member of the ssl-cert group, so it can read the certs directory files ok
+&lt;pre&gt;
+root@freeradius-vagrant:/etc/freeradius/certs# groups freerad
+freerad : freerad shadow &lt;b&gt;ssl-cert&lt;/b&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Next step is to travel down the rabbit hole of why freeradius cannot verify the client certificate.  I do know that freeradius relies on the openssl package to do cert verification, so maybe it is executing openssl.  If it is, then strace will catch the command freeradius is running.
+&lt;pre&gt;
+root@freeradius-vagrant:/etc/freeradius/certs# strace -eexecve -ttvfo /tmp/tt -s 1024 freeradius -X
+FreeRADIUS Version 2.1.12, for host x86_64-pc-linux-gnu, built on Feb 24 2014 at 14:57:57
+Copyright (C) 1999-2009 The FreeRADIUS server project and contributors.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+You may redistribute copies of FreeRADIUS under the terms of the
+GNU General Public License v2.
+Starting - reading configuration files ...
+[...]
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+and execute eapol_test again
+&lt;pre&gt;
+root@freeradius-vagrant:/var/certs/freeradius# ~/eapol_test -a10.0.2.15 -p1812 -sSEKRET -ceapol_test-eaptls.conf -r0
+Reading configuration file &#39;eapol_test-eaptls.conf&#39;
+Line: 1 - start of a new network block
+ssid - hexdump_ascii(len=24):
+     44 6f 65 73 4e 6f 74 4d 61 74 74 65 72 46 6f 72   DoesNotMatterFor
+     54 68 69 73 54 65 73 74                           ThisTest
+key_mgmt: 0x1
+[...]
+EAP: deinitialize previously used EAP method (13, TLS) at EAP deinit
+ENGINE: engine deinit
+MPPE keys OK: 0  mismatch: 1
+FAILURE
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Excellent, another failure
+&lt;/p&gt;
+
+&lt;p&gt;
+Back in the window where freeradius and strace are running, looking at the file /tmp/tt where strace wrote all execve(2) system call invocations, I see that it did in fact execute openssl to verify the client cert.
+&lt;pre&gt;
+[...]
+Waking up in 1.0 seconds.
+Cleaning up request 8 ID 8 with timestamp +64
+Ready to process requests.
+^C
+root@freeradius-vagrant:/etc/freeradius/certs# cat /tmp/tt
+11101 21:18:50.164298 execve(&#34;/usr/sbin/freeradius&#34;, [&#34;freeradius&#34;, &#34;-X&#34;], [&#34;XDG_SESSION_ID=7&#34;, &#34;SHELL=/bin/bash&#34;, &#34;TERM=xterm-256color&#34;, &#34;USER=root&#34;, &#34;LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*&#34;..., &#34;MAIL=/var/mail/root&#34;, &#34;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&#34;, &#34;PWD=/etc/freeradius/certs&#34;, &#34;LANG=en_US.UTF-8&#34;, &#34;SHLVL=1&#34;, &#34;HOME=/root&#34;, &#34;LOGNAME=root&#34;, &#34;LESSOPEN=| /usr/bin/lesspipe %s&#34;, &#34;XDG_RUNTIME_DIR=/run/user/1000&#34;, &#34;LESSCLOSE=/usr/bin/lesspipe %s %s&#34;, &#34;_=/usr/bin/strace&#34;, &#34;OLDPWD=/etc/freeradius&#34;]) = 0
+11122 21:19:54.483582 &lt;b&gt;execve(&#34;/usr/bin/openssl&#34;, [&#34;/usr/bin/openssl&#34;, &#34;verify&#34;, &#34;-CApath&#34;, &#34;/etc/freeradius/certs&#34;, &#34;/var/tmp/radiusd/freeradius.client.XXnZcbyR&#34;]&lt;/b&gt;, [&#34;USER_NAME=\&#34;rchapman@XXXXX.com\&#34;&#34;, &#34;NAS_IP_ADDRESS=127.0.0.1&#34;, &#34;CALLING_STATION_ID=\&#34;02-00-00-00-00-01\&#34;&#34;, &#34;FRAMED_MTU=1400&#34;, &#34;NAS_PORT_TYPE=Wireless-802.11&#34;, &#34;CONNECT_INFO=\&#34;CONNECT 11Mbps 802.11b\&#34;&#34;, &#34;EAP_MESSAGE=0x020804420d002da2bc70b9dabd6e808364e70cce8f29bca839f5f3f8fa79ce502fccef2fa978810e659ad88b4ef09c854c505afba4ad58d46bb84868cbdc720899b49e4ce7cba798fa33fdd30691b4d076f6899b52a40bb2f887b82ddff9bbb0dc774ff3e04b5565d0340a626df5bf48cc4cddb06d551826199248d6e32f091b1f51d9878e83b49809c0e3524df0a7159e17fe7b0131fee3a1af74d81f8b655fcd275612ae2517835c6c408f14b0d849f33e1efdc3db483a832818a10eb783cb204bda90a7d7349ae660daaec59f78b1713028dc4a6e47e3c01eb43757b82d1fbfe90cec33dc0ba3f0936986b4cb1c9e3b939c64976634c3577a5b6c71&#34;, &#34;EAP_MESSAGE=0x71265f3525c485df48f7816eb18dbf6f9a85561413c37283b3bb0dea51f8654122ee549c0a3f6fbbf5916cae5f9055bc19669da55005f21b827bf99dcfc5effbe38890a6f80231759786993a9e33288bcdb6d2838964d77513bd66eb303dafaa0ccbecf501f11f3b9e40d42b37b3e6c67ca154a5f9a129e72fd381e24e46d52cfedc970fbc9b28031b850eecf8ceca78c0eaf4bbae72c6b037e86f8e1150b2f799d0f587d029812d046e0b61b1d4d2726ee66dc31603010046100000424104acd3f28e5f69bdc07945db523a44066d74aa73648e448631f0eb67c11d6b5fc42f2e42f2fbfa9ee0d993f843bb2b756de1f8dfede848b6485834659d69ab&#34;, &#34;EAP_MESSAGE=0x4c6e16030102060f0002020200d05242c896fd7ac6a483cde001e4ab4ba1de4e7d7340d618ba3b9e57419fc9b9d4d76cf9a7855bb81821b8469ec50e3c06475f71652c10e0f790d3f112236fbf82c14c2a4a4eeb8c7889bc517eff3768478a6099ea4c81a1133945a45afb6d3c031f034899edc9e93403a580ef8028cc5d2052559c747eb60d831a590c26e9ea748a89835f50de617ea8dfce6e9cd23fdfdcb9949bf1facfa907b1e11e06230e3a0fdf5230ddcfdc1962d394bfa373c6aab10e9e8e10574cec7c6fc5ca1f42cb4f8df2ce92cbfad6e2e10413795d5c2231dad82c30f485a641073e2267e5edfdae45ba62b923a19d2f0d7cf7641bdba1&#34;, &#34;EAP_MESSAGE=0x883ed91d6b2e271940f9793025052b2270742cd0cdda10ff3d371af52dc7fd9e7f7259310fa9cb000f1dcc453413e2c203d5f26d50d002c88a3886f61128b214e7c9458af2b719fd37f07b91a09a407b4c72311a12d974cdd93b15675ac681d3c89981151cc6a4c6a4477a8e9dea42b388df96870980405f3af7ea73cfaa8cbf537941f8517e134cbb74dbf4e7658456f23f92a29440142b419c61b8a6be1a0e018a35f1924bd7a4763b476d3e9d9e2a6946ad6fc6f0dad9fb76b2ce305ccfbf3db1f22b19541d96148e46327f4790ad797673148c99d09d7e2e74cb6b3638c469e4950e75f3e26e721f9e17781c06c577be5a9ff68aee5ca66bdd7452&#34;, &#34;EAP_MESSAGE=0x677a2de333d1ed17017156a3ad712576535db214030100010116030100302f898135f257599f9fdb3acc07d390f14d03057670c64c1a3faec01fa15cf11ba5b5642b20646e065d7d8b56ce7b7d9d&#34;, &#34;STATE=0x91dd759796d5782502cfcac1e7c999b0&#34;, &#34;MESSAGE_AUTHENTICATOR=0x6c6da037ca70fffeb5c047426910ce4f&#34;, &#34;EAP_TYPE=EAP-TLS&#34;, &#34;TLS_CLIENT_CERT_FILENAME=\&#34;/var/tmp/radiusd/freeradius.client.XXnZcbyR\&#34;&#34;]) = 0
+11122 21:19:54.487938 +++ exited with 2 +++
+11101 21:19:54.488045 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=11122, si_status=2, si_utime=0, si_stime=0} ---
+11101 21:21:39.983570 --- SIGINT {si_signo=SIGINT, si_code=SI_KERNEL, si_value={int=2, ptr=0x2}} ---
+11101 21:21:39.984023 +++ killed by SIGINT +++
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Now I can do the exact same thing freeradius did, by asking openssl to verify my client cert.  Let&#39;s see what it says
+&lt;pre&gt;
+root@freeradius-vagrant:/var/certs/freeradius# USER_NAME=`grep emailAddress client.cnf | grep &#39;@&#39; | sed &#39;s/.*=//;s/^ *//&#39;`; /usr/bin/openssl verify -CApath /etc/freeradius/certs ${USER_NAME}.pem
+rchapman@XXXX.com.pem: C = US, ST = Montana, O = &#34;XXXXXX, Inc.&#34;, CN = rchapman@XXXXXX.com, emailAddress = rchapman@XXXX.com
+error 20 at 0 depth &lt;b&gt;lookup:unable to get local issuer certificate&lt;/b&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Searching Google for &lt;b&gt;openssl unable to get local issuer certificate&lt;/b&gt; returns the page &lt;a href=&#34;https://www.openssl.org/docs/apps/verify.html&#34;&gt;https://www.openssl.org/docs/apps/verify.html&lt;/a&gt;.  That page is simply the man page for openssl verify, and the -CApath option tells me the problem and the solution:
+&lt;pre&gt;
+-CApath directory
+A directory of trusted certificates. &lt;b&gt;The certificates should have names of the form: hash.0 or have symbolic links to them of this form&lt;/b&gt; (&#34;hash&#34; is the hashed certificate subject name: see the -hash option of the x509 utility). &lt;b&gt;Under Unix the c_rehash script will automatically create symbolic links to a directory of certificates&lt;/b&gt;.
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+It can&#39;t really be that simple.  Let&#39;s try running c_rehash in /etc/freeradius/certs
+&lt;pre&gt;
+root@freeradius-vagrant:/etc/freeradius/certs# c_rehash .
+Doing .
+server.pem =&gt; 6eacae23.0
+server.pem =&gt; d01a9214.0
+ca.pem =&gt; 433869d5.0
+ca.pem =&gt; c34814f6.0
+root@freeradius-vagrant:/etc/freeradius/certs# cd /var/certs/freeradius/
+root@freeradius-vagrant:/var/certs/freeradius# USER_NAME=`grep emailAddress client.cnf | grep &#39;@&#39; | sed &#39;s/.*=//;s/^ *//&#39;`; /usr/bin/openssl verify -CApath /etc/freeradius/certs ${USER_NAME}.pem
+rchapman@XXX.com.pem: &lt;b&gt;OK&lt;/b&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Woohoo! That seems to be it.  Let&#39;s try a eapol_test again just to make sure
+&lt;pre&gt;
+root@freeradius-vagrant:/var/certs/freeradius# ~/eapol_test -a10.0.2.15 -p1812 -sSEKRET -ceapol_test-eaptls.conf -r0
+Reading configuration file &#39;eapol_test-eaptls.conf&#39;
+Line: 1 - start of a new network block
+ssid - hexdump_ascii(len=24):
+     44 6f 65 73 4e 6f 74 4d 61 74 74 65 72 46 6f 72   DoesNotMatterFor
+     54 68 69 73 54 65 73 74                           ThisTest
+key_mgmt: 0x1
+[...]
+EAPOL: SUPP_PAE entering state AUTHENTICATED
+EAPOL: SUPP_BE entering state RECEIVE
+EAPOL: SUPP_BE entering state SUCCESS
+EAPOL: SUPP_BE entering state IDLE
+eapol_sm_cb: result=1
+EAPOL: Successfully fetched key (len=32)
+PMK from EAPOL - hexdump(len=32): 74 07 88 20 6e e5 a9 9c 21 33 d7 eb e3 3a 0b c2 f6 7a f7 98 a5 ff 3b fb 9d 4f 8b 49 ee 13 c6 93
+No EAP-Key-Name received from server
+EAP: deinitialize previously used EAP method (13, TLS) at EAP deinit
+ENGINE: engine deinit
+MPPE keys OK: 1  mismatch: 0
+SUCCESS
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Yep, it works now.
+&lt;/p&gt;
+
+
+</description>
+    </item>
+    
+    <item>
+      <title>Eclipse Remote System Explorer fails to connect via ssh with algorithm negotiation failure</title>
+      <link>http://test2.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</link>
+      <pubDate>Tue, 08 Apr 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</guid>
+      <description>&lt;i&gt;Windows 7 SP1, Java JRE 1.7.0_51-b13 (32-bit), Eclipse Kepler Service Release 2 build 20140224-0627, Eclipse Plugin RSE SSH Services 3.2.100.201305201712&lt;/i&gt;&lt;br/&gt;&lt;br/&gt;
+
+If you use a Java IDE or any other Java program that makes ssh connections to a server that has anything over 128 bit encryption turned on, then you&#39;ll see that it fails with the error:
+
+&lt;pre&gt;
+    RSEG1066
+
+    Failed to connect sshd on HMSWEBXX01.ZZZ.LAN:22
+
+    Algorithm negotiation failed
+&lt;/pre&gt;
+
+&lt;p&gt;
+By default, the Java Development Kit and Java Runtime Environment do not offer ciphers larger than 128 bits. To fix, all you need to do is download the strong encryption JAR files for your version of the JDK/JRE and restart your Java app.
+&lt;/p&gt;
+
+&lt;br/&gt;
+&lt;p&gt;
+Java Cryptography Extension Unlimited Strength Downloads
+&lt;/p&gt;
+
+&lt;p&gt;
+JDK/JRE 1.6&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;a href=&#34;http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html&#34;&gt;http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
+
+JDK/JRE 1.7&lt;br/&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;a href=&#34;http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html&#34;&gt;http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
+&lt;/p&gt;
+&lt;br/&gt;
+
+&lt;p&gt;
+Copy &lt;code&gt;local_policy.jar&lt;/code&gt; and &lt;code&gt;US_export_policy.jar&lt;/code&gt; to your JRE/JDK&#39;s lib\security directory
+&lt;/p&gt;
+
+&lt;pre&gt;
+Examples of possible destination folders:
+    JRE 1.6, 32-bit         C:\Program Files (x86)\Java\jre6\lib\security
+    JRE 1.7, 32-bit         C:\Program Files (x86)\Java\jre7\lib\security
+    JRE 1.6, 64-bit         C:\Program Files\Java\jre6\lib\security
+    JRE 1.7, 64-bit         C:\Program Files\Java\jre7\lib\security
+    JDK 1.7.0.51, 64-bit    C:\Program Files\Java\jdk1.7.0_51\jre\lib\security
+&lt;/pre&gt;
+
+</description>
+    </item>
+    
+    <item>
+      <title>Wireshark tips #5: Decrypting HTTPS</title>
+      <link>http://test2.rchapman.org/posts/Wireshark_tips_/</link>
+      <pubDate>Sun, 30 Mar 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Wireshark_tips_/</guid>
+      <description>&lt;i&gt;TShark 1.2.15, Oracle Enterprise Linux 6.5&lt;/i&gt;&lt;br/&gt;&lt;br/&gt;
+
+&lt;p&gt;
+If you are on a web server that is serving SSL, then you can use tshark on that server to decrypt the traffic off the wire. Copy the RSA private key file that your web service is using to /root/private-rsa.key in PKCS#1 format (&lt;a href=&#34;http://www.cryptosys.net/pki/rsakeyformats.html&#34;&gt;PKCS#1 files&lt;/a&gt; begin with &#34;&lt;tt&gt;-----BEGIN RSA PRIVATE KEY-----&lt;/tt&gt;&#34;), then run:
+&lt;/p&gt;
+
+&lt;p&gt;
+&lt;pre&gt;
+tshark -o &#34;ssl.desegment_ssl_records: TRUE&#34; -o &#34;ssl.desegment_ssl_application_data: TRUE&#34; -o &#34;ssl.keys_list:,443,http,/root/private-rsa.key&#34; -o &#34;ssl.debug_file:rsa_private.log&#34; -R &#34;(tcp.port eq 443)&#34; port 443
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Note that tshark has to capture the beginning of an SSL session in order to decrypt it.  If your SSL client machine is Windows, you can force a new SSL session by doing the following:
+&lt;ol&gt;
+&lt;li&gt;Internet Explorer &gt; Internet Preferences&lt;/li&gt;
+&lt;li&gt;On the General tab, click Delete…, and delete everything&lt;/li&gt;
+&lt;li&gt;On the Content tab, click &#34;Clear SSL state&#34;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+If you find that tshark is not showing HTTP traffic, meaning it&#39;s still encrypted, then check the decryption log &lt;tt&gt;rsa_private.log&lt;/tt&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Another option is to capture the traffic with tcpdump or tshark and decrypt it later using Wireshark.  To do that, in Wireshark,
+&lt;ol&gt;
+&lt;li&gt;Capture HTTPS traffic on server/load balancer using tcpdump or tshark:&lt;br/&gt;
+&lt;pre&gt;tcpdump -s 0 -w /tmp/ssl.cap&lt;/pre&gt;&lt;br/&gt;
+or
+&lt;pre&gt;tshark -F pcapng -w /tmp/ssl.pcapng port 443&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;Edit &gt; Preferences&lt;/li&gt;
+&lt;li&gt;Expand Protocols&lt;/li&gt;
+&lt;li&gt;Select SSL&lt;/li&gt;
+&lt;li&gt;Click Edit… beside RSA keys list:&lt;/li&gt;
+&lt;li&gt;Click New&lt;/li&gt;
+&lt;li&gt;For IP address, enter &lt;tt&gt;0.0.0.0&lt;/tt&gt; (sometimes you have to explicitly put in the server/load balancer IP address here)&lt;/li&gt;
+&lt;li&gt;For Port, enter &lt;tt&gt;0&lt;/tt&gt; (sometimes you have to explicitly put in the server/load balancer SSL port here)&lt;/li&gt;
+&lt;li&gt;For Protocol, enter &lt;tt&gt;http&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;For Key File, select the RSA private key file which you copied from the web server or load balancer&lt;/li&gt;
+&lt;li&gt;For Password, enter the password needed for the private key file (if there is not one, leave this field empty)&lt;/li&gt;
+&lt;li&gt;Click OK&lt;/li&gt;
+&lt;li&gt;Back on the SSL Preferences page, for SSL debug file, enter &lt;tt&gt;C:\rsa_debug.txt&lt;/tt&gt;&lt;/li&gt;
+&lt;li&gt;Make sure &#34;&lt;tt&gt;Reassemble SSL records spanning multiple TCP segments&lt;/tt&gt;&#34; is checked&lt;/li&gt;
+&lt;li&gt;Make sure &#34;&lt;tt&gt;Reassemble SSL Application Data spanning multiple SSL records&lt;/tt&gt;&#34; is checked&lt;/li&gt;
+&lt;li&gt;Click OK to close the SSL Preferences page&lt;/li&gt;
+&lt;li&gt;Load your capture file from the web server or load balancer.  As long as the SSL session initiation is in the capture, Wireshark should be able to decrypt the HTTPS packets and show the HTTP protocol information.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/p&gt;
+
+</description>
+    </item>
+    
+    <item>
+      <title>OpenVPN IPv6 Tunnel Fails on Windows</title>
+      <link>http://test2.rchapman.org/posts/OpenVPN_IPv6_Tunnel_Fails_on_Windows/</link>
+      <pubDate>Sun, 25 Aug 2013 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/OpenVPN_IPv6_Tunnel_Fails_on_Windows/</guid>
+      <description>&lt;i&gt;OpenVPN 2.3.2-I003, Windows 7 x86_64&lt;/i&gt;
+
+When attempting to establish a IPv6 tunnel on Windows, if you see the following error:
+
+&lt;pre&gt;
+NETSH: C:\Windows\system32\netsh.exe interface ipv6 set address Local Area Connection 2 2402:b300:100:aafc:4000:1234:0:1000 store=active
+ERROR: netsh command failed: returned error code 1
+&lt;/pre&gt;
+
+then you probably do not have IPv6 enabled on your Windows machine.
+
+IPv6 is controlled in the registry via the key HKLM\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters\DisabledComponents, the default value of which is 0x10.  To enable IPv6 on all network interfaces, change this value to 0x0.  There are several other options for this key; see &lt;a href=&#34;http://support.microsoft.com/kb/929852&#34;&gt;Microsoft KB 929852&lt;/a&gt; for more info.  In my tests, the only value I could get to work with OpenVPN was 0x0, although I also tried &lt;a href=&#34;http://go.microsoft.com/?linkid=9732984&#34;&gt;Microsoft Fix it 50443&lt;/a&gt;, which enables IPv6 on all tunnel interfaces.
+
+
+</description>
+    </item>
+    
+    <item>
+      <title>Enabling Google CalDAV for Mozilla Sunbird</title>
+      <link>http://test2.rchapman.org/posts/Enabling_Google_CalDAV_for_Mozilla_Sunbird/</link>
+      <pubDate>Tue, 13 Aug 2013 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Enabling_Google_CalDAV_for_Mozilla_Sunbird/</guid>
+      <description>&lt;i&gt;Tested with: Gmail (or Google Apps), Mac OS X 10.5.4, Mozilla Sunbird 0.8&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;Google recently enabled CalDAV access to Google Calendars.  It works with Sunbird, but the documentation on doing this is hard to find.  So here is how to do it, step by step.&lt;br /&gt;&lt;br /&gt;&lt;ol&gt;&lt;br /&gt;&lt;li&gt;&lt;a href=&#34;http://www.mozilla.org/projects/calendar/sunbird/&#34;&gt;Download&lt;/a&gt; and install Sunbird on your Mac.&lt;br /&gt;&lt;li&gt;Open Sunbird&lt;br /&gt;&lt;li&gt;Click File, then &#34;Subscribe to Remote Calendar...&#34;&lt;br /&gt;&lt;li&gt;When the &#34;Create a new calendar&#34; dialog box appears, select &#34;On the Network&#34; and click Continue&lt;br /&gt;&lt;li&gt;For Format, select &#34;CalDAV&#34; and for Location, enter &#34;https://www.google.com/calendar/dav/YOUR_GOOGLE_EMAIL/events&#34; (without the quotes)&lt;br /&gt;For example, assume your Gmail address is johndoe@gmail.com, then your Location would be https://www.google.com/calendar/dav/johndoe@gmail.com/events&lt;br /&gt;Let&#39;s assume you have Google Apps and your email is bill.jones@jonescorp.com, then your Location would be:&lt;br /&gt;https://www.google.com/calendar/dav/bill.jones@jonescorp.com/events&lt;br /&gt;&lt;li&gt;Click Continue&lt;br /&gt;&lt;li&gt;Next, your are asked to name your calendar.  For mine, I just typed my first name.  You can choose a color for calendar entries here and choose if your want alarms to go off in Sunbird.  Click Continue.&lt;br /&gt;&lt;li&gt;Click Done.&lt;br /&gt;&lt;/ol&gt;&lt;br /&gt;&lt;br /&gt;&lt;br /&gt;That&#39;s it.  By default, Sunbird will refresh remote calendars every 30 minutes. If you want to change this, go into the Preferences (Command ,)&lt;br /&gt;&lt;br /&gt;Since Google CalDAV syncing is in beta, you should direct all your questions to &lt;a href=&#34;http://groups.google.com/group/google-calendar-help-dataapi&#34;&gt;Google Groups - Calendar Help Dataapi&lt;/a&gt;&lt;div class=&#34;blogger-post-footer&#34;&gt;&amp;nbsp;&lt;/div&gt;
+
+
+</description>
+    </item>
+    
+    <item>
+      <title>Transparently proxying any tcp connection (including http and https without man-in-the-middle)</title>
+      <link>http://test2.rchapman.org/posts/Transparently_proxying_any_tcp_connection/</link>
+      <pubDate>Sun, 07 Apr 2013 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Transparently_proxying_any_tcp_connection/</guid>
+      <description>I recently ran into a situation where a proxy server was being installed, but some applications were not proxy aware. To illustrate, this is what the network looked like:
+
+&lt;a href=&#34;http://www.flickr.com/photos/ryanchapman/8629661876/sizes/l/&#34;&gt;&lt;img src=&#34;http://farm9.staticflickr.com/8260/8629661876_51beaf7510_b.jpg&#34;&gt;&lt;/a&gt;
+
+Here we have a web server running proxy unaware applications.  The web server does not have routes to the internet; it must use a proxy server to communicate with web sites located on the public internet.
+
+The solution is to intercept all HTTP (port 80) and HTTPS (port 443) traffic at the firewall.  For http, we&#39;ll use squid and for https, we&#39;ll use a custom program I wrote.
+
+First up, http.  In vyatta, configure the webproxy with:
+
+&lt;pre&gt;
+set service webproxy listen-address 10.18.11.5
+commit
+save
+&lt;/pre&gt;
+
+
+The squid service will start up after committing the changes, but some changes need to be made to the config file.  Edit /etc/squid3/squid.conf to look like this:
+
+&lt;pre&gt;
+#
+# autogenerated by vyatta-update-webproxy.pl
+#
+
+acl manager proto cache_object
+acl localhost src 127.0.0.1/32
+acl to_localhost dst 127.0.0.0/8
+acl net src all
+acl SSL_ports port 443
+acl Safe_ports port 80          # http
+acl Safe_ports port 21          # ftp
+acl Safe_ports port 443         # https
+acl Safe_ports port 70          # gopher
+acl Safe_ports port 210         # wais
+acl Safe_ports port 1025-65535  # unregistered ports
+acl Safe_ports port 280         # http-mgmt
+acl Safe_ports port 488         # gss-http
+acl Safe_ports port 591         # filemaker
+acl Safe_ports port 777         # multiling http
+acl CONNECT method CONNECT
+
+http_access allow manager localhost
+http_access deny manager
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+http_access allow localhost
+http_access allow net
+http_access deny all
+
+cache_dir ufs /var/spool/squid3 100 16 256
+cache_mem 20 MB
+access_log /var/log/squid3/access.log squid
+
+cache_store_log none
+
+http_port 10.18.11.5:3128 transparent
+
+forwarded_for off
+
+# added by Ryan
+visible_hostname fw01-1.web.lan
+cache_mgr youremail@yourdomain.com
+# Do not send the following domains to the proxy
+acl DIRECTS dstdomain .lan
+never_direct allow all
+always_direct allow DIRECTS
+nonhierarchical_direct off
+# Stop sending requests to a peer if it does not respond within 5 seconds
+peer_connect_timeout 5 seconds
+# When all peers are available, balance requests between proxy1/2.  If those two go down, send requests to the lastresort
+cache_peer 1.2.3.4 parent 80 0 proxy-only no-query name=proxy1 round-robin weight=999999
+cache_peer 1.2.3.5 parent 80 0 proxy-only no-query name=proxy2 round-robin weight=999999
+cache_peer 1.2.3.6 parent 80 0 proxy-only no-query name=proxy-lastresort round-robin weight=1
+&lt;/pre&gt;
+
+Restart squid3 with &lt;code&gt;/etc/init.d/squid3 restart&lt;/code&gt;.  Note that you&#39;ll want to edit vyatta-update-webproxy.pl to make sure the changes we placed in the squid config stay around after a re-commit (this was the best suggestion on the vyatta forums).
+
+A http request from the web server (10.18.11.40) will now be forwarded to the proxies transparently:
+
+&lt;pre&gt;
+[root@web01 ~]# nc www.google.com 80
+HEAD / HTTP/1.0
+
+HTTP/1.0 200 OK
+P3P: CP=&#34;This is not a P3P policy! See http://www.google.com/support/accounts/bin/answer.py?hl=en&amp;answer=151657 for more info.&#34;
+Date: Sun, 07 Apr 2013 21:35:13 GMT
+Server: gws
+Expires: -1
+Set-Cookie: NID=67=DUffxHjxxlJbUCbh58qhFLVJffrvGVX8lMm96QaFzfwjFyGNz4VlHPziZUozs0zh9cUwzxWX-WSftJ-JCPC652SYCVP5lXHIGCYXBabW3A8J1toyxBe1n7Lu8oqmiXEV; expires=Mon, 07-Oct-2013 21:35:13 GMT; path=/; domain=.; HttpOnly
+Content-Type: text/html; charset=ISO-8859-1
+Cache-Control: private, max-age=0
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+X-Cache: MISS from fw01-1.web.lan
+X-Cache-Lookup: MISS from fw01-1.web.lan:3128
+Via: 1.0 fw01-1.web.lan (squid/3.1.6)
+Connection: close
+
+[root@web01 ~]#
+&lt;/pre&gt;
+
+
+Second, https.  This one is a little trickier.  The squid solutions I found on the internet suggested using a man-in-the-middle strategy, where squid decrypts the SSL/TLS data and then re-encrypts it.  I wasn&#39;t fond of this method because not only it is technically difficult to pull off, it raises some ethical issues.  Another way is to transparently do what proxy aware applications perform:
+&lt;ol&gt;
+&lt;li&gt;Application wants to connect to www.google.com on port 443.  It first checks the environment for the variable https_proxy.  Let&#39;s assume https_proxy=http://1.2.3.4:80
+&lt;li&gt;Application makes connection to proxy server at 1.2.3.4 on port 80
+&lt;li&gt;Application sends &#34;CONNECT www.google.com:443 HTTP/1.1\r\nHost:www.google.com\r\n\r\n&#34;
+&lt;li&gt;Proxy server responds &#34;HTTP/1.0 200 Connection established&#34;
+&lt;li&gt;Application speaks TLS as if it had directly connected to www.google.com:443 originally
+&lt;/ol&gt;
+
+I&#39;ve written a program in Golang called any_proxy, available on &lt;a href=&#34;https://github.com/ryanchapman/go-any-proxy&#34;&gt;Github&lt;/a&gt; that can transparently proxy https (there is also a newer version called &lt;a href=&#34;http://github.com/ryanchapman/go-any-proxy&#34;&gt;any_proxy&lt;/a&gt; which supports proxying of any tcp protocol). Here is a network timing diagram to illustrate what&#39;s going on:
+&lt;a href=&#34;http://www.flickr.com/photos/ryanchapman/8628595105/sizes/l/&#34;&gt;&lt;img src=&#34;http://farm9.staticflickr.com/8112/8628595105_4d1fc309dc_b.jpg&#34;&gt;&lt;/a&gt;
+
+Compiling:
+&lt;ol&gt;
+&lt;li&gt;Make sure you have golang installed on your machine. Binaries are available from &lt;a href=&#34;http://golang.org&#34;&gt;golang.org&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Clone the go-any-proxy repo with &lt;code&gt;git clone git://github.com/ryanchapman/go-any-proxy.git&lt;/code&gt;
+&lt;li&gt;Compile with &lt;code&gt;./make.bash&lt;/code&gt;
+&lt;/ol&gt;
+
+Installing:
+&lt;ol&gt;
+&lt;li&gt;Secure copy any_proxy to your vyatta:&lt;br&gt;
+&lt;pre&gt;scp any_proxy fw01-1.web.lan:/root&lt;/pre&gt;
+&lt;li&gt;Ssh to your vyatta:&lt;br&gt;
+&lt;pre&gt;ssh ryan@fw01-1.web.lan&lt;/pre&gt;
+&lt;li&gt;Make sure you already set up the squid webproxy earlier. Add a firewall rule to have 443 traffic redirected to any_proxy:&lt;br&gt;
+&lt;pre&gt;iptables -t nat -A WEBPROXY -p tcp --dport 443 redir ports 3129&lt;/pre&gt;
+&lt;li&gt;Start the proxy:
+&lt;pre&gt;/root/any_proxy -l :3129 -p &#34;1.2.3.4:80,1.2.3.5:80,1.2.3.6:80&#34;&lt;/pre&gt;
+&lt;li&gt;You should now be able to connect to a site with https now:
+&lt;pre&gt;
+[root@web01 ~]# openssl s_client -host www.google.com -port 443
+CONNECTED(00000003)
+depth=2 C = US, O = Equifax, OU = Equifax Secure Certificate Authority
+verify return:1
+depth=1 C = US, O = Google Inc, CN = Google Internet Authority
+verify return:1
+depth=0 C = US, ST = California, L = Mountain View, O = Google Inc, CN = www.google.com
+verify return:1
+---
+Certificate chain
+ 0 s:/C=US/ST=California/L=Mountain View/O=Google Inc/CN=www.google.com
+   i:/C=US/O=Google Inc/CN=Google Internet Authority
+ 1 s:/C=US/O=Google Inc/CN=Google Internet Authority
+   i:/C=US/O=Equifax/OU=Equifax Secure Certificate Authority
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIDgDCCAumgAwIBAgIKKZxzswABAACCpzANBgkqhkiG9w0BAQUFADBGMQswCQYD
+VQQGEwJVUzETMBEGA1UEChMKR29vZ2xlIEluYzEiMCAGA1UEAxMZR29vZ2xlIElu
+dGVybmV0IEF1dGhvcml0eTAeFw0xMzAzMjcxMzI4MjJaFw0xMzEyMzExNTU4NTBa
+MGgxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1N
+b3VudGFpbiBWaWV3MRMwEQYDVQQKEwpHb29nbGUgSW5jMRcwFQYDVQQDEw53d3cu
+Z29vZ2xlLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1zqnIRAV0QRL
+49U0b7wi+rF0wdkY3BcWHdmYgBmF81QH6854F8NBFdECnPOpLpSIcB+r7NjK4Gj6
+PQ0Kfg1BkqBC5fy1D5QeW5MOMuftbraURLu9LrELBG/DN2K5KVegQE60yitLOhU/
+wSc/ac5sEdsfx6T1HaPm4eByQ5S8fhcCAwEAAaOCAVEwggFNMB0GA1UdJQQWMBQG
+CCsGAQUFBwMBBggrBgEFBQcDAjAdBgNVHQ4EFgQUeTiJyDmB+bnMsRpBVwCCswsj
+JLEwHwYDVR0jBBgwFoAUv8Aw6/VDET5nup6R+/xq2uNrEiQwWwYDVR0fBFQwUjBQ
+oE6gTIZKaHR0cDovL3d3dy5nc3RhdGljLmNvbS9Hb29nbGVJbnRlcm5ldEF1dGhv
+cml0eS9Hb29nbGVJbnRlcm5ldEF1dGhvcml0eS5jcmwwZgYIKwYBBQUHAQEEWjBY
+MFYGCCsGAQUFBzAChkpodHRwOi8vd3d3LmdzdGF0aWMuY29tL0dvb2dsZUludGVy
+bmV0QXV0aG9yaXR5L0dvb2dsZUludGVybmV0QXV0aG9yaXR5LmNydDAMBgNVHRMB
+Af8EAjAAMBkGA1UdEQQSMBCCDnd3dy5nb29nbGUuY29tMA0GCSqGSIb3DQEBBQUA
+A4GBAKAluLPebUSSuwF2wyablQT08GGyQQ0A+SW8gQXy7obaXpQJa/gw5BaZz64w
+qMs4Bhmw7AECfq4nPDfY0k9eC4sIHOO95MwGXcH+14IFFDiF4o2f1q1SQQIbdS19
+eepmrzYfjNn6KM0dahsnSf1zViIRYdu9gZ3HVwwfif1foidR
+-----END CERTIFICATE-----
+subject=/C=US/ST=California/L=Mountain View/O=Google Inc/CN=www.google.com
+issuer=/C=US/O=Google Inc/CN=Google Internet Authority
+---
+No client certificate CA names sent
+---
+SSL handshake has read 1887 bytes and written 298 bytes
+---
+New, TLSv1/SSLv3, Cipher is RC4-SHA
+Server public key is 1024 bit
+Secure Renegotiation IS supported
+Compression: NONE
+Expansion: NONE
+SSL-Session:
+    Protocol  : TLSv1
+    Cipher    : RC4-SHA
+    Session-ID: 20100F0A1526BDADC3E7E278D2925738CAC56CB49A209CB0F3E036FFD57EEFF5
+    Session-ID-ctx:
+    Master-Key: FE00D81636D02CF0259B4945A16B37A0ACF267918635D23D9034F46886993C0291A0E639573534413FC176D9A4E1253E
+    Key-Arg   : None
+    Krb5 Principal: None
+    PSK identity: None
+    PSK identity hint: None
+    TLS session ticket lifetime hint: 100800 (seconds)
+    TLS session ticket:
+    0000 - 1c f0 4d b2 70 a7 14 13-a4 e4 25 f4 dd 29 c8 52   ..M.p.....%..).R
+    0010 - 96 22 0f a5 c7 2f e0 c5-ef 99 db 1c e8 8d 66 a8   .&#34;.../........f.
+    0020 - c4 b1 c1 87 12 69 10 a3-c1 a8 7e 8f 32 3e 03 9e   .....i....~.2&gt;..
+    0030 - 97 8b 7e a5 b4 64 75 50-69 98 f7 da 11 d8 83 20   ..~..duPi.......
+    0040 - 67 3a dc 66 11 8a b0 08-61 3b 94 53 7e c4 2e e5   g:.f....a;.S~...
+    0050 - 9d dd 38 34 e6 de 42 69-88 a2 d4 8c be 94 aa 38   ..84..Bi.......8
+    0060 - 2d be f3 b7 81 93 48 48-fc 53 af d3 98 87 c8 a8   -.....HH.S......
+    0070 - d0 41 dc ab 1e fd 5f 05-34 ac 2f d3 b4 ec 43 c1   .A...._.4./...C.
+    0080 - ac 84 0b ce 6f 98 6c 0c-3a d7 03 d7 40 f2 33 5d   ....o.l.:...@.3]
+    0090 - d3 cd 75 f5                                       ..u.
+
+    Start Time: 1365373842
+    Timeout   : 300 (sec)
+    Verify return code: 0 (ok)
+---
+HEAD / HTTP/1.0
+
+HTTP/1.0 200 OK
+Date: Sun, 07 Apr 2013 22:30:47 GMT
+Expires: -1
+Cache-Control: private, max-age=0
+Content-Type: text/html; charset=ISO-8859-1
+Set-Cookie: PREF=ID=e458ec6f20965cef:FF=0:TM=1365373847:LM=1365373847:S=IEPlOV-aQ9f_RF-u; expires=Tue, 07-Apr-2015 22:30:47 GMT; path=/; domain=.google.com
+Set-Cookie: NID=67=BlzgMe73-RN5tlryHoZcQGdRxrJfJpwNkBjfyJ-Zl-0ucm4HwkzpjPIVyTFR_IFqvCoCPOuHgEa566XAGfmCYI1nQgydCjRoqM8-wu__n-H7nIC5nt1JukFP1YtLc0BL; expires=Mon, 07-Oct-2013 22:30:47 GMT; path=/; domain=.google.com; HttpOnly
+P3P: CP=&#34;This is not a P3P policy! See http://www.google.com/support/accounts/bin/answer.py?hl=en&amp;answer=151657 for more info.&#34;
+Server: gws
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+
+read:errno=0
+[root@web01 ~]#
+&lt;/pre&gt;
+&lt;/ol&gt;
+
+Of course, you&#39;ll want to make sure the services start on reboot.  That is left as an exercise for the reader.
+Feel free to leave comments or send pull requests with any improvements to the code.
+
+
 </description>
     </item>
     

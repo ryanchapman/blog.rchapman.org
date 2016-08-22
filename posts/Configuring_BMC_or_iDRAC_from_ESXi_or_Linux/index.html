@@ -1,0 +1,400 @@
+---
+redirect_from: /post/17480234232/configuring-bmc-drac-from-esxi-or-linux
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Configuring BMC or iDRAC from ESXi or Linux &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Configuring BMC or iDRAC from ESXi or Linux</h1>
+    
+    Published Thu, Mar 1, 2012<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <i>VMware ESX 4.1u1, ipmitool 1.8.11, Dell C2100 with BMC or Dell R710 with Enterprise iDRAC6</i>
+
+
+<h1><u>ESXi</u></h1>
+
+Ever needed to gain access to the iDRAC or BMC in your Dell machine?  Recently, I needed remote console (KVM) access to a server.  I knew that the BMC that provides console access on a Dell C2100 had been configured, but I didn't know the IP address.
+
+Turns out if you compile ipmitool as a 32-bit binary, then you can copy it over to an ESXi host and get information about the BMC/iDRAC.
+
+The steps to do this are:
+
+<ol>
+<li>Download ipmitool from <a href="ipmitool.sourceforge.net">SourceForge</a>
+
+
+<li>Decompress
+
+<pre>ryan@buggy:~/src$ tar zxvf ipmitool-1.8.11.tar.gz</pre>
+
+
+<li>Compile.  Note that I added the -static linker option. The resulting binary I got back was not statically compiled, but worked.  Omitting the -static flag caused ipmitool to throw compile errors, so I left it.
+
+<pre>ryan@buggy:~/src/ipmitool-1.8.11$ ./configure CFLAGS=-m32 LDFLAGS=-static</pre>
+
+
+<li>Copy the binary to your ESXi server
+
+<pre>ryan@buggy:~/src/ipmitool-1.8.11$ scp ./src/ipmitool qaesx01.qa.lan:/scratch/</pre>
+
+
+<li>Log into the ESXi server and run the program from /scratch
+
+<pre>root@C2100:~ # cd /scratch/
+root@C2100:/vmfs/volumes/4f364c4f-5e22faef-0987-e89a8f229d27 # ./ipmitool shell
+ipmitool> lan set 1 ipsrc static
+# If your eth0 is tagged (802.1q), then you may need to set the VLAN
+# to remove the 802.1q tag, use "lan set 1 vlan id off"
+#ipmitool> lan set 1 vlan id 43
+ipmitool> lan set 1 ipaddr 10.1.1.151
+ipmitool> lan set 1 netmask 255.255.255.0
+ipmitool> lan set 1 defgw ipaddr 10.1.1.1
+ipmitool> lan set 1 auth ADMIN MD5,PASSWORD
+ipmitool> lan set 1 arp respond on
+ipmitool> lan set 1 arp generate on
+ipmitool> lan set 1 arp interval 5
+ipmitool> lan set 1 access on
+ipmitool> user set name 2 root
+ipmitool> user set password 2 BuggyP@ssw0rd
+ipmitool> channel setaccess 1 2 callin=on link=on privilege=4
+ipmitool> user enable 2
+ipmitool> lan print 1
+Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5
+                        : User     : MD2 MD5
+                        : Operator : MD2 MD5
+                        : Admin    : MD5 PASSWORD
+                        : OEM      :
+IP Address Source       : Static Address
+IP Address              : 10.1.1.151
+Subnet Mask             : 255.255.255.0
+MAC Address             : 00:22:19:27:53:10
+SNMP Community String   : public
+IP Header               : TTL=0x40 Flags=0x40 Precedence=0x00 TOS=0x10
+Default Gateway IP      : 0.0.0.0
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+Cipher Suite Priv Max   : aaaaaaaaaaaaaaa
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM
+</pre>
+</ol>
+<br>
+<br>
+
+
+<h1><u>Linux</u></h1>
+
+On an R710 system, when I tried to run ipmitool, I was met with the following error:
+
+<pre>root@R710:~# ipmitool lan print
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Invalid channel: 255</pre>
+
+
+
+The fix is to insert the ipmi kernel module and create the /dev/ipmi0 character device:
+
+<pre>root@R710:~# modprobe ipmi_devintf
+root@R710:~# modprobe ipmi_msghandler
+root@R710:~# modprobe ipmi_si
+root@R710:~# cat /proc/devices | grep ipmi
+<strong><i>247</i></strong> ipmidev</pre>
+
+
+Take the major number for ipmidev (247 in above example; your machine will probably be different) and create the character block device /dev/ipmi0:
+
+<pre>root@R710:~# mknod -m 0600 /dev/ipmi0 c <i>247</i> 0</pre>
+
+
+
+Now it works
+
+<pre>root@R710:~# lsmod | grep ipmi
+ipmi_si                39597  0
+ipmi_devintf            7203  0
+ipmi_msghandler        35197  2 ipmi_si,ipmi_devintf
+
+
+root@R710:~# ipmitool lan print
+Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5
+                        : User     : MD2 MD5
+                        : Operator : MD2 MD5
+                        : Admin    : MD2 MD5
+                        : OEM      : MD2 MD5
+IP Address Source       : Static Address
+IP Address              : 10.5.0.5
+Subnet Mask             : 255.255.255.0
+MAC Address             : 00:24:e8:7a:8e:0f
+SNMP Community String   : public
+IP Header               : TTL=0x40 Flags=0x40 Precedence=0x00 TOS=0x10
+Default Gateway IP      : 10.5.0.1
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+Cipher Suite Priv Max   : aaaaaaaaaaaaaaa
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM</pre>
+
+<br>
+<br>
+
+
+<h1><u>Accessing IPMI Remotely</u></h1>
+
+<ol>
+<li>Compile ipmitool with the lanplus interface enabled
+<pre>ryan@buggy:~/src/ipmitool-1.8.11$ ./configure --enable-intf-lanplus</pre>
+
+<li>Access remote host via IPMI
+<pre>ryan@buggy:~/src/ipmitool-1.8.11$ ./src/ipmitool -I lanplus -H 10.1.1.151 -U root -P 'BuggyP@ssw0rd' -v shell
+ipmitool> lan print 1
+Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5
+                        : User     : MD2 MD5
+                        : Operator : MD2 MD5
+                        : Admin    : MD5 PASSWORD
+                        : OEM      :
+IP Address Source       : Static Address
+IP Address              : 10.1.1.151
+Subnet Mask             : 255.255.255.0
+MAC Address             : 00:22:19:27:53:10
+SNMP Community String   : public
+IP Header               : TTL=0x40 Flags=0x40 Precedence=0x00 TOS=0x10
+Default Gateway IP      : 0.0.0.0
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+Cipher Suite Priv Max   : aaaaaaaaaaaaaaa
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM
+</pre>
+</ol>
+
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Configuring%20BMC%20or%20iDRAC%20from%20ESXi%20or%20Linux&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fConfiguring_BMC_or_iDRAC_from_ESXi_or_Linux%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fConfiguring_BMC_or_iDRAC_from_ESXi_or_Linux%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fConfiguring_BMC_or_iDRAC_from_ESXi_or_Linux%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Configuring_BMC_or_iDRAC_from_ESXi_or_Linux\/';
+    var disqus_title = 'Configuring BMC or iDRAC from ESXi or Linux';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Configuring_BMC_or_iDRAC_from_ESXi_or_Linux\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+
