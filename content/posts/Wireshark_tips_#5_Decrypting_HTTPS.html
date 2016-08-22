@@ -1,0 +1,65 @@
+---
+title: "Wireshark tips #5: Decrypting HTTPS"
+date: "2014-03-30"
+redirect_from: "/post/81265978158/wireshark-tips-5-decrypting-https"
+categories: 
+    - "HTTPS"
+    - "Wireshark"
+    - "tshark"
+    - "decrypt"
+    - "RSA"
+    - "SSL"
+    - "TLS"
+---
+
+<i>TShark 1.2.15, Oracle Enterprise Linux 6.5</i><br/><br/>
+
+<p>
+If you are on a web server that is serving SSL, then you can use tshark on that server to decrypt the traffic off the wire. Copy the RSA private key file that your web service is using to /root/private-rsa.key in PKCS#1 format (<a href="http://www.cryptosys.net/pki/rsakeyformats.html">PKCS#1 files</a> begin with "<tt>-----BEGIN RSA PRIVATE KEY-----</tt>"), then run:
+</p>
+
+<p>
+<pre>
+tshark -o "ssl.desegment_ssl_records: TRUE" -o "ssl.desegment_ssl_application_data: TRUE" -o "ssl.keys_list:,443,http,/root/private-rsa.key" -o "ssl.debug_file:rsa_private.log" -R "(tcp.port eq 443)" port 443
+</pre>
+</p>
+
+<p>Note that tshark has to capture the beginning of an SSL session in order to decrypt it.  If your SSL client machine is Windows, you can force a new SSL session by doing the following:
+<ol>
+<li>Internet Explorer > Internet Preferences</li>
+<li>On the General tab, click Delete…, and delete everything</li>
+<li>On the Content tab, click "Clear SSL state"</li>
+</ol>
+</p>
+
+<p>
+If you find that tshark is not showing HTTP traffic, meaning it's still encrypted, then check the decryption log <tt>rsa_private.log</tt>
+</p>
+
+<p>
+Another option is to capture the traffic with tcpdump or tshark and decrypt it later using Wireshark.  To do that, in Wireshark,
+<ol>
+<li>Capture HTTPS traffic on server/load balancer using tcpdump or tshark:<br/>
+<pre>tcpdump -s 0 -w /tmp/ssl.cap</pre><br/>
+or
+<pre>tshark -F pcapng -w /tmp/ssl.pcapng port 443</pre>
+</li>
+<li>Edit > Preferences</li>
+<li>Expand Protocols</li>
+<li>Select SSL</li>
+<li>Click Edit… beside RSA keys list:</li>
+<li>Click New</li>
+<li>For IP address, enter <tt>0.0.0.0</tt> (sometimes you have to explicitly put in the server/load balancer IP address here)</li>
+<li>For Port, enter <tt>0</tt> (sometimes you have to explicitly put in the server/load balancer SSL port here)</li>
+<li>For Protocol, enter <tt>http</tt></li>
+<li>For Key File, select the RSA private key file which you copied from the web server or load balancer</li>
+<li>For Password, enter the password needed for the private key file (if there is not one, leave this field empty)</li>
+<li>Click OK</li>
+<li>Back on the SSL Preferences page, for SSL debug file, enter <tt>C:\rsa_debug.txt</tt></li>
+<li>Make sure "<tt>Reassemble SSL records spanning multiple TCP segments</tt>" is checked</li>
+<li>Make sure "<tt>Reassemble SSL Application Data spanning multiple SSL records</tt>" is checked</li>
+<li>Click OK to close the SSL Preferences page</li>
+<li>Load your capture file from the web server or load balancer.  As long as the SSL session initiation is in the capture, Wireshark should be able to decrypt the HTTPS packets and show the HTTP protocol information.</li>
+</ol>
+</p>
+

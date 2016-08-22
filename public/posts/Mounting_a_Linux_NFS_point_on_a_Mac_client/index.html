@@ -1,0 +1,217 @@
+---
+redirect_from: /post/4921797462/mounting-a-linux-nfs-point-on-a-mac-client
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Mounting a Linux NFS point on a Mac client &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Mounting a Linux NFS point on a Mac client</h1>
+    
+    Published Thu, May 15, 2008<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <i>Mac OS X 10.5.2, Linux (Debian) kernel 2.6.21.5</i><br/><br/>
+
+Quick tip for anyone trying to connect to a Linux server's NFS share from a Mac.
+The Finder provides a way to do this (from the menu bar, <tt>Go-&gt;Connect to server</tt>, then <tt>nfs://&lt;server_name&gt;/&lt;mount_point&gt;</tt>).  Turns out this may not work if your distribution of Linux requires NFS connections to come from a trusted port.  The solution requires you to open a terminal and type:<br /><br />
+
+<pre>sudo /sbin/mount_nfs -o resvport &lt;server_name&gt;:&lt;mount_point&gt;</pre><br /><br />
+
+In this example, the Mac has an IP address of 192.168.1.1 and the Linux server's is 192.168.1.34. <br />
+So on my linux box, my <tt>/etc/exports</tt> file looks like:<br /><br /><br /><br/>
+<pre># /etc/exports: the access control list for filesystems which may be exported
+#  to NFS clients.  See exports(5).<br /><br />/home/music 192.168.1.0/255.255.255.0(ro,sync)
+</pre><br /><br /><br />
+
+On the Mac, I type:<br/><br/>
+<pre>mkdir /tmp/mnt</pre>
+
+    (make a directory where I want to mount the remote directory<br /><br />
+
+<pre>sudo /sbin/mount_nfs -o resvport 192.168.1.34:/home/music /tmp/mnt</pre><br /><br /><br /><br />
+
+You should now be able to <pre>cd /tmp/mnt</pre> and see the contents of the remote directory.<br/><br/><br/><br/>
+
+Troubleshooting Notes:<br/><br/>
+
+If you are having trouble, look in the logs on the Linux/Mac boxes.  On Linux, they are usually in /var/log. For the Mac, use the Console application in the Utilities folder.  After you add an entry to /etc/exports on the Linux box, you may have to tell mountd(8) and nfsd(8) to re-read the file.  Some systems allow you to do this with the command <pre>exportfs -a</pre>
+
+If that command does not work, then send <a href="http://en.wikipedia.org/wiki/SIGHUP">HUP</a> signals to the two server processes:<br /><br />
+<pre>sudo killall -HUP rpc.mountd
+sudo killall -HUP rpc.nfsd</pre>
+<div class="blogger-post-footer">&nbsp;</div>
+
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Mounting%20a%20Linux%20NFS%20point%20on%20a%20Mac%20client&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fMounting_a_Linux_NFS_point_on_a_Mac_client%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fMounting_a_Linux_NFS_point_on_a_Mac_client%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fMounting_a_Linux_NFS_point_on_a_Mac_client%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Mounting_a_Linux_NFS_point_on_a_Mac_client\/';
+    var disqus_title = 'Mounting a Linux NFS point on a Mac client';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Mounting_a_Linux_NFS_point_on_a_Mac_client\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+

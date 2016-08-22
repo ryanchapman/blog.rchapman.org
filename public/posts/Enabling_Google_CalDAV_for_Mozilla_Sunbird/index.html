@@ -1,0 +1,188 @@
+---
+redirect_from: /post/4921797707/enabling-google-caldav-for-mozilla-sunbird
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Enabling Google CalDAV for Mozilla Sunbird &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Enabling Google CalDAV for Mozilla Sunbird</h1>
+    
+    Published Tue, Aug 13, 2013<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <i>Tested with: Gmail (or Google Apps), Mac OS X 10.5.4, Mozilla Sunbird 0.8</i><br /><br />Google recently enabled CalDAV access to Google Calendars.  It works with Sunbird, but the documentation on doing this is hard to find.  So here is how to do it, step by step.<br /><br /><ol><br /><li><a href="http://www.mozilla.org/projects/calendar/sunbird/">Download</a> and install Sunbird on your Mac.<br /><li>Open Sunbird<br /><li>Click File, then "Subscribe to Remote Calendar..."<br /><li>When the "Create a new calendar" dialog box appears, select "On the Network" and click Continue<br /><li>For Format, select "CalDAV" and for Location, enter "https://www.google.com/calendar/dav/YOUR_GOOGLE_EMAIL/events" (without the quotes)<br />For example, assume your Gmail address is johndoe@gmail.com, then your Location would be https://www.google.com/calendar/dav/johndoe@gmail.com/events<br />Let's assume you have Google Apps and your email is bill.jones@jonescorp.com, then your Location would be:<br />https://www.google.com/calendar/dav/bill.jones@jonescorp.com/events<br /><li>Click Continue<br /><li>Next, your are asked to name your calendar.  For mine, I just typed my first name.  You can choose a color for calendar entries here and choose if your want alarms to go off in Sunbird.  Click Continue.<br /><li>Click Done.<br /></ol><br /><br /><br />That's it.  By default, Sunbird will refresh remote calendars every 30 minutes. If you want to change this, go into the Preferences (Command ,)<br /><br />Since Google CalDAV syncing is in beta, you should direct all your questions to <a href="http://groups.google.com/group/google-calendar-help-dataapi">Google Groups - Calendar Help Dataapi</a><div class="blogger-post-footer">&nbsp;</div>
+
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Enabling%20Google%20CalDAV%20for%20Mozilla%20Sunbird&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fEnabling_Google_CalDAV_for_Mozilla_Sunbird%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fEnabling_Google_CalDAV_for_Mozilla_Sunbird%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fEnabling_Google_CalDAV_for_Mozilla_Sunbird%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Enabling_Google_CalDAV_for_Mozilla_Sunbird\/';
+    var disqus_title = 'Enabling Google CalDAV for Mozilla Sunbird';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Enabling_Google_CalDAV_for_Mozilla_Sunbird\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+

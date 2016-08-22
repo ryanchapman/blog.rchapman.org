@@ -1,0 +1,62 @@
+---
+title: "Eclipse Remote System Explorer fails to connect via ssh with algorithm negotiation failure"
+date: "2014-04-08"
+redirect_from: "/post/82092881937/eclipse-remote-system-explorer-fails-to-connect-via-ssh"
+categories: 
+    - "Eclipse"
+    - "Java JDK"
+    - "Java JRE"
+    - "RSREG1066"
+    - "AES192"
+    - "AES256"
+    - "Crypto"
+    - "SSH"
+    - "Remote System Explorer"
+    - "RSE"
+    - "JSCH"
+    - "Algorithm negotiation failed"
+---
+
+<i>Windows 7 SP1, Java JRE 1.7.0_51-b13 (32-bit), Eclipse Kepler Service Release 2 build 20140224-0627, Eclipse Plugin RSE SSH Services 3.2.100.201305201712</i><br/><br/>
+
+If you use a Java IDE or any other Java program that makes ssh connections to a server that has anything over 128 bit encryption turned on, then you'll see that it fails with the error:
+
+<pre>
+    RSEG1066
+
+    Failed to connect sshd on HMSWEBXX01.ZZZ.LAN:22
+
+    Algorithm negotiation failed
+</pre>
+
+<p>
+By default, the Java Development Kit and Java Runtime Environment do not offer ciphers larger than 128 bits. To fix, all you need to do is download the strong encryption JAR files for your version of the JDK/JRE and restart your Java app.
+</p>
+
+<br/>
+<p>
+Java Cryptography Extension Unlimited Strength Downloads
+</p>
+
+<p>
+JDK/JRE 1.6<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html">http://www.oracle.com/technetwork/java/javase/downloads/jce-6-download-429243.html</a><br/><br/>
+
+JDK/JRE 1.7<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html">http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html</a><br/><br/>
+</p>
+<br/>
+
+<p>
+Copy <code>local_policy.jar</code> and <code>US_export_policy.jar</code> to your JRE/JDK's lib\security directory
+</p>
+
+<pre>
+Examples of possible destination folders:
+    JRE 1.6, 32-bit         C:\Program Files (x86)\Java\jre6\lib\security
+    JRE 1.7, 32-bit         C:\Program Files (x86)\Java\jre7\lib\security
+    JRE 1.6, 64-bit         C:\Program Files\Java\jre6\lib\security
+    JRE 1.7, 64-bit         C:\Program Files\Java\jre7\lib\security
+    JDK 1.7.0.51, 64-bit    C:\Program Files\Java\jdk1.7.0_51\jre\lib\security
+</pre>
+

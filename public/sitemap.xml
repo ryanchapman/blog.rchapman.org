@@ -3,7 +3,32 @@
   
   <url>
     <loc>http://test2.rchapman.org/</loc>
-    <lastmod>2015-11-07T00:00:00+00:00</lastmod>
+    <lastmod>2016-06-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/SSH_with_Yubikey_NEO/</loc>
+    <lastmod>2016-06-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Yubikey_NEO_for_Physical_Access_Control/</loc>
+    <lastmod>2016-06-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</loc>
+    <lastmod>2016-02-10T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Securely_allowing_rancid_to_back_up_IOS_configs/</loc>
+    <lastmod>2015-11-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Loading_an_openssh_pubkey_on_Cisco_IOS/</loc>
+    <lastmod>2015-11-22T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -12,8 +37,168 @@
   </url>
   
   <url>
+    <loc>http://test2.rchapman.org/posts/ASA_debugging_AnyConnect_and_radius/</loc>
+    <lastmod>2015-11-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://test2.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</loc>
     <lastmod>2015-10-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Getting_shell_on_a_RouterBoard/</loc>
+    <lastmod>2015-09-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Troubleshooting_EAP-TLS_with_freeradius/</loc>
+    <lastmod>2015-07-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</loc>
+    <lastmod>2014-04-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Wireshark_tips_/</loc>
+    <lastmod>2014-03-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/OpenVPN_IPv6_Tunnel_Fails_on_Windows/</loc>
+    <lastmod>2013-08-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Enabling_Google_CalDAV_for_Mozilla_Sunbird/</loc>
+    <lastmod>2013-08-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Transparently_proxying_any_tcp_connection/</loc>
+    <lastmod>2013-04-07T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/</loc>
+    <lastmod>2012-11-29T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Configuring_BMC_or_iDRAC_from_ESXi_or_Linux/</loc>
+    <lastmod>2012-03-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Create_eager_zero_hard_disks_from_PowerCLI_%28PowerShell%29/</loc>
+    <lastmod>2012-01-29T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/PXE_Booting_From_One_PXE_Server_To_Another/</loc>
+    <lastmod>2012-01-29T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Bypassing_snoopy_logging/</loc>
+    <lastmod>2011-04-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Screen_will_only_display_8_colors_instead_of_16/</loc>
+    <lastmod>2010-10-05T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Getting_Line_Drawing_to_Work_with_putty/</loc>
+    <lastmod>2010-09-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Finding_network_traffic_generated_by_programs/</loc>
+    <lastmod>2009-12-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Forwarding_iPhone_to_Google_Voice_Voicemail/</loc>
+    <lastmod>2009-08-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/How_to_enable_international_mode_on_Griffin_iTrip_AutoPilot/</loc>
+    <lastmod>2009-06-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/How_to_get_FieldTest_application_icon_to_always_show_up_on_the_iPhone/</loc>
+    <lastmod>2009-02-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Capture_packets_on_a_Mac/</loc>
+    <lastmod>2008-08-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Setting_Up_Gmail_To_Work_With_Blackberry/</loc>
+    <lastmod>2008-08-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Syncing_your_Blackberrys_calendar_with_your_Google_Calendar/</loc>
+    <lastmod>2008-08-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Mounting_a_Linux_NFS_point_on_a_Mac_client/</loc>
+    <lastmod>2008-05-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Replace_the_Dock_Icon_Created_by_a_VMware_Fusion_Application/</loc>
+    <lastmod>2008-04-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/FileMon_replacement_for_Mac/</loc>
+    <lastmod>2008-03-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Getting_1Password_to_work_with_Safari_3.1/</loc>
+    <lastmod>2008-03-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/How_To_Connect_or_Disconnect_a_PPTP_VPN_Session_From_the_Command_Line/</loc>
+    <lastmod>2008-01-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Debugging_Dialup_Modem_Connection_Issues_on_Mac_OS_X/</loc>
+    <lastmod>2008-01-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/How_To_Tether_Your_Phone_To_a_Mac_Using_Bluetooth/</loc>
+    <lastmod>2008-01-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/How_To_Print_To_a_HP_DeskJet_820Cxi_and_820Cse_From_a_Mac/</loc>
+    <lastmod>2008-01-16T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/How_To_Stream_SiriusMac_StarPlayr_or_XMac_To_Your_Airport_Express/</loc>
+    <lastmod>2008-01-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Inside_Story_on_the_Creation_of_the_iPhone/</loc>
+    <lastmod>2008-01-11T00:00:00+00:00</lastmod>
   </url>
   
 </urlset>

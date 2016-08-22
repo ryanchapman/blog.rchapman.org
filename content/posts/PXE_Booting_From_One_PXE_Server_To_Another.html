@@ -1,0 +1,70 @@
+---
+title: "PXE booting from one PXE server to another"
+date: "2012-01-29"
+redirect_from: "/post/16690497775/pxe-booting-from-one-pxe-server-to-another"
+categories: 
+    - "PXE"
+    - "bootchaining"
+    - "gpxe"
+    - "pxelinux"
+    - "syslinux"
+---
+
+<p><em>Linux 2.6.18, Syslinux 4.02, nasm 2.09</em></p>
+<p>I've spent the past several days trying to figure out how to add a new PXE server to our environment at work.  We have a corporate PXE server which I do not have access to, but I can request that a hook be put into place on the main PXE server and build my own.  It seems this process is typically called PXE chaining.</p>
+<p> </p>
+<p><span style="text-decoration: underline;">Currently</span></p>
+<pre>CORP PXE SERVER
+  MENU
+  1) Install Linux
+  2) Install Windows
+  ..
+</pre>
+<p> </p>
+<p><span style="text-decoration: underline;">Desired</span></p>
+<pre>  +---------------------------------------------------------------+
+  |                                                               |
+ \ /                                                              |
+CORP PXE SERVER (10.90.1.2)   +--&gt; QA PXE SERVER (10.5.0.2)       |
+  MENU                        |     MENU                          |
+  1) Install Linux            |     1) Update BIOS                |
+  2) Install Windows          |     2) Install Xen                |
+  3) QA PXE Server------------+     3) Return to CORP PXE Server--+
+</pre>
+<p> </p>
+<p>The best method of accomplishing this is with pxechain.com, which is part of the syslinux project.  To set it up, you need at least version 4.04 of syslinux.  Then your CORP server's <span style="font-family: Courier; font-size: 12px;">/tftpboot/pxelinux.cfg/default </span>would have an entry like this:</p>
+<pre>LABEL qapxe
+MENU LABEL QA PXE Server
+KERNEL pxechain.com
+APPEND 10.5.0.2::pxelinux.0
+</pre>
+<p> </p>
+<p>The issue I ran into is that the corporate PXE server is on an old version of syslinux (4.02), which has a bug in pxechain.com/pxelinux.0 that causes the machine being PXE booted to hang when pxechain.com is loaded.  So pxechain.com was not an option for me as I could not upgrade syslinux on the corporate server.</p>
+<p> </p>
+<p>The second option I came across was gpxe.  Turns out it works with syslinux 4.02.  To configure it:</p>
+<p>1) Download syslinux 4.02</p>
+<p>2) Compile (make) the package with <span style="font-family: Courier; font-size: 12px;">cd syslinux-4.02 ; make</span></p>
+<p>3) Go into the <span style="font-family: Courier; font-size: 12px;">syslinux-4.02/gpxe</span></p>
+<p>4) Modify the <span style="font-family: Courier; font-size: 12px;">pxelinux.gpxe</span> script to look like this:</p>
+<pre>#!gpxe
+set use-cached 1
+dhcp net0
+set net0/209:string pxelinux.cfg/default
+set net0/210:string tftp://10.5.0.2/
+imgload pxelinux.0
+boot pxelinux.0
+</pre>
+<p>5) Run make again in the gpxe directory.  This will produce a binary called <span style="font-family: Courier; font-size: 12px;">gpxelinux.0</span> that contains the above script embedded within it.  Install <span style="font-family: Courier; font-size: 12px;">gpxelinux.0</span> on the corporate PXE server in the <span style="font-family: Courier; font-size: 12px;">/tftpboot/</span> directory</p>
+<p>6) Add an entry similar to this to <span style="font-family: Courier; font-size: 12px;">/tftpboot/pxelinux.cfg/default</span>:</p>
+<pre>LABEL qapxe
+MENU LABEL QA PXE Server
+KERNEL gpxelinux.0
+</pre>
+<p> </p>
+<p>The process for creating the menu entry on the QA PXE server that returns to the CORP PXE server is similar.  Edit the <span style="font-family: Courier; font-size: 12px;">pxelinux.gpxe</span> script and change the IP address to <span style="font-family: Courier; font-size: 12px;">10.90.1.2</span>.  Compile and place that <span style="font-family: Courier; font-size: 12px;">gpxelinux.0</span> on the QA PXE server in the <span style="font-family: Courier; font-size: 12px;">/tftpboot/</span> directory.</p>
+<p> </p>
+<p>If you need to troubleshoot pxechain.com, you need to uncomment the <span style="font-family: Courier; font-size: 12px;">%define DEBUG</span> in <span style="font-family: Courier; font-size: 12px;">modules/pxechain.asm</span> and be sure to use nasm 2.09.  nasm 2.03.01 on CentOS 5.5 wouldn't compile for me.  I had better luck with Debian Squeeze, which has a modern nasm.</p>
+<p> </p>
+<a href="http://farm8.staticflickr.com/7157/6781475395_b51f4fb9ee_b.jpg"><img src="http://farm8.staticflickr.com/7157/6781475395_b51f4fb9ee.jpg"></a>
+
+

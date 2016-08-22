@@ -1,0 +1,24 @@
+---
+title: "OpenVPN IPv6 Tunnel Fails on Windows"
+date: "2013-08-25"
+redirect_from: "/post/59339270690/openvpn-ipv6-tunnel-fails-on-windows"
+categories: 
+    - "OpenVPN"
+    - "IPv6"
+    - "Windows"
+---
+
+<i>OpenVPN 2.3.2-I003, Windows 7 x86_64</i>
+
+When attempting to establish a IPv6 tunnel on Windows, if you see the following error:
+
+<pre>
+NETSH: C:\Windows\system32\netsh.exe interface ipv6 set address Local Area Connection 2 2402:b300:100:aafc:4000:1234:0:1000 store=active
+ERROR: netsh command failed: returned error code 1
+</pre>
+
+then you probably do not have IPv6 enabled on your Windows machine.
+
+IPv6 is controlled in the registry via the key HKLM\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters\DisabledComponents, the default value of which is 0x10.  To enable IPv6 on all network interfaces, change this value to 0x0.  There are several other options for this key; see <a href="http://support.microsoft.com/kb/929852">Microsoft KB 929852</a> for more info.  In my tests, the only value I could get to work with OpenVPN was 0x0, although I also tried <a href="http://go.microsoft.com/?linkid=9732984">Microsoft Fix it 50443</a>, which enables IPv6 on all tunnel interfaces.
+
+

@@ -1,0 +1,417 @@
+---
+redirect_from: /post/47406142744/transparently-proxying-http-and-https-connections
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Transparently proxying any tcp connection (including http and https without man-in-the-middle) &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Transparently proxying any tcp connection (including http and https without man-in-the-middle)</h1>
+    
+    Published Sun, Apr 7, 2013<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    I recently ran into a situation where a proxy server was being installed, but some applications were not proxy aware. To illustrate, this is what the network looked like:
+
+<a href="http://www.flickr.com/photos/ryanchapman/8629661876/sizes/l/"><img src="http://farm9.staticflickr.com/8260/8629661876_51beaf7510_b.jpg"></a>
+
+Here we have a web server running proxy unaware applications.  The web server does not have routes to the internet; it must use a proxy server to communicate with web sites located on the public internet.
+
+The solution is to intercept all HTTP (port 80) and HTTPS (port 443) traffic at the firewall.  For http, we'll use squid and for https, we'll use a custom program I wrote.
+
+First up, http.  In vyatta, configure the webproxy with:
+
+<pre>
+set service webproxy listen-address 10.18.11.5
+commit
+save
+</pre>
+
+
+The squid service will start up after committing the changes, but some changes need to be made to the config file.  Edit /etc/squid3/squid.conf to look like this:
+
+<pre>
+#
+# autogenerated by vyatta-update-webproxy.pl
+#
+
+acl manager proto cache_object
+acl localhost src 127.0.0.1/32
+acl to_localhost dst 127.0.0.0/8
+acl net src all
+acl SSL_ports port 443
+acl Safe_ports port 80          # http
+acl Safe_ports port 21          # ftp
+acl Safe_ports port 443         # https
+acl Safe_ports port 70          # gopher
+acl Safe_ports port 210         # wais
+acl Safe_ports port 1025-65535  # unregistered ports
+acl Safe_ports port 280         # http-mgmt
+acl Safe_ports port 488         # gss-http
+acl Safe_ports port 591         # filemaker
+acl Safe_ports port 777         # multiling http
+acl CONNECT method CONNECT
+
+http_access allow manager localhost
+http_access deny manager
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+http_access allow localhost
+http_access allow net
+http_access deny all
+
+cache_dir ufs /var/spool/squid3 100 16 256
+cache_mem 20 MB
+access_log /var/log/squid3/access.log squid
+
+cache_store_log none
+
+http_port 10.18.11.5:3128 transparent
+
+forwarded_for off
+
+# added by Ryan
+visible_hostname fw01-1.web.lan
+cache_mgr youremail@yourdomain.com
+# Do not send the following domains to the proxy
+acl DIRECTS dstdomain .lan
+never_direct allow all
+always_direct allow DIRECTS
+nonhierarchical_direct off
+# Stop sending requests to a peer if it does not respond within 5 seconds
+peer_connect_timeout 5 seconds
+# When all peers are available, balance requests between proxy1/2.  If those two go down, send requests to the lastresort
+cache_peer 1.2.3.4 parent 80 0 proxy-only no-query name=proxy1 round-robin weight=999999
+cache_peer 1.2.3.5 parent 80 0 proxy-only no-query name=proxy2 round-robin weight=999999
+cache_peer 1.2.3.6 parent 80 0 proxy-only no-query name=proxy-lastresort round-robin weight=1
+</pre>
+
+Restart squid3 with <code>/etc/init.d/squid3 restart</code>.  Note that you'll want to edit vyatta-update-webproxy.pl to make sure the changes we placed in the squid config stay around after a re-commit (this was the best suggestion on the vyatta forums).
+
+A http request from the web server (10.18.11.40) will now be forwarded to the proxies transparently:
+
+<pre>
+[root@web01 ~]# nc www.google.com 80
+HEAD / HTTP/1.0
+
+HTTP/1.0 200 OK
+P3P: CP="This is not a P3P policy! See http://www.google.com/support/accounts/bin/answer.py?hl=en&answer=151657 for more info."
+Date: Sun, 07 Apr 2013 21:35:13 GMT
+Server: gws
+Expires: -1
+Set-Cookie: NID=67=DUffxHjxxlJbUCbh58qhFLVJffrvGVX8lMm96QaFzfwjFyGNz4VlHPziZUozs0zh9cUwzxWX-WSftJ-JCPC652SYCVP5lXHIGCYXBabW3A8J1toyxBe1n7Lu8oqmiXEV; expires=Mon, 07-Oct-2013 21:35:13 GMT; path=/; domain=.; HttpOnly
+Content-Type: text/html; charset=ISO-8859-1
+Cache-Control: private, max-age=0
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+X-Cache: MISS from fw01-1.web.lan
+X-Cache-Lookup: MISS from fw01-1.web.lan:3128
+Via: 1.0 fw01-1.web.lan (squid/3.1.6)
+Connection: close
+
+[root@web01 ~]#
+</pre>
+
+
+Second, https.  This one is a little trickier.  The squid solutions I found on the internet suggested using a man-in-the-middle strategy, where squid decrypts the SSL/TLS data and then re-encrypts it.  I wasn't fond of this method because not only it is technically difficult to pull off, it raises some ethical issues.  Another way is to transparently do what proxy aware applications perform:
+<ol>
+<li>Application wants to connect to www.google.com on port 443.  It first checks the environment for the variable https_proxy.  Let's assume https_proxy=http://1.2.3.4:80
+<li>Application makes connection to proxy server at 1.2.3.4 on port 80
+<li>Application sends "CONNECT www.google.com:443 HTTP/1.1\r\nHost:www.google.com\r\n\r\n"
+<li>Proxy server responds "HTTP/1.0 200 Connection established"
+<li>Application speaks TLS as if it had directly connected to www.google.com:443 originally
+</ol>
+
+I've written a program in Golang called any_proxy, available on <a href="https://github.com/ryanchapman/go-any-proxy">Github</a> that can transparently proxy https (there is also a newer version called <a href="http://github.com/ryanchapman/go-any-proxy">any_proxy</a> which supports proxying of any tcp protocol). Here is a network timing diagram to illustrate what's going on:
+<a href="http://www.flickr.com/photos/ryanchapman/8628595105/sizes/l/"><img src="http://farm9.staticflickr.com/8112/8628595105_4d1fc309dc_b.jpg"></a>
+
+Compiling:
+<ol>
+<li>Make sure you have golang installed on your machine. Binaries are available from <a href="http://golang.org">golang.org</a></li>
+<li>Clone the go-any-proxy repo with <code>git clone git://github.com/ryanchapman/go-any-proxy.git</code>
+<li>Compile with <code>./make.bash</code>
+</ol>
+
+Installing:
+<ol>
+<li>Secure copy any_proxy to your vyatta:<br>
+<pre>scp any_proxy fw01-1.web.lan:/root</pre>
+<li>Ssh to your vyatta:<br>
+<pre>ssh ryan@fw01-1.web.lan</pre>
+<li>Make sure you already set up the squid webproxy earlier. Add a firewall rule to have 443 traffic redirected to any_proxy:<br>
+<pre>iptables -t nat -A WEBPROXY -p tcp --dport 443 redir ports 3129</pre>
+<li>Start the proxy:
+<pre>/root/any_proxy -l :3129 -p "1.2.3.4:80,1.2.3.5:80,1.2.3.6:80"</pre>
+<li>You should now be able to connect to a site with https now:
+<pre>
+[root@web01 ~]# openssl s_client -host www.google.com -port 443
+CONNECTED(00000003)
+depth=2 C = US, O = Equifax, OU = Equifax Secure Certificate Authority
+verify return:1
+depth=1 C = US, O = Google Inc, CN = Google Internet Authority
+verify return:1
+depth=0 C = US, ST = California, L = Mountain View, O = Google Inc, CN = www.google.com
+verify return:1
+---
+Certificate chain
+ 0 s:/C=US/ST=California/L=Mountain View/O=Google Inc/CN=www.google.com
+   i:/C=US/O=Google Inc/CN=Google Internet Authority
+ 1 s:/C=US/O=Google Inc/CN=Google Internet Authority
+   i:/C=US/O=Equifax/OU=Equifax Secure Certificate Authority
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIDgDCCAumgAwIBAgIKKZxzswABAACCpzANBgkqhkiG9w0BAQUFADBGMQswCQYD
+VQQGEwJVUzETMBEGA1UEChMKR29vZ2xlIEluYzEiMCAGA1UEAxMZR29vZ2xlIElu
+dGVybmV0IEF1dGhvcml0eTAeFw0xMzAzMjcxMzI4MjJaFw0xMzEyMzExNTU4NTBa
+MGgxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1N
+b3VudGFpbiBWaWV3MRMwEQYDVQQKEwpHb29nbGUgSW5jMRcwFQYDVQQDEw53d3cu
+Z29vZ2xlLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1zqnIRAV0QRL
+49U0b7wi+rF0wdkY3BcWHdmYgBmF81QH6854F8NBFdECnPOpLpSIcB+r7NjK4Gj6
+PQ0Kfg1BkqBC5fy1D5QeW5MOMuftbraURLu9LrELBG/DN2K5KVegQE60yitLOhU/
+wSc/ac5sEdsfx6T1HaPm4eByQ5S8fhcCAwEAAaOCAVEwggFNMB0GA1UdJQQWMBQG
+CCsGAQUFBwMBBggrBgEFBQcDAjAdBgNVHQ4EFgQUeTiJyDmB+bnMsRpBVwCCswsj
+JLEwHwYDVR0jBBgwFoAUv8Aw6/VDET5nup6R+/xq2uNrEiQwWwYDVR0fBFQwUjBQ
+oE6gTIZKaHR0cDovL3d3dy5nc3RhdGljLmNvbS9Hb29nbGVJbnRlcm5ldEF1dGhv
+cml0eS9Hb29nbGVJbnRlcm5ldEF1dGhvcml0eS5jcmwwZgYIKwYBBQUHAQEEWjBY
+MFYGCCsGAQUFBzAChkpodHRwOi8vd3d3LmdzdGF0aWMuY29tL0dvb2dsZUludGVy
+bmV0QXV0aG9yaXR5L0dvb2dsZUludGVybmV0QXV0aG9yaXR5LmNydDAMBgNVHRMB
+Af8EAjAAMBkGA1UdEQQSMBCCDnd3dy5nb29nbGUuY29tMA0GCSqGSIb3DQEBBQUA
+A4GBAKAluLPebUSSuwF2wyablQT08GGyQQ0A+SW8gQXy7obaXpQJa/gw5BaZz64w
+qMs4Bhmw7AECfq4nPDfY0k9eC4sIHOO95MwGXcH+14IFFDiF4o2f1q1SQQIbdS19
+eepmrzYfjNn6KM0dahsnSf1zViIRYdu9gZ3HVwwfif1foidR
+-----END CERTIFICATE-----
+subject=/C=US/ST=California/L=Mountain View/O=Google Inc/CN=www.google.com
+issuer=/C=US/O=Google Inc/CN=Google Internet Authority
+---
+No client certificate CA names sent
+---
+SSL handshake has read 1887 bytes and written 298 bytes
+---
+New, TLSv1/SSLv3, Cipher is RC4-SHA
+Server public key is 1024 bit
+Secure Renegotiation IS supported
+Compression: NONE
+Expansion: NONE
+SSL-Session:
+    Protocol  : TLSv1
+    Cipher    : RC4-SHA
+    Session-ID: 20100F0A1526BDADC3E7E278D2925738CAC56CB49A209CB0F3E036FFD57EEFF5
+    Session-ID-ctx:
+    Master-Key: FE00D81636D02CF0259B4945A16B37A0ACF267918635D23D9034F46886993C0291A0E639573534413FC176D9A4E1253E
+    Key-Arg   : None
+    Krb5 Principal: None
+    PSK identity: None
+    PSK identity hint: None
+    TLS session ticket lifetime hint: 100800 (seconds)
+    TLS session ticket:
+    0000 - 1c f0 4d b2 70 a7 14 13-a4 e4 25 f4 dd 29 c8 52   ..M.p.....%..).R
+    0010 - 96 22 0f a5 c7 2f e0 c5-ef 99 db 1c e8 8d 66 a8   .".../........f.
+    0020 - c4 b1 c1 87 12 69 10 a3-c1 a8 7e 8f 32 3e 03 9e   .....i....~.2>..
+    0030 - 97 8b 7e a5 b4 64 75 50-69 98 f7 da 11 d8 83 20   ..~..duPi.......
+    0040 - 67 3a dc 66 11 8a b0 08-61 3b 94 53 7e c4 2e e5   g:.f....a;.S~...
+    0050 - 9d dd 38 34 e6 de 42 69-88 a2 d4 8c be 94 aa 38   ..84..Bi.......8
+    0060 - 2d be f3 b7 81 93 48 48-fc 53 af d3 98 87 c8 a8   -.....HH.S......
+    0070 - d0 41 dc ab 1e fd 5f 05-34 ac 2f d3 b4 ec 43 c1   .A...._.4./...C.
+    0080 - ac 84 0b ce 6f 98 6c 0c-3a d7 03 d7 40 f2 33 5d   ....o.l.:...@.3]
+    0090 - d3 cd 75 f5                                       ..u.
+
+    Start Time: 1365373842
+    Timeout   : 300 (sec)
+    Verify return code: 0 (ok)
+---
+HEAD / HTTP/1.0
+
+HTTP/1.0 200 OK
+Date: Sun, 07 Apr 2013 22:30:47 GMT
+Expires: -1
+Cache-Control: private, max-age=0
+Content-Type: text/html; charset=ISO-8859-1
+Set-Cookie: PREF=ID=e458ec6f20965cef:FF=0:TM=1365373847:LM=1365373847:S=IEPlOV-aQ9f_RF-u; expires=Tue, 07-Apr-2015 22:30:47 GMT; path=/; domain=.google.com
+Set-Cookie: NID=67=BlzgMe73-RN5tlryHoZcQGdRxrJfJpwNkBjfyJ-Zl-0ucm4HwkzpjPIVyTFR_IFqvCoCPOuHgEa566XAGfmCYI1nQgydCjRoqM8-wu__n-H7nIC5nt1JukFP1YtLc0BL; expires=Mon, 07-Oct-2013 22:30:47 GMT; path=/; domain=.google.com; HttpOnly
+P3P: CP="This is not a P3P policy! See http://www.google.com/support/accounts/bin/answer.py?hl=en&answer=151657 for more info."
+Server: gws
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+
+read:errno=0
+[root@web01 ~]#
+</pre>
+</ol>
+
+Of course, you'll want to make sure the services start on reboot.  That is left as an exercise for the reader.
+Feel free to leave comments or send pull requests with any improvements to the code.
+
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Transparently%20proxying%20any%20tcp%20connection%20%28including%20http%20and%20https%20without%20man-in-the-middle%29&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fTransparently_proxying_any_tcp_connection%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fTransparently_proxying_any_tcp_connection%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fTransparently_proxying_any_tcp_connection%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Transparently_proxying_any_tcp_connection\/';
+    var disqus_title = 'Transparently proxying any tcp connection (including http and https without man-in-the-middle)';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Transparently_proxying_any_tcp_connection\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+

@@ -1,0 +1,13 @@
+---
+title: "How to connect or disconnect a PPTP VPN session from the command line (terminal)"
+date: "2008-01-20"
+redirect_from: "/post/4921771133/how-to-connect-or-disconnect-a-pptp-vpn-session"
+categories: 
+    - "Mac OS"
+    - "PPTP"
+    - "VPN"
+---
+
+<i>Mac OS X 10.5.1</i><br /><br />Below is how to establish a PPTP VPN session from the command line in OS X.  Note you must first set up the VPN connection in System Preferences-&gt;Network.  I use this to connect to a Cisco 827H router running IOS.  If there is any interest, I'll post instructions on how to setup an IOS router for PPTP or IPSEC VPN connections (your choice, but the IPSEC requires the Cisco VPN Client for Mac).<br /><br />I'm saving everything to ~/bin in the example below.  Make modifications as you see fit.<br /><ol><br /><li>Open Script Editor and paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  if exists VPNservice then connect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.scpt<br /><br /><br /></li><li>In Script Editor, File-&gt;New, then paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  set isConnected to connected of current configuration of VPNservice<br />  if isConnected then disconnect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.scpt<br /><br /><br /></li><li>Open your favorite text editor, such as vi, and paste the following shell script:<br /><pre><br />#!/bin/sh -<br />osascript pptp_connect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.sh<br /><br /><br /></li><li>Paste the following shell script in a new text editor window:<br /><pre><br />#!/bin/sh -<br />osascript pptp_disconnect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.sh<br /><br /><br /></li><li>Execute the following command to make the scripts executable by everyone:<br /><pre><br />chmod +x ~/bin/pptp_*.sh<br /></pre><br /><br />Now in your terminal, you can execute <tt>~/bin/pptp_connect.sh</tt> or <tt>~/bin/pptp_disconnect.sh</tt> to establish or tear down your PPTP connection.<br /><br />This works with L2TP VPN connections also.  Where you see "VPN (PPTP)" simply change it to "VPN (L2TP)".<br /></li></ol><div class="blogger-post-footer">&nbsp;</div>
+
+

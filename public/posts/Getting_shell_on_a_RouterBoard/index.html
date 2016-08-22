@@ -1,0 +1,1211 @@
+---
+redirect_from: /post/128621800479/getting-shell-on-a-routerboard
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Getting shell on a RouterBoard &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Getting shell on a RouterBoard</h1>
+    
+    Published Tue, Sep 8, 2015<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <p><em>Cloud Router Switch CRS125-24G-1S-RM, RouterOS 6.24, Mac OS X 10.8.5 (dhcpd/tftp running on Mac)</em><br/><br/></p>
+
+<p>Ever wondered if you could get a real shell on a RouterBoard? The answer is yes, yes you can. I recently wanted to know how RouterOS on a Mikrotik CRS125-24G-1S-RM actually sets up VLANs internally so that I can duplicate a complicated set up that I already have on a Ubiquiti EdgeRouter. Below is how to get a busybox shell via ssh or the console.  Once you are in, you'll see that the busybox included is pretty limited; however, you can upload a fully operational busybox via the RouterOS web admin interface (WebFig) and then execute that one.  With the new busybox, things like ifconfig, dmesg, ls, vconfig, and many more will work.</p>
+
+<p>
+1. Choose a machine that you want to serve the openwrt boot image.
+</p>
+
+<p>
+2. Configure your wired ethernet interface to have an IP address of 192.168.88.5 and a netmask of 255.255.255.0
+</p>
+
+<p>
+3. Download the openwrt image I compiled for booting into a CRS125 from <a href="https://github.com/ryanchapman/openwrt-mikrotik-crs125/raw/master/bin/ar71xx/openwrt-ar71xx-mikrotik-vmlinux-initramfs.elf">https://github.com/ryanchapman/openwrt-mikrotik-crs125/raw/master/bin/ar71xx/openwrt-ar71xx-mikrotik-vmlinux-initramfs.elf</a> into /Users/ryan/tftpboot/vmlinux
+</p>
+
+<p>
+4. Modify your tftp plist file to look like this:<br/>
+<pre>
+Ryans-MacBook-Pro:~ ryan$ cat /System/Library/LaunchDaemons/tftp.plist
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"&gt;
+&lt;plist version="1.0"&gt;
+&lt;dict&gt;
+    &lt;key>Disabled&lt;/key&gt;
+    &lt;true/&gt;
+    &lt;key&gt;Label&lt;/key&gt;
+    &lt;string&gt;com.apple.tftpd&lt;/string&gt;
+    &lt;key&gt;ProgramArguments&lt;/key&gt;
+    &lt;array&gt;
+        &lt;string&gt;/usr/libexec/tftpd&lt;/string&gt;
+        &lt;string&gt;-i&lt;string&gt;
+        &lt;string&gt;/Users/ryan/tftpboot&lt;/string&gt;
+    &lt;/array&gt;
+    &lt;key&gt;inetdCompatibility&lt;/key&gt;
+    &lt;dict&gt;
+        &lt;key&gt;Wait&lt;/key&gt;
+        &lt;true/&gt;
+    &lt;/dict&gt;
+    &lt;key&gt;InitGroups&lt;/key&gt;
+    &lt;true/&gt;
+    &lt;key&gt;Sockets&lt;/key&gt;
+    &lt;dict&gt;
+        &lt;key&gt;Listeners&lt;/key&gt;
+        &lt;dict&gt;
+            &lt;key&gt;SockServiceName&lt;/key&gt;
+            &lt;string&gt;tftp&lt;/string&gt;
+            &lt;key&gt;SockType&lt;/key&gt;
+            &lt;string&gt;dgram&lt;/string&gt;
+        &lt;/dict&gt;
+    &lt;/dict&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;
+Ryans-MacBook-Pro:~ ryan$
+</pre>
+</p>
+
+<p>
+5. Load the tftp plist file and start the tftp server:
+<pre>sudo launchctl load -F /System/Library/LaunchDaemons/tftp.plist
+sudo launchctl start com.apple.tftpd
+</pre>
+</p>
+
+<p>
+6. Create a dhcpd config file
+<pre>Ryans-MacBook-Pro:~ ryan$ cat /etc/dhcpd.conf
+ddns-update-style interim;
+
+# option definitions common to all supported networks...
+#default-lease-time 600;
+default-lease-time 14400;
+max-lease-time 7200;
+authoritative;
+
+allow bootp;
+allow booting;
+
+subnet 192.168.88.0 netmask 255.255.255.0 {
+    filename "vmlinux";
+    next-server 192.168.88.5;
+    range dynamic-bootp 192.168.88.15 192.168.88.254;
+}
+
+Ryans-MacBook-Pro:~ ryan$
+</pre>
+</p>
+
+<p>
+7. Start the dhcp daemon with <pre>sudo dhcpd -d en0</pre> (replace en0 with your wired ethernet interface on your Mac, use <code>ifconfig</code> if unsure)
+<pre>Ryans-MacBook-Pro:~ ryan$ sudo dhcpd -d en0
+dyld: DYLD_ environment variables being ignored because main executable (/usr/bin/sudo) is setuid or setgid
+Internet Systems Consortium DHCP Server 4.1-ESV-R4
+Copyright 2004-2011 Internet Systems Consortium.
+All rights reserved.
+For info, please visit https://www.isc.org/software/dhcp/
+Wrote 3 leases to leases file.
+Listening on BPF/en0/00:XX:XX:XX:XX:XX/192.168.88.0/24
+Sending on   BPF/en0/00:XX:XX:XX:XX:XX/192.168.88.0/24
+Sending on   Socket/fallback/fallback-net
+</pre>
+</p>
+
+<p>
+If you see output like above and no errors, exit dhcpd with <b>Ctrl-C</b> then type <code>sudo dhcpd en0 &</code> to get it to run in the background.  You may have to press enter a few times to get a prompt to show up again.
+</p>
+
+<p>
+8. Attach an ethernet cable to port 1 on the CRS125 and plug the other end into your Mac running dhcpd
+</p>
+
+<p>
+9. Connect a cable to the console port of the CRS125 and the other end to a serial port on your Mac (I'm using a Asunflower FTDI USB-to-console cable which you can find on Amazon for less than $20)
+</p>
+
+<p>
+10. Install kermit with <code>brew install kermit</code> (visit http://brew.sh if you don't have brew)
+</p>
+
+<p>
+11. Start kermit and connect to the console port.
+<pre>
+Ryans-MacBook-Pro:~ ryan$ ls -l /dev/tty.usbserial*
+crw-rw-rw-  1 root  wheel   33,  10 Sep  7 23:34 /dev/tty.usbserial-AL00B1FN
+Ryans-MacBook-Pro:~ ryan$
+Ryans-MacBook-Pro:~ ryan$ kermit
+C-Kermit 9.0.302 OPEN SOURCE:, 20 Aug 2011, for Mac OS X 10.8.2 (64-bit)
+ Copyright (C) 1985, 2011,
+  Trustees of Columbia University in the City of New York.
+Type ? or HELP for help.
+(/Users/ryan/) C-Kermit>set line /dev/tty.usbserial-AL00B1FN
+(/Users/ryan/) C-Kermit>set speed 115200
+/dev/tty.usbserial-AL00B1FN, 115200 bps
+(/Users/ryan/) C-Kermit>set carrier-watch off
+(/Users/ryan/) C-Kermit>connect
+Connecting to /dev/tty.usbserial-AL00B1FN, speed 115200
+ Escape character: Ctrl-\ (ASCII 28, FS): enabled
+Type the escape character followed by C to get back,
+or followed by ? to see other options.
+----------------------------------------------------
+</pre>
+</p>
+
+<p>
+12. Now power on your MikroTik CRS125.  You'll have to press any key when prompted on boot to change the boot order, so be ready.  You'll change the boot order by pressing <code>o</code>, <code>e</code>, <code>x</code> as you'll see below.
+<pre>
+----------------------------------------------------
+(/Users/ryan/) C-Kermit>conn
+Connecting to /dev/tty.usbserial-AL00B1FN, speed 115200
+ Escape character: Ctrl-\ (ASCII 28, FS): enabled
+Type the escape character followed by C to get back,
+or followed by ? to see other options.
+----------------------------------------------------
+
+
+RouterBOOT booter 3.19
+
+CRS125-24G-1S
+
+CPU frequency: 600 MHz
+ Memory speed: 200 MHz
+  Memory size: 128 MiB
+    NAND size: 128 MiB
+
+Press any key within 2 seconds to enter setup
+
+RouterBOOT-3.19
+What do you want to configure?
+   d - boot delay
+   k - boot key
+   s - serial console
+   n - silent boot
+   o - boot device
+   f - cpu frequency
+   r - reset booter configuration
+   e - format nand
+   w - repartition nand
+   g - upgrade firmware
+   i - board info
+   p - boot protocol
+   b - booter options
+   t - do memory testing
+   x - exit setup
+your choice: o - boot device
+
+Select boot device:
+   e - boot over Ethernet
+   n - boot from NAND, if fail then Ethernet
+   1 - boot Ethernet once, then NAND
+ * o - boot from NAND only
+   b - boot chosen device
+   f - boot Flash Configure Mode
+   3 - boot Flash Configure Mode once, then NAND
+your choice: e - boot over Ethernet
+
+RouterBOOT-3.19
+What do you want to configure?
+   d - boot delay
+   k - boot key
+   s - serial console
+   n - silent boot
+   o - boot device
+   f - cpu frequency
+   r - reset booter configuration
+   e - format nand
+   w - repartition nand
+   g - upgrade firmware
+   i - board info
+   p - boot protocol
+   b - booter options
+   t - do memory testing
+   x - exit setup
+your choice: x - exit setup
+
+
+writing settings to flash... OK
+
+
+RouterBOOT booter 3.19
+
+CRS125-24G-1S
+
+CPU frequency: 600 MHz
+ Memory speed: 200 MHz
+  Memory size: 128 MiB
+    NAND size: 128 MiB
+
+Press any key within 2 seconds to enter setup..
+trying bootp protocol................... OK
+Got IP address: 192.168.88.16
+resolved mac address 00:XX:XX:XX:XX:XX
+transfer started .............................*............ transfer ok, time=3.01s
+setting up elf image... OK
+jumping to kernel code
+[    0.000000] Linux version 4.1.6 (root@ny-monitor) (gcc version 4.8.3 (OpenWrt/Linaro GCC 4.8-2014.04 r46796) ) #10 Sun Sep 6 04:19:18 EDT 2015
+[    0.000000] bootconsole [early0] enabled
+[    0.000000] CPU0 revision is: 0001974c (MIPS 74Kc)
+[    0.000000] SoC: Atheros AR9344 rev 2
+[    0.000000] Determined physical RAM map:
+[    0.000000]  memory: 08000000 @ 00000000 (usable)
+[    0.000000] User-defined physical RAM map:
+[    0.000000]  memory: 08000000 @ 00000000 (usable)
+[    0.000000] Initrd not found or empty - disabling initrd
+[    0.000000] Zone ranges:
+[    0.000000]   Normal   [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000000000000-0x0000000007ffffff]
+[    0.000000] Primary instruction cache 64kB, VIPT, 4-way, linesize 32 bytes.
+[    0.000000] Primary data cache 32kB, 4-way, VIPT, cache aliases, linesize 32 bytes
+[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 32512
+[    0.000000] Kernel command line: lcd_ctrl=84 parts=1 boot_part_size=4194304 gpio=233019 HZ=300000000 mem=128M kmac=4C:5E:0C:99:E3:9D board=crs125g ver=3.19 boot=1 mlc=7 console=ttyS0,115200 root=/dev/mtdblock2 rootfstype=squashfs,yaffs,jffs2 noinitrd rootfstype=yaffs noinitrd
+[    0.000000] PID hash table entries: 512 (order: -1, 2048 bytes)
+[    0.000000] Dentry cache hash table entries: 16384 (order: 4, 65536 bytes)
+[    0.000000] Inode-cache hash table entries: 8192 (order: 3, 32768 bytes)
+[    0.000000] Writing ErrCtl register=00000000
+[    0.000000] Readback ErrCtl register=00000000
+[    0.000000] Memory: 124004K/131072K available (2516K kernel code, 152K rwdata, 532K rodata, 2104K init, 184K bss, 7068K reserved, 0K cma-reserved)
+[    0.000000] SLUB: HWalign=32, Order=0-3, MinObjects=0, CPUs=1, Nodes=1
+[    0.000000] NR_IRQS:83
+[    0.000000] Clocks: CPU:600.000MHz, DDR:400.000MHz, AHB:400.000MHz, Ref:25.000MHz
+[    0.000000] clocksource MIPS: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 6370868154 ns
+[    0.000009] sched_clock: 32 bits at 300MHz, resolution 3ns, wraps every 7158278654ns
+[    0.008003] Calibrating delay loop... 299.82 BogoMIPS (lpj=1499136)
+[    0.080747] pid_max: default: 32768 minimum: 301
+[    0.085611] Mount-cache hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.092366] Mountpoint-cache hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.102438] clocksource jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604462750000 ns
+[    0.113071] NET: Registered protocol family 16
+[    0.119033] MIPS: machine is RouterBOARD CRS125-24G-1S
+[    0.354096] Switched to clocksource MIPS
+[    0.359362] NET: Registered protocol family 2
+[    0.364633] TCP established hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.371756] TCP bind hash table entries: 1024 (order: 0, 4096 bytes)
+[    0.378331] TCP: Hash tables configured (established 1024 bind 1024)
+[    0.384913] UDP hash table entries: 256 (order: 0, 4096 bytes)
+[    0.390867] UDP-Lite hash table entries: 256 (order: 0, 4096 bytes)
+[    0.397620] NET: Registered protocol family 1
+[    2.745167] futex hash table entries: 256 (order: -1, 3072 bytes)
+[    2.765559] io scheduler noop registered
+[    2.769538] io scheduler deadline registered (default)
+[    2.775165] Serial: 8250/16550 driver, 1 ports, IRQ sharing disabled
+[    2.782051] console [ttyS0] disabled
+[    2.805831] serial8250.0: ttyS0 at MMIO 0x18020000 (irq = 11, base_baud = 1562500) is a 16550A
+[    2.814658] console [ttyS0] enabled
+[    2.814658] console [ttyS0] enabled
+[    2.821803] bootconsole [early0] disabled
+[    2.821803] bootconsole [early0] disabled
+[    2.834338] nand: device found, Manufacturer ID: 0x98, Chip ID: 0xf1
+[    2.840909] nand: Toshiba NAND 128MiB 3,3V 8-bit
+[    2.845703] nand: 128 MiB, SLC, erase size: 128 KiB, page size: 2048, OOB size: 64
+[    2.853560] Scanning device for bad blocks
+[    2.952681] Creating 3 MTD partitions on "ar934x-nfc":
+[    2.958010] 0x000000000000-0x000000040000 : "booter"
+[    2.964028] 0x000000040000-0x000000400000 : "kernel"
+[    2.969968] 0x000000400000-0x000008000000 : "rootfs"
+[    2.976146] mtd: device 2 (rootfs) set to be root filesystem
+[    2.983880] mtdsplit: no squashfs found in "rootfs"
+[    2.989578] mtdsplit: no squashfs found in "ar934x-nfc"
+[    3.032821] libphy: ag71xx_mdio: probed
+[    3.625988] eth0: Atheros AG71xx at 0xb9000000, irq 4, mode:RGMII
+[    3.633482] NET: Registered protocol family 17
+[    3.638221] bridge: automatic filtering via arp/ip/ip6tables has been deprecated. Update your scripts to load br_netfilter if you need this.
+[    3.651371] 8021q: 802.1Q VLAN Support v1.8
+[    3.668454] Freeing unused kernel memory: 2104K (80382000 - 80590000)
+[    3.688113] init: Console is alive
+[    3.691857] init: - watchdog -
+[    3.717323] usbcore: registered new interface driver usbfs
+[    3.723071] usbcore: registered new interface driver hub
+[    3.728703] usbcore: registered new device driver usb
+[    3.739186] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+[    3.747402] ehci-platform: EHCI generic platform driver
+[    3.755732] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+[    3.763327] ohci-platform: OHCI generic platform driver
+[    4.695771] init: - preinit -
+[    4.841933] eth0: link up (1000Mbps/Full duplex)
+Press the [f] key and hit [enter] to enter failsafe mode
+Press the [1], [2], [3] or [4] key and hit [enter] to select the debug level
+[    7.988790] eth0: link down
+[    8.001903] procd: - early -
+[    8.005573] procd: - watchdog -
+[    8.552079] procd: - ubus -
+[    9.557472] random: ubusd urandom read with 79 bits of entropy available
+[    9.575446] procd: - init -
+Please press Enter to activate this console.
+[   10.215886] NET: Registered protocol family 10
+[   10.227637] ip6_tables: (C) 2000-2006 Netfilter Core Team
+[   10.246244] Loading modules backported from Linux version master-2015-07-21-0-g47cd203
+[   10.254477] Backport generated by backports.git backports-20150626-0-gc1a4168
+[   10.264958] ip_tables: (C) 2000-2006 Netfilter Core Team
+[   10.280582] nf_conntrack version 0.5.0 (1970 buckets, 7880 max)
+[   10.323471] xt_time: kernel timezone is -0000
+[   10.347230] cfg80211: World regulatory domain updated:
+[   10.352542] cfg80211:  DFS Master region: unset
+[   10.357082] cfg80211:   (start_freq - end_freq @ bandwidth), (max_antenna_gain, max_eirp), (dfs_cac_time)
+[   10.367154] cfg80211:   (2402000 KHz - 2472000 KHz @ 40000 KHz), (N/A, 2000 mBm), (N/A)
+[   10.375429] cfg80211:   (2457000 KHz - 2482000 KHz @ 40000 KHz), (N/A, 2000 mBm), (N/A)
+[   10.383690] cfg80211:   (2474000 KHz - 2494000 KHz @ 20000 KHz), (N/A, 2000 mBm), (N/A)
+[   10.391962] cfg80211:   (5170000 KHz - 5250000 KHz @ 80000 KHz, 160000 KHz AUTO), (N/A, 2000 mBm), (N/A)
+[   10.401765] cfg80211:   (5250000 KHz - 5330000 KHz @ 80000 KHz, 160000 KHz AUTO), (N/A, 2000 mBm), (0 s)
+[   10.411565] cfg80211:   (5490000 KHz - 5730000 KHz @ 160000 KHz), (N/A, 2000 mBm), (0 s)
+[   10.419921] cfg80211:   (5735000 KHz - 5835000 KHz @ 80000 KHz), (N/A, 2000 mBm), (N/A)
+[   10.428194] cfg80211:   (57240000 KHz - 63720000 KHz @ 2160000 KHz), (N/A, 0 mBm), (N/A)
+[   10.511024] PPP generic driver version 2.4.2
+[   10.518067] NET: Registered protocol family 24
+[   17.616533] eth0: link up (1000Mbps/Full duplex)
+[   17.644699] device eth0 entered promiscuous mode
+[   17.650592] IPv6: ADDRCONF(NETDEV_UP): br-lan: link is not ready
+[   18.604159] br-lan: port 1(eth0) entered forwarding state
+[   18.609787] br-lan: port 1(eth0) entered forwarding state
+[   18.644161] IPv6: ADDRCONF(NETDEV_CHANGE): br-lan: link becomes ready
+[   20.604107] br-lan: port 1(eth0) entered forwarding state
+[   40.374123] random: nonblocking pool is initialized
+</pre>
+</p>
+
+<p>
+12. Press enter and you'll be greeted with the OpenWRT prompt:
+<pre>
+
+BusyBox v1.23.2 (2015-09-05 23:54:48 EDT) built-in shell (ash)
+
+  _______                     ________        __
+ |       |.-----.-----.-----.|  |  |  |.----.|  |_
+ |   -   ||  _  |  -__|     ||  |  |  ||   _||   _|
+ |_______||   __|_____|__|__||________||__|  |____|
+          |__| W I R E L E S S   F R E E D O M
+ -----------------------------------------------------
+ CHAOS CALMER (Bleeding Edge, r46796)
+ -----------------------------------------------------
+  * 1 1/2 oz Gin            Shake with a glassful
+  * 1/4 oz Triple Sec       of broken ice and pour
+  * 3/4 oz Lime Juice       unstrained into a goblet.
+  * 1 1/2 oz Orange Juice
+  * 1 tsp. Grenadine Syrup
+ -----------------------------------------------------
+root@OpenWrt:/#
+</pre>
+</p>
+
+<p>
+13. Create a temporary mount directory at /mnt2
+<pre>
+root@OpenWrt:/# mkdir -p /mnt2
+root@OpenWrt:/#
+</pre>
+</p>
+
+<p>
+14. Mount the flash chip on the CRS125 into the directory /mnt2
+<pre>
+root@OpenWrt:/# mount /dev/mtdblock2 /mnt2
+[  297.951244] yaffs: dev is 32505858 name is "mtdblock2" rw
+[  297.956880] yaffs: passed flags ""
+root@OpenWrt:/#
+root@OpenWrt:/# ls -l /mnt2
+drwxrwxr-x    1 root     root          2048 Feb  5  2014 bin
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 boot
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 etc
+drwx------    1 root     root          2048 Sep  4 14:50 lost+found
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 nova
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 rw
+drwxr-xr-x    1 root     root          2048 Jan  1  1970 var
+</pre>
+</p>
+
+<p>
+15. Touch the file <code>/mnt2/nova/etc/devel-login</code>.  Credit goes to the person at r00t.cz for discovering this.  See <a href="www.r00t.cz/Misc/MikrotikBackdoor">www.r00t.cz/Misc/MikrotikBackdoor</a> for more info.
+<pre>
+root@OpenWrt:/# touch /mnt2/nova/etc/devel-login
+root@OpenWrt:/# ls -l /mnt2/nova/etc/
+-rw-r--r--    1 root     root             0 Sep  4 14:53 devel-login
+</pre>
+</p>
+
+<p>
+16. Unmount /mnt2 and reboot
+<pre>
+root@OpenWrt:/# umount /mnt2
+root@OpenWrt:/# reboot
+root@OpenWrt:/# [  466.597039] br-lan: port 1(eth0) entered disabled state
+[  466.614340] device eth0 left promiscuous mode
+[  466.618891] br-lan: port 1(eth0) entered disabled state
+[  466.628785] eth0: link down
+[  466.633361] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[  470.815364] reboot: Restarting system
+</pre>
+</p>
+
+<p>
+17. Change the boot order back to boot from NAND
+<pre>
+RouterBOOT booter 3.19
+
+CRS125-24G-1S
+
+CPU frequency: 600 MHz
+ Memory speed: 200 MHz
+  Memory size: 128 MiB
+    NAND size: 128 MiB
+
+Press any key within 2 seconds to enter setup
+
+RouterBOOT-3.19
+What do you want to configure?
+   d - boot delay
+   k - boot key
+   s - serial console
+   n - silent boot
+   o - boot device
+   f - cpu frequency
+   r - reset booter configuration
+   e - format nand
+   w - repartition nand
+   g - upgrade firmware
+   i - board info
+   p - boot protocol
+   b - booter options
+   t - do memory testing
+   x - exit setup
+your choice: o - boot device
+
+Select boot device:
+ * e - boot over Ethernet
+   n - boot from NAND, if fail then Ethernet
+   1 - boot Ethernet once, then NAND
+   o - boot from NAND only
+   b - boot chosen device
+   f - boot Flash Configure Mode
+   3 - boot Flash Configure Mode once, then NAND
+your choice: o - boot from NAND only
+
+RouterBOOT-3.19
+What do you want to configure?
+   d - boot delay
+   k - boot key
+   s - serial console
+   n - silent boot
+   o - boot device
+   f - cpu frequency
+   r - reset booter configuration
+   e - format nand
+   w - repartition nand
+   g - upgrade firmware
+   i - board info
+   p - boot protocol
+   b - booter options
+   t - do memory testing
+   x - exit setup
+your choice: x - exit setup
+
+
+writing settings to flash... OK
+</pre>
+</p>
+
+<p>
+18. The CRS125 will boot again, but this time it will boot RouterOS that is on NAND.  If you see an error message, unplug the CRS125 from power and plug it back in for a fresh boot.  If all goes well, you'll see a RouterOS login:
+<pre>
+MikroTik 6.24
+MikroTik Login:
+</pre>
+</p>
+
+<p>
+19. Log in with the username 'devel'.  For the password, use the same password as is on the 'admin' account, which by default is empty (as in nothing, just press enter):
+<pre>
+MikroTik 6.24
+MikroTik Login: devel
+Password:
+
+
+BusyBox v1.00 (2014.12.09-08:43+0000) Built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+#
+</pre>
+</p>
+
+<p>
+20. Interestingly, the BusyBox provided by RouterOS is extremely limited.  It doesn't even have the <code>ls</code> command
+<pre>
+# ls
+bash: ls: not found
+#
+</pre>
+</p>
+
+<p>
+21. No worries, <code>echo *</code> does the same thing:
+<pre>
+# echo *
+MikroTik-19700102-0016.backup auto-before-reset.backup autosupout.old.rif autosupout.rif pub skins
+# pwd
+/flash/rw/pckg
+#
+</pre>
+</p>
+
+<p>
+22. This is pretty hard to use, so download a precompiled busybox for the mips architecture that has more applets enabled.
+Download http://www.busybox.net/downloads/binaries/latest/busybox-mips to your Mac
+</p>
+
+<p>
+23. Log into WebFig by visiting http://192.168.88.1/
+</p>
+
+<p>
+24. Go to Files on the left hand side, and beside Upload:, press the <b>Choose File</b> button.  Select the busybox binary you downloaded in step 21.
+</p>
+
+<p>
+25. Back in the RouterOS console, move busybox to /flash/bin because that is already in the PATH environment variable.  Also set the executable bit on busybox-mips so we can run it
+<pre>
+# echo $PATH
+/sbin:/flash//bin:/bin
+#
+#
+# echo *
+MikroTik-19700102-0016.backup auto-before-reset.backup autosupout.old.rif autosupout.rif busybox-mips pub skins
+#
+# mv busybox-mips /flash/bin
+#
+# cd /flash/bin/
+# chmod +x /flash/bin/busybox-mips
+#
+</pre>
+</p>
+
+<p>
+26. Now if you run busybox-mips from any directory, you'll get a list of available applets in this busybox executable
+<pre>
+# busybox-mips
+BusyBox v1.16.1 (2010-03-29 11:53:01 CDT) multi-call binary.
+Copyright (C) 1998-2009 Erik Andersen, Rob Landley, Denys Vlasenko
+and others. Licensed under GPLv2.
+See source distribution for full notice.
+
+Usage: busybox [function] [arguments]...
+   or: function [arguments]...
+
+    BusyBox is a multi-call binary that combines many common Unix
+    utilities into a single executable.  Most people will create a
+    link to busybox for each function they wish to use and BusyBox
+    will act like whatever it was invoked as.
+
+Currently defined functions:
+    [, [[, acpid, addgroup, adduser, adjtimex, arp, arping, ash, awk,
+    basename, bbconfig, beep, blkid, brctl, bunzip2, bzcat, bzip2, cal,
+    cat, catv, chat, chattr, chgrp, chmod, chown, chpasswd, chpst, chroot,
+    chrt, chvt, cksum, clear, cmp, comm, cp, cpio, crond, crontab, cryptpw,
+    cttyhack, cut, date, dc, dd, deallocvt, delgroup, deluser, depmod,
+    devmem, df, dhcprelay, diff, dirname, dmesg, dnsd, dnsdomainname,
+    dos2unix, dpkg, dpkg-deb, du, dumpkmap, dumpleases, echo, ed, egrep,
+    eject, env, envdir, envuidgid, ether-wake, expand, expr, fakeidentd,
+    false, fbset, fbsplash, fdflush, fdformat, fdisk, fgrep, find, findfs,
+    flashcp, fold, free, freeramdisk, fsck, fsck.minix, fsync, ftpd,
+    ftpget, ftpput, fuser, getopt, getty, grep, gunzip, gzip, halt, hd,
+    hdparm, head, hexdump, hostid, hostname, httpd, hush, hwclock, id,
+    ifconfig, ifdown, ifenslave, ifplugd, ifup, inetd, init, insmod,
+    install, ionice, ip, ipaddr, ipcalc, ipcrm, ipcs, iplink, iproute,
+    iprule, iptunnel, kbd_mode, kill, killall, killall5, klogd, lash, last,
+    length, less, linux32, linux64, linuxrc, ln, loadfont, loadkmap,
+    logger, login, logname, logread, losetup, lpd, lpq, lpr, ls, lsattr,
+    lsmod, lspci, lsusb, lzmacat, lzop, lzopcat, makedevs, makemime, man,
+    md5sum, mdev, mesg, microcom, mkdir, mkdosfs, mkfifo, mkfs.minix,
+    mkfs.reiser, mkfs.vfat, mknod, mkpasswd, mkswap, mktemp, modprobe,
+    more, mount, mountpoint, msh, mt, mv, nameif, nc, netstat, nice,
+    nmeter, nohup, nslookup, ntpd, od, openvt, passwd, pgrep, pidof, ping,
+    ping6, pipe_progress, pivot_root, pkill, popmaildir, poweroff,
+    printenv, printf, ps, pscan, pwd, raidautorun, rdate, rdev, readahead,
+    readlink, readprofile, realpath, reboot, reformime, renice, reset,
+    resize, rm, rmdir, rmmod, route, rpm, rpm2cpio, rtcwake, run-parts,
+    runlevel, runsv, runsvdir, rx, script, scriptreplay, sed, sendmail,
+    seq, setarch, setconsole, setfont, setkeycodes, setlogcons, setsid,
+    setuidgid, sh, sha1sum, sha256sum, sha512sum, showkey, slattach, sleep,
+    softlimit, sort, split, start-stop-daemon, stat, strings, stty, su,
+    sulogin, sum, sv, svlogd, swapoff, swapon, switch_root, sync, sysctl,
+    syslogd, tac, tail, tar, tcpsvd, tee, telnet, telnetd, test, tftp,
+    tftpd, time, timeout, top, touch, tr, traceroute, traceroute6, true,
+    tty, ttysize, tunctl, udhcpc, udhcpd, udpsvd, umount, uname,
+    uncompress, unexpand, uniq, unix2dos, unlzma, unlzop, unzip, uptime,
+    usleep, uudecode, uuencode, vconfig, vi, vlock, volname, wall, watch,
+    watchdog, wc, wget, which, who, whoami, xargs, yes, zcat, zcip
+</pre>
+</p>
+
+<p>
+27. The next part is a pain.  You have to create a symbolic link for each applet you want to be able to use. For example, if you want <code>ls</code> to work, make sure you are in the </code>/flash/bin</code> directory and create a symlink for <code>ls</code> pointing to <code>busybox-mips</code>
+<pre>
+# pwd
+/flash/bin
+# ln -s busybox-mips ls
+#
+</pre>
+</p>
+
+<p>
+28. Now <code>ls</code> works
+<pre>
+# ls
+busybox-mips  ls
+#
+</pre>
+</p>
+
+<p>
+29. Let's do the same for some other interesting commands on a router:
+<pre>
+# ln -s busybox-mips ifconfig
+# ln -s busybox-mips brctl
+# ln -s busybox-mips ps
+# ln -s busybox-mips top
+# ln -s busybox-mips netstat
+# ln -s busybox-mips lspci
+# ln -s busybox-mips route
+# ln -s busybox-mips grep
+# ln -s busybox-mips strings
+# ln -s busybox-mips less
+#
+# ifconfig
+br0       Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9D
+          inet addr:192.168.88.1  Bcast:192.168.88.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:2058 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1081 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:1859490 (1.7 MiB)  TX bytes:534258 (521.7 KiB)
+
+br1       Link encap:Ethernet  HWaddr 00:00:00:00:00:00
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:40 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:4180 (4.0 KiB)
+
+eth0      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9D
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:2075 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1685 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:1903564 (1.8 MiB)  TX bytes:579157 (565.5 KiB)
+
+eth1      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9E
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth10     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A7
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth11     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A8
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth12     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A9
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth13     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AA
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth14     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AB
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth15     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AC
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth16     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AD
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth17     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AE
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth18     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:AF
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth19     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B0
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth2      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9F
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth20     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B1
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth21     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B2
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth22     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B3
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth23     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B4
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth24     Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:B5
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth3      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A0
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth4      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A1
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth5      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A2
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth6      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A3
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth7      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A4
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth8      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A5
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+eth9      Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:A6
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:3584  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+switch0   Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
+          UP RUNNING NOARP  MTU:1500  Metric:1
+          RX packets:2070 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1685 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:1913988 (1.8 MiB)  TX bytes:592477 (578.5 KiB)
+
+vlan30    Link encap:Ethernet  HWaddr 4C:5E:0C:AC:E3:9D
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:40 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:4500 (4.3 KiB)
+
+#
+# brctl show
+bridge name bridge id       STP enabled interfaces
+br0     0000.000000000000   yes     eth0
+br1     0000.000000000000   yes
+#
+#
+# ps a
+PID   USER     TIME   COMMAND
+    1 root      17:10 /init
+    2 root       6:30 [kthreadd]
+    3 root      36:47 [ksoftirqd/0]
+    4 root       0:12 [kworker/0:0]
+    5 root     212:23 [kworker/u:0]
+    6 root       0:08 [khelper]
+    7 root      15:36 [kdevtmpfs]
+    8 root       0:04 [netns]
+    9 root       6:00 [sync_supers]
+   10 root       0:38 [bdi-default]
+   11 root       0:08 [kblockd]
+   12 root       0:00 [kswapd0]
+   13 root       0:47 [fsnotify_mark]
+   14 root       0:04 [crypto]
+   18 root       0:00 [mtdblock0]
+   19 root       0:00 [mtdblock1]
+   20 root       0:04 [mtdblock2]
+   21 root     1844:1 [kworker/0:1]
+   31 root       0:08 [kworker/u:1]
+   85 root       0:47 catlog -fs -n 10 backtrace
+  103 root       0:04 [btest]
+  177 root     165:25 /nova/bin/loader
+  189 root       8:01 /nova/bin/mproxy
+  190 root       4:09 /nova/bin/log
+  191 root       2:34 /nova/bin/moduler
+  192 root      44:57 /nova/bin/resolver
+  193 root       2:30 /nova/bin/mactel
+  194 root      38:34 /nova/bin/bridge2
+  195 root       2:13 /nova/bin/macping
+  197 root     130:42 /nova/bin/net
+  198 root      77:48 /nova/bin/sys2
+  199 root       4:17 /nova/bin/btest
+  200 root      10:22 /nova/bin/route
+  202 root       2:00 /nova/bin/sermgr
+  203 root       0:25 /nova/bin/diskd
+  205 root      39:43 /nova/bin/led
+  206 root       2:17 /nova/bin/quickset
+  207 root     276:01 /nova/bin/lcdstat
+  215 root      35:17 /nova/bin/www
+  237 root       1:43 [khubd]
+  304 root      13:10 bash
+  336 root       0:38 [flush-31:1]
+  365 root       0:04 ps a
+#
+#
+# netstat -anp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 0.0.0.0:8291            0.0.0.0:*               LISTEN      189/mproxy
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      215/www
+tcp        0      0 0.0.0.0:2000            0.0.0.0:*               LISTEN      199/btest
+tcp        0      0 0.0.0.0:21              0.0.0.0:*               LISTEN      202/sermgr
+tcp        0      0 0.0.0.0:53              0.0.0.0:*               LISTEN      192/resolver
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      202/sermgr
+tcp        0      0 0.0.0.0:23              0.0.0.0:*               LISTEN      202/sermgr
+tcp        0      0 0.0.0.0:8728            0.0.0.0:*               LISTEN      202/sermgr
+tcp        0      0 0.0.0.0:8729            0.0.0.0:*               LISTEN      202/sermgr
+netstat: /proc/net/tcp6: No such file or directory
+udp        0      0 0.0.0.0:5678            0.0.0.0:*                           197/net
+udp        0      0 0.0.0.0:53              0.0.0.0:*                           192/resolver
+netstat: /proc/net/udp6: No such file or directory
+netstat: /proc/net/raw6: No such file or directory
+Active UNIX domain sockets (servers and established)
+Proto RefCnt Flags       Type       State         I-Node PID/Program name    Path
+unix  2      [ ACC ]     STREAM     LISTENING        381 177/loader          /ram/novasock
+unix  2      [ ACC ]     STREAM     LISTENING        479 190/log             /ram/logsocket
+unix  3      [ ]         STREAM     CONNECTED        663 190/log             /ram/logsocket
+unix  3      [ ]         STREAM     CONNECTED        662 197/net
+unix  3      [ ]         STREAM     CONNECTED        629 190/log             /ram/logsocket
+unix  3      [ ]         STREAM     CONNECTED        628 200/route
+unix  3      [ ]         STREAM     CONNECTED        527 190/log             /ram/logsocket
+unix  3      [ ]         STREAM     CONNECTED        526 198/sys2
+unix  3      [ ]         STREAM     CONNECTED        502 215/www
+unix  3      [ ]         STREAM     CONNECTED        501 177/loader
+unix  3      [ ]         STREAM     CONNECTED        423 207/lcdstat
+unix  3      [ ]         STREAM     CONNECTED        422 177/loader
+unix  3      [ ]         STREAM     CONNECTED        421 206/quickset
+unix  3      [ ]         STREAM     CONNECTED        420 177/loader
+unix  3      [ ]         STREAM     CONNECTED        419 205/led
+unix  3      [ ]         STREAM     CONNECTED        418 177/loader
+unix  3      [ ]         STREAM     CONNECTED        415 203/diskd
+unix  3      [ ]         STREAM     CONNECTED        414 177/loader
+unix  3      [ ]         STREAM     CONNECTED        413 202/sermgr
+unix  3      [ ]         STREAM     CONNECTED        412 177/loader
+unix  3      [ ]         STREAM     CONNECTED        409 200/route
+unix  3      [ ]         STREAM     CONNECTED        408 177/loader
+unix  3      [ ]         STREAM     CONNECTED        407 199/btest
+unix  3      [ ]         STREAM     CONNECTED        406 177/loader
+unix  3      [ ]         STREAM     CONNECTED        405 198/sys2
+unix  3      [ ]         STREAM     CONNECTED        404 177/loader
+unix  3      [ ]         STREAM     CONNECTED        403 197/net
+unix  3      [ ]         STREAM     CONNECTED        402 177/loader
+unix  3      [ ]         STREAM     CONNECTED        399 195/macping
+unix  3      [ ]         STREAM     CONNECTED        398 177/loader
+unix  3      [ ]         STREAM     CONNECTED        397 194/bridge2
+unix  3      [ ]         STREAM     CONNECTED        396 177/loader
+unix  3      [ ]         STREAM     CONNECTED        395 193/mactel
+unix  3      [ ]         STREAM     CONNECTED        394 177/loader
+unix  3      [ ]         STREAM     CONNECTED        393 192/resolver
+unix  3      [ ]         STREAM     CONNECTED        392 177/loader
+unix  3      [ ]         STREAM     CONNECTED        391 191/moduler
+unix  3      [ ]         STREAM     CONNECTED        390 177/loader
+unix  3      [ ]         STREAM     CONNECTED        389 190/log
+unix  3      [ ]         STREAM     CONNECTED        388 177/loader
+unix  3      [ ]         STREAM     CONNECTED        387 189/mproxy
+unix  3      [ ]         STREAM     CONNECTED        386 177/loader
+#
+#
+# lspci
+#
+# lspci -h
+lspci: invalid option -- h
+BusyBox v1.16.1 (2010-03-29 11:53:01 CDT) multi-call binary.
+
+Usage: lspci [-mk]
+
+List all PCI devices
+
+    -m  Parseable output
+    -k  Show driver
+
+# lspci -k
+#
+#
+# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.88.0    0.0.0.0         255.255.255.0   U     0      0        0 br0
+#
+#
+# strings /nova/bin/resolver | grep dnsmasq
+#
+</pre>
+</p>
+
+<p>
+Hmm, I always thought the DNS resolver on MikroTik was dnsmasq under the covers.  Guess not.
+</p>
+
+<p>There you go.  Root shell on a MikroTik, step-by-step.  If you uncover interesting details about the underlying system, be sure to let me know.</p>
+
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Getting%20shell%20on%20a%20RouterBoard&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fGetting_shell_on_a_RouterBoard%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fGetting_shell_on_a_RouterBoard%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fGetting_shell_on_a_RouterBoard%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Getting_shell_on_a_RouterBoard\/';
+    var disqus_title = 'Getting shell on a RouterBoard';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Getting_shell_on_a_RouterBoard\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+

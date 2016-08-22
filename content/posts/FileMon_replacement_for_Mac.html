@@ -1,0 +1,11 @@
+---
+title: "FileMon replacement for Mac"
+date: "2008-03-19"
+redirect_from: "/post/4921795252/filemon-replacement-for-mac"
+categories:
+    - "FileMon"
+    - "Mac OS"
+---
+         
+<i>Mac OS X 10.5.2</i><br /><br />Since switching to a Mac in January of 2008, I've been looking for a replacement of the <a href="http://technet.microsoft.com/en-us/sysinternals/default.aspx?wt.svl=leftnav">Sysinternals</a> tools, especially <a href="http://technet.microsoft.com/en-us/sysinternals/bb896642.aspx?wt.svl=leftnav">FileMon</a>.  For those who don't know, FileMon is a program which shows file activity in real-time (file accesses, changes).  I found a utility on the Mac that is almost the same: <a href="http://www.fernlightning.com/doku.php?id=software:fseventer:start">fseventer</a>.  The only thing fseventer lacks is the ability to print file accesses--it only prints file/directory changes.   If you need to be able to see file accesses, it seems the only solution on the Mac is to use Instruments, which is a program included with the free Developer Tools (XCode, Interface Builder, Shark, etc.)  If you have Leopard and have some experience with dtrace(1), then you can use that utility from the command line.  For 10.4, you can look at ktrace(1), but that utility shows system calls, not file accesses/modifications.<br /><br /><a href="http://farm3.static.flickr.com/2149/2344893463_be647c9013_o.png"><img src="http://farm3.static.flickr.com/2149/2344893463_2c34b3f09e.jpg?v=0" /></a><br /><br /><a href="http://www.fernlightning.com/doku.php?id=software:fseventer:start">Download fseventer</a>&nbsp;</div>
+

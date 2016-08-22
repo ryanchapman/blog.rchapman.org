@@ -1,0 +1,285 @@
+---
+redirect_from: /post/133714833054/loading-an-openssh-pubkey-on-to-ios
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Loading an openssh pubkey on Cisco IOS &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Loading an openssh pubkey on Cisco IOS</h1>
+    
+    Published Sun, Nov 22, 2015<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <p><em>Mac OS X 10.10.5, Cisco IOS-XE 3.7, JunOS 12.3R6.6</em><br/><br/></p>
+
+<p>
+I work primarily on a Mac and want to be able to ssh to Cisco IOS equipment with ssh keys; however, Cisco does not make it easy to load keys.  On JunOS, this is as easy as:
+
+<pre>
+Ryans-MacBook-Pro:~ $ ssh 1.2.3.4 -l rac
+--- JUNOS 12.3R6.6 built 2014-03-13 06:57:48 UTC
+{master:0}
+rac> configure
+Entering configuration mode
+
+{master:0}[edit]
+rac# edit system login
+
+{master:0}[edit system login]
+rchapman# set user test class read-only authentication ssh-rsa "AAAAB3NzaC1yc2EAAAADAQABAAABAQDDMRHIzELLQvj06gxqFnZn150T/OicDkBWwojNgSKdnOQIvEU/xu0LtlVUcZaVxVlZeVbm+UwsMdq1c/QuIsbINx18pRByPcwWWbI+4+du6kq8J6wi1qSD3bnBfGpHt2LG3liTTBHzvXFinWn1oB0BPq9q7zEUb2D1gBqyaurLdKs07DsC2T4xgNbJ1aQJFKP3qtfdTC8Fah7F46VK7eztUpPPJ/TEPxXBahwNxxUBnvYtEryhsOspLwVAtA9Uk5CnWt3q77pijtMj2p4gJ6zRKhMLFM0sWEoe98zyYkutlRkGlaLbR6c+0WpY5fuGdPsEibsVXqx/07OfvF6WAsb test@Ryans-MacBook-Pro.local"
+
+{master:0}[edit system login]
+rchapman# commit check
+configuration check succeeds
+
+{master:0}[edit system login]
+rchapman# commit
+configuration check succeeds
+commit complete
+{master:0}[edit system login]
+rchapman# quit
+
+{master:0}[edit]
+rchapman# quit
+Exiting configuration mode
+
+{master:0}
+rchapman> quit
+
+Connection to 1.2.3.4 closed.
+Ryans-MacBook-Pro:~ $
+Ryans-MacBook-Pro:~ $ ssh -i /tmp/id_rsa test@1.2.3.4
+--- JUNOS 12.3R6.6 built 2014-03-13 06:57:48 UTC
+{master:0}
+test>
+</pre>
+</p>
+
+<p>
+Cisco IOS is a pain in comparison, requiring you to break the key up into lines of no more than 256 characters. When someone hands me their ssh pubkey, I don't want to have to manually break it up into appropriately sized lines, so I wrote a quick bash snippet to do it.  This snippet was tested and worked on Mac OS X as well as Ubuntu 14.4 Linux:
+
+<pre>
+IOS_USERNAME=test; KEYFILE=/tmp/id_rsa.pub LANG=C; IOS_PASSWORD=$(cat /dev/random | perl -pe 's/[^A-Za-z0-9]//g' | fold -w $((RANDOM%10+20)) | head -n 1); printf "\nusername $IOS_USERNAME privilege 1 secret $IOS_PASSWORD\nip ssh pubkey-chain\n username $IOS_USERNAME\n  key-string\n"; cat ${KEYFILE} | fold -w200 ; printf "  exit\n exit\n\n"
+</pre>
+</p>
+
+<p>
+That creates an account for the user test, with the pubkey file in /tmp/id_rsa.pub, a random length password (at least 20 characters, but less than 30) for password authentication, and a privilege level of 1. Change the priv to 15 if you want to have all privileges.  It splits the key up into lines that are a max of 200 characters just to be safe, even though the documentation says 256 is the max.
+
+<pre>
+rchapman@Chapmans-Macbook-Pro:/tmp$ IOS_USERNAME=test; KEYFILE=/tmp/id_rsa.pub LANG=C; IOS_PASSWORD=$(cat /dev/random | perl -pe 's/[^A-Za-z0-9]//g' | fold -w $((RANDOM%10+20)) | head -n 1); printf "\nusername $IOS_USERNAME privilege 1 secret $IOS_PASSWORD\nip ssh pubkey-chain\n username $IOS_USERNAME\n  key-string\n"; cat ${KEYFILE} | fold -w200 ; printf "  exit\n exit\n\n"
+
+username test privilege 1 secret 53L9rOkcyBcky4eZZpzxM
+ip ssh pubkey-chain
+ username test
+  key-string
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDMRHIzELLQvj06gxqFnZn150T/OicDkBWwojNgSKdnOQIvEU/xu0LtlVUcZaVxVlZeVbm+UwsMdq1c/QuIsbINx18pRByPcwWWbI+4+du6kq8J6wi1qSD3bnBfGpHt2LG3liTTBHzvXFinWn1oB0BPq9q7zEUb2D1
+gBqyaurLdKs07DsC2T4xgNbJ1aQJFKP3qtfdTC8Fah7F46VK7eztUpPPJ/TEPxXBahwNxxUB+nvYtEryhsOspLwVAtA9Uk5CnWt3q77pijtMj2p4gJ6zRKhMLFM0sWEoe98zyYkutlRkGlaLbR6c+0WpY5fuGdPsEibsVXqx/07OfvF6WAsb test@Ryans-MacBook-
+Pro.local
+  exit
+ exit
+
+rchapman@Chapmans-Macbook-Pro:/tmp$ ssh rac@1.2.3.4
+core1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+core1(config)#username test privilege 1 secret 73L7rOgmyBcky4eoZwzxF
+core1(config)#ip ssh pubkey-chain
+core1(conf-ssh-pubkey)# username test
+core1(conf-ssh-pubkey-user)#  key-string
+core1(conf-ssh-pubkey-data)#ssh AAAAB3NzaC1yc2EAAAADAQABAAABAQDDMRHIzELLQvj06gxqFnZn150T/OicDkBWwojNgSKdnOQIvEU/xu0LtlVUcZaVxVlZeVbm+UwsMdq1c/QuIsbINx18pRByPcwWWbI+4+du6kq8J6wi1qSD3bnBfGpHt2LG3liTTBHzvXFinWn1oB0BPq9q7zEUb2D1
+core1(conf-ssh-pubkey-data)#gBqyaurLdKs07DsC2T4xgNbJ1aQJFKP3qtfdTC8Fah7F46VK7eztUpPPJ/TEPxXBahwNxxUB+nvYtEryhsOspLwVAtA9Uk5CnWt3q77pijtMj2p4gJ6zRKhMLFM0sWEoe98zyYkutlRkGlaLbR6c+0WpY5fuGdPsEibsVXqx/07OfvF6WAsb test@Ryans-MacBook-
+core1(conf-ssh-pubkey-data)#Pro.local
+core1(conf-ssh-pubkey-data)#  exit
+core1(conf-ssh-pubkey-user)# exit
+core1(conf-ssh-pubkey)#exit
+core1(config)#exit
+core1#q
+Shared connection to 1.2.3.4 closed.
+Connection to 1.2.3.4 closed by remote host.
+</pre>
+</p>
+
+<p>
+Now to verify that it works:
+<pre>
+rac@Chapmans-Macbook-Pro:/tmp$ ssh -i /tmp/id_rsa test@1.2.3.4
+core1>
+</pre>
+</p>
+
+<p>
+Yep. It works.
+</p>
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Loading%20an%20openssh%20pubkey%20on%20Cisco%20IOS&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fLoading_an_openssh_pubkey_on_Cisco_IOS%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fLoading_an_openssh_pubkey_on_Cisco_IOS%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fLoading_an_openssh_pubkey_on_Cisco_IOS%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Loading_an_openssh_pubkey_on_Cisco_IOS\/';
+    var disqus_title = 'Loading an openssh pubkey on Cisco IOS';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Loading_an_openssh_pubkey_on_Cisco_IOS\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+

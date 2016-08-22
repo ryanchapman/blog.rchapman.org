@@ -1,0 +1,228 @@
+---
+title: "Configuring BMC or iDRAC from ESXi or Linux"
+date: "2012-03-01"
+redirect_from: "/post/17480234232/configuring-bmc-drac-from-esxi-or-linux"
+categories: 
+    - "VMware ESXi"
+    - "VMware ESX"
+    - "IPMI"
+    - "BMC"
+    - "omconfig"
+    - "KVM"
+---
+
+<i>VMware ESX 4.1u1, ipmitool 1.8.11, Dell C2100 with BMC or Dell R710 with Enterprise iDRAC6</i>
+
+
+<h1><u>ESXi</u></h1>
+
+Ever needed to gain access to the iDRAC or BMC in your Dell machine?  Recently, I needed remote console (KVM) access to a server.  I knew that the BMC that provides console access on a Dell C2100 had been configured, but I didn't know the IP address.
+
+Turns out if you compile ipmitool as a 32-bit binary, then you can copy it over to an ESXi host and get information about the BMC/iDRAC.
+
+The steps to do this are:
+
+<ol>
+<li>Download ipmitool from <a href="ipmitool.sourceforge.net">SourceForge</a>
+
+
+<li>Decompress
+
+<pre>ryan@buggy:~/src$ tar zxvf ipmitool-1.8.11.tar.gz</pre>
+
+
+<li>Compile.  Note that I added the -static linker option. The resulting binary I got back was not statically compiled, but worked.  Omitting the -static flag caused ipmitool to throw compile errors, so I left it.
+
+<pre>ryan@buggy:~/src/ipmitool-1.8.11$ ./configure CFLAGS=-m32 LDFLAGS=-static</pre>
+
+
+<li>Copy the binary to your ESXi server
+
+<pre>ryan@buggy:~/src/ipmitool-1.8.11$ scp ./src/ipmitool qaesx01.qa.lan:/scratch/</pre>
+
+
+<li>Log into the ESXi server and run the program from /scratch
+
+<pre>root@C2100:~ # cd /scratch/
+root@C2100:/vmfs/volumes/4f364c4f-5e22faef-0987-e89a8f229d27 # ./ipmitool shell
+ipmitool> lan set 1 ipsrc static
+# If your eth0 is tagged (802.1q), then you may need to set the VLAN
+# to remove the 802.1q tag, use "lan set 1 vlan id off"
+#ipmitool> lan set 1 vlan id 43
+ipmitool> lan set 1 ipaddr 10.1.1.151
+ipmitool> lan set 1 netmask 255.255.255.0
+ipmitool> lan set 1 defgw ipaddr 10.1.1.1
+ipmitool> lan set 1 auth ADMIN MD5,PASSWORD
+ipmitool> lan set 1 arp respond on
+ipmitool> lan set 1 arp generate on
+ipmitool> lan set 1 arp interval 5
+ipmitool> lan set 1 access on
+ipmitool> user set name 2 root
+ipmitool> user set password 2 BuggyP@ssw0rd
+ipmitool> channel setaccess 1 2 callin=on link=on privilege=4
+ipmitool> user enable 2
+ipmitool> lan print 1
+Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5
+                        : User     : MD2 MD5
+                        : Operator : MD2 MD5
+                        : Admin    : MD5 PASSWORD
+                        : OEM      :
+IP Address Source       : Static Address
+IP Address              : 10.1.1.151
+Subnet Mask             : 255.255.255.0
+MAC Address             : 00:22:19:27:53:10
+SNMP Community String   : public
+IP Header               : TTL=0x40 Flags=0x40 Precedence=0x00 TOS=0x10
+Default Gateway IP      : 0.0.0.0
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+Cipher Suite Priv Max   : aaaaaaaaaaaaaaa
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM
+</pre>
+</ol>
+<br>
+<br>
+
+
+<h1><u>Linux</u></h1>
+
+On an R710 system, when I tried to run ipmitool, I was met with the following error:
+
+<pre>root@R710:~# ipmitool lan print
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Could not open device at /dev/ipmi0 or /dev/ipmi/0 or /dev/ipmidev/0: No such file or directory
+Get Channel Info command failed
+Invalid channel: 255</pre>
+
+
+
+The fix is to insert the ipmi kernel module and create the /dev/ipmi0 character device:
+
+<pre>root@R710:~# modprobe ipmi_devintf
+root@R710:~# modprobe ipmi_msghandler
+root@R710:~# modprobe ipmi_si
+root@R710:~# cat /proc/devices | grep ipmi
+<strong><i>247</i></strong> ipmidev</pre>
+
+
+Take the major number for ipmidev (247 in above example; your machine will probably be different) and create the character block device /dev/ipmi0:
+
+<pre>root@R710:~# mknod -m 0600 /dev/ipmi0 c <i>247</i> 0</pre>
+
+
+
+Now it works
+
+<pre>root@R710:~# lsmod | grep ipmi
+ipmi_si                39597  0
+ipmi_devintf            7203  0
+ipmi_msghandler        35197  2 ipmi_si,ipmi_devintf
+
+
+root@R710:~# ipmitool lan print
+Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5
+                        : User     : MD2 MD5
+                        : Operator : MD2 MD5
+                        : Admin    : MD2 MD5
+                        : OEM      : MD2 MD5
+IP Address Source       : Static Address
+IP Address              : 10.5.0.5
+Subnet Mask             : 255.255.255.0
+MAC Address             : 00:24:e8:7a:8e:0f
+SNMP Community String   : public
+IP Header               : TTL=0x40 Flags=0x40 Precedence=0x00 TOS=0x10
+Default Gateway IP      : 10.5.0.1
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+Cipher Suite Priv Max   : aaaaaaaaaaaaaaa
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM</pre>
+
+<br>
+<br>
+
+
+<h1><u>Accessing IPMI Remotely</u></h1>
+
+<ol>
+<li>Compile ipmitool with the lanplus interface enabled
+<pre>ryan@buggy:~/src/ipmitool-1.8.11$ ./configure --enable-intf-lanplus</pre>
+
+<li>Access remote host via IPMI
+<pre>ryan@buggy:~/src/ipmitool-1.8.11$ ./src/ipmitool -I lanplus -H 10.1.1.151 -U root -P 'BuggyP@ssw0rd' -v shell
+ipmitool> lan print 1
+Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5
+                        : User     : MD2 MD5
+                        : Operator : MD2 MD5
+                        : Admin    : MD5 PASSWORD
+                        : OEM      :
+IP Address Source       : Static Address
+IP Address              : 10.1.1.151
+Subnet Mask             : 255.255.255.0
+MAC Address             : 00:22:19:27:53:10
+SNMP Community String   : public
+IP Header               : TTL=0x40 Flags=0x40 Precedence=0x00 TOS=0x10
+Default Gateway IP      : 0.0.0.0
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+Cipher Suite Priv Max   : aaaaaaaaaaaaaaa
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM
+</pre>
+</ol>
+
+

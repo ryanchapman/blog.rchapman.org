@@ -1,0 +1,42 @@
+---
+title: "Mounting a Linux NFS point on a Mac client"
+date: "2008-05-15"
+redirect_from: "/post/4921797462/mounting-a-linux-nfs-point-on-a-mac-client"
+categories: 
+    - "Linux"
+    - "NFS"
+    - "Mac OS"
+---
+
+<i>Mac OS X 10.5.2, Linux (Debian) kernel 2.6.21.5</i><br/><br/>
+
+Quick tip for anyone trying to connect to a Linux server's NFS share from a Mac.
+The Finder provides a way to do this (from the menu bar, <tt>Go-&gt;Connect to server</tt>, then <tt>nfs://&lt;server_name&gt;/&lt;mount_point&gt;</tt>).  Turns out this may not work if your distribution of Linux requires NFS connections to come from a trusted port.  The solution requires you to open a terminal and type:<br /><br />
+
+<pre>sudo /sbin/mount_nfs -o resvport &lt;server_name&gt;:&lt;mount_point&gt;</pre><br /><br />
+
+In this example, the Mac has an IP address of 192.168.1.1 and the Linux server's is 192.168.1.34. <br />
+So on my linux box, my <tt>/etc/exports</tt> file looks like:<br /><br /><br /><br/>
+<pre># /etc/exports: the access control list for filesystems which may be exported
+#  to NFS clients.  See exports(5).<br /><br />/home/music 192.168.1.0/255.255.255.0(ro,sync)
+</pre><br /><br /><br />
+
+On the Mac, I type:<br/><br/>
+<pre>mkdir /tmp/mnt</pre>
+
+    (make a directory where I want to mount the remote directory<br /><br />
+
+<pre>sudo /sbin/mount_nfs -o resvport 192.168.1.34:/home/music /tmp/mnt</pre><br /><br /><br /><br />
+
+You should now be able to <pre>cd /tmp/mnt</pre> and see the contents of the remote directory.<br/><br/><br/><br/>
+
+Troubleshooting Notes:<br/><br/>
+
+If you are having trouble, look in the logs on the Linux/Mac boxes.  On Linux, they are usually in /var/log. For the Mac, use the Console application in the Utilities folder.  After you add an entry to /etc/exports on the Linux box, you may have to tell mountd(8) and nfsd(8) to re-read the file.  Some systems allow you to do this with the command <pre>exportfs -a</pre>
+
+If that command does not work, then send <a href="http://en.wikipedia.org/wiki/SIGHUP">HUP</a> signals to the two server processes:<br /><br />
+<pre>sudo killall -HUP rpc.mountd
+sudo killall -HUP rpc.nfsd</pre>
+<div class="blogger-post-footer">&nbsp;</div>
+
+

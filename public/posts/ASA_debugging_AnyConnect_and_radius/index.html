@@ -1,0 +1,253 @@
+---
+redirect_from: /post/132374666129/debugging-asa-and-radius
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>ASA: debugging AnyConnect and radius &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">ASA: debugging AnyConnect and radius</h1>
+    
+    Published Sun, Nov 1, 2015<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <p><em>Ubuntu 14.04 (Linux 3.13.0-48), freeradius 2.1.12, ASA 9.4.2 (which runs Lua 5.0.2), AnyConnect 4.2</em><br/><br/></p>
+
+<p>Setting up communications between an ASA and a radius server can be tricky, because it's hard to know what attributes the radius server is sending back and are being applied to a user session.  One method is to use wireshark to capture the communications between the ASA and radius server.  Another is to enable debugging on the ASA with <tt>debug dap trace</tt>. An easier way is to just have the attributes printed out on the end-user device when they log in.</p>
+
+<p>The dynamic access policy feature of the ASA will let you input Lua functions to get this information. Open ASDM and go to
+<ul>
+<li>Configuration</li>
+<li>Remote Access VPN</li>
+<li>Network (Client) Access</li>
+<li>Dynamic Access Policies</li>
+<li>Click Add</li>
+<li>Policy Name: debug</li>
+<li>Priority: 1 (or whatever works in your environment)</li>
+<li>In the Selection Criteria area, click Advanced</li>
+<li>Make sure AND is selected.  In the Logical Expressions box, enter:
+<pre>
+assert(function()
+
+  function print_table(tbl, prefix)
+     if (type(tbl) == "table") then
+       for k,v in pairs(tbl) do
+         if (type(v) == "table") then
+           print_table(v, prefix .. "." .. k)
+         else
+           CheckAndMsg(true, prefix .. "." .. k .. "=\"" .. v .. "\"", "")
+         end
+       end
+     end
+  end
+
+  CheckAndMsg(true, "============", "")
+  CheckAndMsg(true, "DEBUG", "")
+  print_table(aaa, "aaa")
+  print_table(endpoint, "endpoint")
+
+  return true
+
+end)()
+</pre>
+</li>
+<li>Click OK to close the Add Dynamic Access Policy window, then click Apply</li>
+</ul>
+</p>
+
+<p>
+Now, if you log in to AnyConnect on a device, you'll notice that a dropdown message box appears and shows you the values of the AV pairs.
+</p>
+<p>
+<a href="https://farm6.staticflickr.com/5709/22071016164_aeab29f3b8_b.jpg"><img src="https://farm6.staticflickr.com/5709/22071016164_aeab29f3b8.jpg"></a>
+</p>
+
+
+<p>
+You might want to be able to toggle the display of the debug message from a freeradius server.  That will allow you to turn it on when a user calls in and reports problems and you need to know what settings are being applied to their account.
+
+<ul>
+<li>On the freeradius server, change their user record and add <tt>Reply-Message = "debug_print"</tt>.  Note that you could use any attribute you want, but I know that Reply-Message does work.
+<pre>
+test            Cleartext-Password := "test123"
+                Class = "OU=Test_VPN;",
+                Reply-Message = "debug_print"
+</pre>
+<li>Back in ASDM, go to the debug policy you created earlier and change it so that it only fires when <tt>Reply-Message = "debug_print"</tt>
+<a href="https://farm6.staticflickr.com/5655/22074947183_2a499cb747_b.jpg"><img src="https://farm6.staticflickr.com/5655/22074947183_2a499cb747.jpg"></a></li>
+<li>OK and Apply</li>
+</ul>
+</p>
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=ASA%3a%20debugging%20AnyConnect%20and%20radius&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fASA_debugging_AnyConnect_and_radius%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fASA_debugging_AnyConnect_and_radius%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fASA_debugging_AnyConnect_and_radius%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/ASA_debugging_AnyConnect_and_radius\/';
+    var disqus_title = 'ASA: debugging AnyConnect and radius';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/ASA_debugging_AnyConnect_and_radius\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+

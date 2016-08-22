@@ -1,0 +1,188 @@
+---
+redirect_from: /post/4921771133/how-to-connect-or-disconnect-a-pptp-vpn-session
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>How to connect or disconnect a PPTP VPN session from the command line (terminal) &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">How to connect or disconnect a PPTP VPN session from the command line (terminal)</h1>
+    
+    Published Sun, Jan 20, 2008<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <i>Mac OS X 10.5.1</i><br /><br />Below is how to establish a PPTP VPN session from the command line in OS X.  Note you must first set up the VPN connection in System Preferences-&gt;Network.  I use this to connect to a Cisco 827H router running IOS.  If there is any interest, I'll post instructions on how to setup an IOS router for PPTP or IPSEC VPN connections (your choice, but the IPSEC requires the Cisco VPN Client for Mac).<br /><br />I'm saving everything to ~/bin in the example below.  Make modifications as you see fit.<br /><ol><br /><li>Open Script Editor and paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  if exists VPNservice then connect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.scpt<br /><br /><br /></li><li>In Script Editor, File-&gt;New, then paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  set isConnected to connected of current configuration of VPNservice<br />  if isConnected then disconnect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.scpt<br /><br /><br /></li><li>Open your favorite text editor, such as vi, and paste the following shell script:<br /><pre><br />#!/bin/sh -<br />osascript pptp_connect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.sh<br /><br /><br /></li><li>Paste the following shell script in a new text editor window:<br /><pre><br />#!/bin/sh -<br />osascript pptp_disconnect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.sh<br /><br /><br /></li><li>Execute the following command to make the scripts executable by everyone:<br /><pre><br />chmod +x ~/bin/pptp_*.sh<br /></pre><br /><br />Now in your terminal, you can execute <tt>~/bin/pptp_connect.sh</tt> or <tt>~/bin/pptp_disconnect.sh</tt> to establish or tear down your PPTP connection.<br /><br />This works with L2TP VPN connections also.  Where you see "VPN (PPTP)" simply change it to "VPN (L2TP)".<br /></li></ol><div class="blogger-post-footer">&nbsp;</div>
+
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=How%20to%20connect%20or%20disconnect%20a%20PPTP%20VPN%20session%20from%20the%20command%20line%20%28terminal%29&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fHow_To_Connect_or_Disconnect_a_PPTP_VPN_Session_From_the_Command_Line%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fHow_To_Connect_or_Disconnect_a_PPTP_VPN_Session_From_the_Command_Line%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fHow_To_Connect_or_Disconnect_a_PPTP_VPN_Session_From_the_Command_Line%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/How_To_Connect_or_Disconnect_a_PPTP_VPN_Session_From_the_Command_Line\/';
+    var disqus_title = 'How to connect or disconnect a PPTP VPN session from the command line (terminal)';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/How_To_Connect_or_Disconnect_a_PPTP_VPN_Session_From_the_Command_Line\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+

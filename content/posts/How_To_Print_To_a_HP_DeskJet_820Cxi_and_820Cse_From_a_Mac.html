@@ -1,0 +1,25 @@
+---
+title: "How to print to a HP DeskJet 820Cxi (and 820Cse) from a Mac"
+date: "2008-01-16"
+redirect_from: "/post/4921768875/how-to-print-to-a-hp-deskjet-820cxi-and-820cse"
+categories: 
+    - "Mac OS"
+    - "HP DeskJet 820cxi"
+    - "HP DeskJet 820cse"
+---
+
+<p><em>Tested on Mac OS X Leopard 10.5.1</em> <em>Also works with DeskJet 710C, DeskJet 712C, DeskJet 720C, DeskJet 722C, DeskJet 1000Cse, DeskJet 1000Cxi</em><br /><br /></p>&#13;
+<p><strong><em>Update: After using the 820 drivers on my Mac for a week, I found that some documents do not print at all.  For this reason, I am now using the method described <a href="http://mywebpages.comcast.net/heretrythis/hp3100/psemuxp.html">here</a> to set up a Postscript converter on a Windows computer I have.  Now on the Mac I have a printer set up as a HP Color LaserJet 4550 PS, which sends a postscript document to the windows box.  The Windows machine receives it, converts it using Ghostscript, and then prints to the 820Cxi.</em></strong></p>&#13;
+<p><br /><br /></p>&#13;
+<p>I've been trying for weeks to get my Mac to print to an old HP DeskJet 820Cxi that is attached to a Windows box in the next room and today I was successful. Turns out the 820 series uses a protocol called PPA (Printer Performance Architecture), which is proprietary to Hewlett-Packard. I've confirmed that this method also works when the printer is attached to a JetDirect 300X print server.</p>&#13;
+<p><br /><br /></p>&#13;
+<ol><br /><li>Download and install <a href="http://www.openprinting.org/download/printdriver/macosx/old/pnm2ppa-foomatic-1.12-2.ppc.dmg">pnm2ppa</a> and <a href="http://prdownloads.sourceforge.net/gimp-print/espgs-7.07.1.ppc.dmg?download">espgs</a> (GhostScript). Update: If you are running Mac OS X Lion, the Ghostscript package may not work.  The reason is that in Lion, Mac removed the ability to run PowerPC binaries (Apple called this technology Rosetta)<br /><br /><br /></li>&#13;
+<li>Download this <a href="http://openprinting.org/ppd-o-matic.cgi?driver=pnm2ppa&amp;printer=HP-DeskJet_820C&amp;show=0">ppd</a> file, which tells Mac OS X how to print to the 820.<br /><br /><br /><br /></li>&#13;
+<li>Open the Printer Setup Utility (look in Applications-&gt;Utilities folder or in System Preferences) and Add a printer. If attached to the network, enter the info to connect to it. When asked for the printer model (Print Using:), select Other, then find the ppd file you downloaded in step 3. If Mac OS X complains about not being able to find programs, then you'll have to put the full paths to the programs in the ppd.<br /><br /><br /><br /><ol><br /><li>Open the ppd file and find the line that starts "*FoomaticRIPCommandLine: "gs -q -dNOPAUSE ...." and change it to "*FoomaticRIPCommandLine: "/usr/local/bin/gs -q -dNOPAUSE ...."<br /><br /><br /><br /></li>&#13;
+<li>On the same line, you'll see "pnm2ppa" which should be changed to the full path also: "/usr/local/bin/pnm2ppa%C%B -v 820 -i - -o -" (the -v 820 tells pnm2ppa the model of the printer)<br /><br /><br /></li>&#13;
+</ol></li>&#13;
+<br /><br /><li>That's it!</li>&#13;
+<br /></ol><p>For more info: <a href="http://www.linux-foundation.org/en/OpenPrinting/MacOSX/pnm2ppa">Linux Foundation</a></p>&#13;
+<div class="blogger-post-footer">&nbsp;</div>
+
+

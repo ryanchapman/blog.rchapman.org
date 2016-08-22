@@ -1,0 +1,116 @@
+---
+title: "Securely allowing rancid to back up IOS configs"
+date: "2015-11-25"
+redirect_from: "/post/133715391209/securely-allowing-rancid-to-back-up-ios-configs"
+categories: 
+    - "rancid"
+    - "Cisco IOS-XE"
+    - "git"
+---
+
+<p><em>Cisco IOS-XE 3.7, rancid-git 2.3.9 on Ubuntu 14.4, git 1.9.1</em></p>
+
+<p>
+I use rancid to back up configs of network devices, but giving an automated process like rancid full access to switches, routers, and firewalls is a horrible idea.  If someone breaks into the Linux rancid account (or wherever the rancid program runs), they pretty much own your network because the rancid scripts either have the password or ssh private key for logging into network devices.
+</p>
+
+<p>
+You don't have to give rancid full access to IOS though.  You can configure a privilege level to provide just what rancid needs to backup the configs and nothing more.  There is still a security risk because rancid can see password hashes, so you should make sure your users use strong passwords.  You can just generate random strong passwords for users rather than letting them choose passwords.
+<p>
+
+<p>
+Configure privilege level 2 to allow only the commands rancid needs:
+<pre>
+
+privilege exec level 2 dir /all bootflash:
+privilege exec level 2 dir /all disk0:
+privilege exec level 2 dir /all disk1:
+privilege exec level 2 dir /all disk2:
+privilege exec level 2 dir /all harddisk:
+privilege exec level 2 dir /all harddiska:
+privilege exec level 2 dir /all harddiskb:
+privilege exec level 2 dir /all nvram:
+privilege exec level 2 dir /all sec-bootflash:
+privilege exec level 2 dir /all sec-disk0:
+privilege exec level 2 dir /all sec-disk1:
+privilege exec level 2 dir /all sec-disk2:
+privilege exec level 2 dir /all sec-nvram:
+privilege exec level 2 dir /all sec-slot0:
+privilege exec level 2 dir /all sec-slot1:
+privilege exec level 2 dir /all sec-slot2:
+privilege exec level 2 dir /all slavebootflash:
+privilege exec level 2 dir /all slavedisk0:
+privilege exec level 2 dir /all slavedisk1:
+privilege exec level 2 dir /all slavedisk2:
+privilege exec level 2 dir /all slavenvram:
+privilege exec level 2 dir /all slavenslot0:
+privilege exec level 2 dir /all slavenslot1:
+privilege exec level 2 dir /all slavenslot2:
+privilege exec level 2 dir /all slavesup-bootflash:
+privilege exec level 2 dir /all slavesup-slot0:
+privilege exec level 2 dir /all slavesup-slot1:
+privilege exec level 2 dir /all slavesup-slot2:
+privilege exec level 2 dir /all sup-bootdisk:
+privilege exec level 2 dir /all sup-bootflash:
+privilege exec level 2 dir /all sup-microcode:
+privilege exec level 2 more system:running-config
+privilege exec level 2 show boot
+privilege exec level 2 show bootvar
+privilege exec level 2 show c7200
+privilege exec level 2 show capture
+privilege exec level 2 show controllers
+privilege exec level 2 show controllers cbus
+privilege exec level 2 show crypto pki certificates
+privilege exec level 2 show debug
+privilege exec level 2 show diag
+privilege exec level 2 show diag chassis-info
+privilege exec level 2 show diagbus
+privilege exec level 2 show env all
+privilege exec level 2 show flash
+privilege exec level 2 show gsr chassis
+privilege exec level 2 show idprom backplane
+privilege exec level 2 show install active
+privilege exec level 2 show interface
+privilege exec level 2 show inventory raw
+privilege exec level 2 show ip interface
+privilege exec level 2 show ipv6 interface
+privilege exec level 2 show module
+privilege exec level 2 show redundancy secondary
+privilege exec level 2 show rsp chassis-info
+privilege exec level 2 show running-config
+privilege exec level 2 show running-config view full
+privilege exec level 2 show shun
+privilege exec level 2 show snmp engineID
+privilege exec level 2 show snmp mib ifmib ifindex
+privilege exec level 2 show spe version
+privilege exec level 2 show standby
+privilege exec level 2 show variables boot
+privilege exec level 2 show variables boot
+privilege exec level 2 show version
+privilege exec level 2 show vlan
+privilege exec level 2 show vlan-switch
+privilege exec level 2 show vtp status
+privilege exec level 2 write term
+</pre>
+</p>
+
+
+<p>
+Now create the rancid user, generate a random password for the account, and only allow the the account to sign in from 192.168.0.55
+
+<pre>
+access-list 95 permit 192.168.0.55
+username rancid privilege 2 access-class 95 secret 2NANyrnyxRJie1WtGjtTxcXnesLu
+ip ssh pubkey-chain
+ username rancid
+  key-string
+ssh-rsa AAAAB3[...]vv6X rancid
+  exit
+ exit
+</pre>
+</p>
+
+<p>
+In my testing, this was enough for the rancid program (I use the git fork at https://github.com/dotwaffle/rancid-git) to download the configuration from IOS devices and push them to the git repo.
+</p>
+

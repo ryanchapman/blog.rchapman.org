@@ -1,0 +1,46 @@
+---
+title: "Yubikey NEO for Physical Access Control"
+date: "2016-06-15"
+redirect_from: "/post/145951044949/yubikey-neo-for-physical-access-control"
+categories: 
+    - "YubiKey NEO"
+    - "Physical Access Control"
+    - "PACS"
+    - "HID pivClass"
+    - "PIV"
+---
+
+<p>
+After discovering that many physical access control systems are not secure (for example, proximity cards based on 125kHz), I wanted to figure out if there was a system based on public key crypto, which would be secure.  Turns out there is.  The U.S. Government has been using physical access control systems based on public key crypto for years.  NIST designed the system and called it PIV for Personal Identity Verification.  Unfortunately, information on this technology is extremely hard to come by.  I started by trying to get info from the PIV card manufacturers, but found they have no interest in speaking to anyone unless they are purchasing a large quantity of cards.  Even though I had $1000 in hand I was willing to spend to get a PIV card software dev kit, my requests went unanswered.
+</p>
+
+<p>
+I continued to research options and realized that the YubiKey NEO is actually a Java Card, same as the PIV cards being used by government.  Yubico had the foresight to realize PIV could be useful, and they include a PIV applet with the NEO.  So after some reading of the NIST specs and some help from the excellent people at HID Global and Yubico, I was able to glue the pieces together and get a system working.  It's been a fun hobby for the past six months.
+</p>
+
+<p>
+It could probably be done with any number of vendor's solutions, but I used HID's pivCLASS system along with Genetec for the physical access control system.
+</p>
+
+<p>
+A full write-up with detailed instructions is available at https://docs.google.com/document/d/1fOFzxfpgi8P-HVRdtnWiTNGCDRgeXcvorEqoSXA_4sE
+</p>
+
+<p>
+Some code for generating the certificates and populating a YubiKey NEO can be found on <a href="https://github.com/ryanchapman/piv-pacs-poc">GitHub</a>.
+</p>
+
+<p>
+Video of the NEO opening a door protected by pivCLASS:<br/>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/i031nExD-LM" frameborder="0" allowfullscreen></iframe>
+</p>
+
+<p>
+I also made a video of a traditional PIV card opening the same pivCLASS system:<br/>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/rCUCtAM5m8I" frameborder="0" allowfullscreen></iframe>
+</p>
+
+<p>
+Enjoy.  If you have questions or suggestions for improvement, please send me a message.
+</p>
+

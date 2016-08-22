@@ -1,0 +1,28 @@
+---
+title: "Create eager zero hard disks from PowerCLI (PowerShell)"
+date: "2012-01-29"
+redirect_from: "/post/16690892045/create-eager-zero-hard-disks-from-powercli-powershell"
+categories: 
+    - "Eager zero disk"
+    - "Eagerly scrub disk"
+    - "VMware ESXi"
+    - "VMware ESX"
+    - "PowerCLI"
+    - "PowerShell"
+    - "VMFS3"
+---
+
+
+<p><em><em>Microsoft PowerShell 2.0, </em>VMware PowerCLI  5.0.0.3501, VMware ESXi 4.1.0</em></p>
+<p><strong>New-EagerZeroHardDisk</strong> is a PowerShell function I wrote to create hard disks that are eagerly scrubbed, meaning that ESX will create the hard disk in Thick format and then write zeroes to the disk.  The ESX SDK refers to this as eagerlyScrub, while other documents refer to the process as eagerzero.</p>
+<p>Zeroing disks at creation time <em>should</em> create a vmdk in a contiguous region on the physical hard disks, preventing fragmentation and seek times versus a hard disk that is thin.  <strike>I say <em>should</em>, but I'm not sure if this is true.  If you have knowledge on this, please leave a message in the comments.</strike> Update: according to a <a href="http://www.ntpro.nl/blog/archives/2233-Mythbusting-goes-virtual-Dutch-VMUG-2012.html">presentation given by Eric Sloof and Mattias Sundling on ntpro.nl</a>, eager zeroed disks have (slides 41-43) 651% faster throughput and 4.5x faster seeks than lazy zeroed disks.  Compared to thin provisioned disks, eagered zero disks have 632% faster throughput and 4.8x faster seeks.</p>
+<p>The function is available on github:</p>
+<p><a href="https://github.com/ryanchapman/vmware_scripts">https://github.com/ryanchapman/vmware_scripts</a></p>
+<p>git clone git@github.com:ryanchapman/vmware_scripts.git</p>
+<p>Once you clone the git repository, source the script in PowerShell with:</p>
+<pre>PS C:\TEMP\vmware_scripts&gt; . .\New-EagerZeroDisk.ps1</pre>
+<p>Documentation on the function can be had by using the help command:</p>
+<pre>PS C:\TEMP\vmware_scripts&gt; help New-EagerZeroHardDisk -Full</pre>
+<p> </p>
+<a href="http://farm8.staticflickr.com/7034/6781425441_c7ff4eab42_b.jpg"><img src="http://farm8.staticflickr.com/7034/6781425441_c7ff4eab42.jpg"></a>
+

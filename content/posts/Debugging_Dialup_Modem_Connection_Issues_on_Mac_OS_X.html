@@ -1,0 +1,12 @@
+---
+title: "Debugging Dialup Modem Connection Issues on Mac OS X"
+date: "2008-01-18"
+redirect_from: "/post/4921769463/debugging-dialup-modem-connection-issues-on-mac-os"
+categories: 
+    - "PPP"
+    - "Mac OS"
+    - "modem"
+---
+
+<i>Mac OS 10.5.1</i><br /><br /><p>Having troubles establishing a dialup (PPP) connection in Mac OS X and can't figure out where to find information on why it's failing?  Below I tell you where the log files are kept and how to enable verbose logging.<br /><br /><br /><b>Enable Verbose Logging</b><br /></p><ol><br /><li>Open System Preferences<br /><br /><br /></li><li>Click Network<br /><br /><br /></li><li>Click the network on the left pane which is associated with the dialup connection.  In this example, I'm using a Bluetooth network to establish a dialup connection to Alltel's CDMA EVDO phone network.<br /><img src="http://farm3.static.flickr.com/2179/2202469765_f079fffcde.jpg?v=0" /><br /><br /><br /></li><li>Click Advanced <img src="http://farm3.static.flickr.com/2219/2203260620_3109ecdd71_t.jpg" /><br /><br /><br /></li><li>Select the PPP tab and change "Settings:" to Configuration<br /><br /><br /></li><li>Here you can enable verbose logging, the sending of PPP echo packets (LCP echo packets, see the pppd(8) man page for more info.  Note that PPP echo can cause problems with mobile networks, such as CDMA and GSM.  If you want to use your own terminal script, create the directory "/System/Terminal Scripts" and place the file in there.<br /><img src="http://farm3.static.flickr.com/2109/2202469815_0a3c0f1fbe.jpg?v=0" /><br /></li></ol><br /><br /><b>Finding Log Files</b><br /><ol><br /><li>Open Console (Applications-&gt;Utilities-&gt;Console)<br /><br /><br /></li><li>Look in /var/log/ppp.log or /var/log/ppp/ and you will find connection logs.<br /></li></ol><div class="blogger-post-footer">&nbsp;</div>
+

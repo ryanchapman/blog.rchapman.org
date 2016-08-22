@@ -1,0 +1,113 @@
+---
+title: "Loading an openssh pubkey on Cisco IOS"
+date: "2015-11-22"
+redirect_from: "/post/133714833054/loading-an-openssh-pubkey-on-to-ios"
+categories: 
+    - "Mac OS"
+    - "Cisco IOS-XE"
+    - "JunOS"
+    - "ssh"
+    - "id_rsa"
+    - "openssh"
+---
+
+<p><em>Mac OS X 10.10.5, Cisco IOS-XE 3.7, JunOS 12.3R6.6</em><br/><br/></p>
+
+<p>
+I work primarily on a Mac and want to be able to ssh to Cisco IOS equipment with ssh keys; however, Cisco does not make it easy to load keys.  On JunOS, this is as easy as:
+
+<pre>
+Ryans-MacBook-Pro:~ $ ssh 1.2.3.4 -l rac
+--- JUNOS 12.3R6.6 built 2014-03-13 06:57:48 UTC
+{master:0}
+rac> configure
+Entering configuration mode
+
+{master:0}[edit]
+rac# edit system login
+
+{master:0}[edit system login]
+rchapman# set user test class read-only authentication ssh-rsa "AAAAB3NzaC1yc2EAAAADAQABAAABAQDDMRHIzELLQvj06gxqFnZn150T/OicDkBWwojNgSKdnOQIvEU/xu0LtlVUcZaVxVlZeVbm+UwsMdq1c/QuIsbINx18pRByPcwWWbI+4+du6kq8J6wi1qSD3bnBfGpHt2LG3liTTBHzvXFinWn1oB0BPq9q7zEUb2D1gBqyaurLdKs07DsC2T4xgNbJ1aQJFKP3qtfdTC8Fah7F46VK7eztUpPPJ/TEPxXBahwNxxUBnvYtEryhsOspLwVAtA9Uk5CnWt3q77pijtMj2p4gJ6zRKhMLFM0sWEoe98zyYkutlRkGlaLbR6c+0WpY5fuGdPsEibsVXqx/07OfvF6WAsb test@Ryans-MacBook-Pro.local"
+
+{master:0}[edit system login]
+rchapman# commit check
+configuration check succeeds
+
+{master:0}[edit system login]
+rchapman# commit
+configuration check succeeds
+commit complete
+{master:0}[edit system login]
+rchapman# quit
+
+{master:0}[edit]
+rchapman# quit
+Exiting configuration mode
+
+{master:0}
+rchapman> quit
+
+Connection to 1.2.3.4 closed.
+Ryans-MacBook-Pro:~ $
+Ryans-MacBook-Pro:~ $ ssh -i /tmp/id_rsa test@1.2.3.4
+--- JUNOS 12.3R6.6 built 2014-03-13 06:57:48 UTC
+{master:0}
+test>
+</pre>
+</p>
+
+<p>
+Cisco IOS is a pain in comparison, requiring you to break the key up into lines of no more than 256 characters. When someone hands me their ssh pubkey, I don't want to have to manually break it up into appropriately sized lines, so I wrote a quick bash snippet to do it.  This snippet was tested and worked on Mac OS X as well as Ubuntu 14.4 Linux:
+
+<pre>
+IOS_USERNAME=test; KEYFILE=/tmp/id_rsa.pub LANG=C; IOS_PASSWORD=$(cat /dev/random | perl -pe 's/[^A-Za-z0-9]//g' | fold -w $((RANDOM%10+20)) | head -n 1); printf "\nusername $IOS_USERNAME privilege 1 secret $IOS_PASSWORD\nip ssh pubkey-chain\n username $IOS_USERNAME\n  key-string\n"; cat ${KEYFILE} | fold -w200 ; printf "  exit\n exit\n\n"
+</pre>
+</p>
+
+<p>
+That creates an account for the user test, with the pubkey file in /tmp/id_rsa.pub, a random length password (at least 20 characters, but less than 30) for password authentication, and a privilege level of 1. Change the priv to 15 if you want to have all privileges.  It splits the key up into lines that are a max of 200 characters just to be safe, even though the documentation says 256 is the max.
+
+<pre>
+rchapman@Chapmans-Macbook-Pro:/tmp$ IOS_USERNAME=test; KEYFILE=/tmp/id_rsa.pub LANG=C; IOS_PASSWORD=$(cat /dev/random | perl -pe 's/[^A-Za-z0-9]//g' | fold -w $((RANDOM%10+20)) | head -n 1); printf "\nusername $IOS_USERNAME privilege 1 secret $IOS_PASSWORD\nip ssh pubkey-chain\n username $IOS_USERNAME\n  key-string\n"; cat ${KEYFILE} | fold -w200 ; printf "  exit\n exit\n\n"
+
+username test privilege 1 secret 53L9rOkcyBcky4eZZpzxM
+ip ssh pubkey-chain
+ username test
+  key-string
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDDMRHIzELLQvj06gxqFnZn150T/OicDkBWwojNgSKdnOQIvEU/xu0LtlVUcZaVxVlZeVbm+UwsMdq1c/QuIsbINx18pRByPcwWWbI+4+du6kq8J6wi1qSD3bnBfGpHt2LG3liTTBHzvXFinWn1oB0BPq9q7zEUb2D1
+gBqyaurLdKs07DsC2T4xgNbJ1aQJFKP3qtfdTC8Fah7F46VK7eztUpPPJ/TEPxXBahwNxxUB+nvYtEryhsOspLwVAtA9Uk5CnWt3q77pijtMj2p4gJ6zRKhMLFM0sWEoe98zyYkutlRkGlaLbR6c+0WpY5fuGdPsEibsVXqx/07OfvF6WAsb test@Ryans-MacBook-
+Pro.local
+  exit
+ exit
+
+rchapman@Chapmans-Macbook-Pro:/tmp$ ssh rac@1.2.3.4
+core1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+core1(config)#username test privilege 1 secret 73L7rOgmyBcky4eoZwzxF
+core1(config)#ip ssh pubkey-chain
+core1(conf-ssh-pubkey)# username test
+core1(conf-ssh-pubkey-user)#  key-string
+core1(conf-ssh-pubkey-data)#ssh AAAAB3NzaC1yc2EAAAADAQABAAABAQDDMRHIzELLQvj06gxqFnZn150T/OicDkBWwojNgSKdnOQIvEU/xu0LtlVUcZaVxVlZeVbm+UwsMdq1c/QuIsbINx18pRByPcwWWbI+4+du6kq8J6wi1qSD3bnBfGpHt2LG3liTTBHzvXFinWn1oB0BPq9q7zEUb2D1
+core1(conf-ssh-pubkey-data)#gBqyaurLdKs07DsC2T4xgNbJ1aQJFKP3qtfdTC8Fah7F46VK7eztUpPPJ/TEPxXBahwNxxUB+nvYtEryhsOspLwVAtA9Uk5CnWt3q77pijtMj2p4gJ6zRKhMLFM0sWEoe98zyYkutlRkGlaLbR6c+0WpY5fuGdPsEibsVXqx/07OfvF6WAsb test@Ryans-MacBook-
+core1(conf-ssh-pubkey-data)#Pro.local
+core1(conf-ssh-pubkey-data)#  exit
+core1(conf-ssh-pubkey-user)# exit
+core1(conf-ssh-pubkey)#exit
+core1(config)#exit
+core1#q
+Shared connection to 1.2.3.4 closed.
+Connection to 1.2.3.4 closed by remote host.
+</pre>
+</p>
+
+<p>
+Now to verify that it works:
+<pre>
+rac@Chapmans-Macbook-Pro:/tmp$ ssh -i /tmp/id_rsa test@1.2.3.4
+core1>
+</pre>
+</p>
+
+<p>
+Yep. It works.
+</p>

