@@ -1,0 +1,90 @@
+---
+title: "Wireshark tips #1: DNS traffic"
+date: "2014-03-30"
+redirect_from: "/post/81258365640/wireshark-tips-1-dns-traffic"
+categories: 
+    - "Wireshark"
+    - "tshark"
+    - "DNS"
+---
+
+<p><i>TShark 1.2.15, Oracle Enterprise Linux 6.5</i></p>
+
+<p>
+As part of a series on Wireshark, this is the first of many tips on using this versatile network tool.
+</p>
+
+<p>
+If you run a DNS server, you may want to quickly see what types of queries are coming into the server as well as the response codes.  The following query provides:
+</p>
+
+<p>
+<ol>
+<li>Number of <tt>A</tt> (IPv4) queries in the last minute</li>
+<li>Number of <tt>AAAA</tt> (IPv6) queries in the last minute</li>
+<li>Number of <tt>CNAME</tt> …</li>
+<li>Number of <tt>MX</tt> …</li>
+<li>Number of <tt>NS</tt> …</li>
+<li>Number of <tt>PTR</tt> …</li>
+<li>Number of <tt>SOA</tt> …</li>
+<li>Number of <tt>SRV</tt> …</li>
+<li>Number of <tt>TXT</tt> …</li>
+<li>Number of <tt>AXFR</tt> (complete zone transfers) …</li>
+<li>Number of <tt>IXFR</tt> (incremental zone transfers) …</li>
+<li>Number of Successful queries, which are those where the response code was zero (<tt>rcode==0</tt>)</li>
+<li>Number of Unsuccessful queries, which are those where the response code was non-zero (<tt>rcode!=0</tt>)</li>
+</ol>
+</p>
+
+<p>
+A complete listing of rcodes can be found at <a href="http://www.iana.org/assignments/dns-parameters/dns-parameters.xml#dns-parameters-6">http://www.iana.org/assignments/dns-parameters/dns-parameters.xml#dns-parameters-6</a>
+</p>
+
+<p>
+Note this query shows ingress and egress DNS traffic, so you'll see DNS queries/responses that were sent to the server where you are running shark as well as queries/responses that originated on the server where tshark is running.
+</p>
+
+<p>
+<pre>
+tshark -i eth0 -qz "io,stat,60,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==A,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==AAAA,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==CNAME,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==MX,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==NS,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==PTR,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==SOA,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==SRV,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==TXT,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==AXFR,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==IXFR,COUNT(dns.flags.rcode)dns.flags.rcode and dns.flags.rcode==0,COUNT(dns.flags.rcode)dns.flags.rcode and dns.flags.rcode!=0" dst port 53 and dst host 10.100.5.5
+</pre>
+</p>
+
+<p>
+<em>Press ^C after 60 seconds or more to see results</em>
+</p>
+
+<p>
+<pre>
+^C3380 packets captured
+
+===================================================================
+IO Statistics
+Interval: 60.000 secs
+Column #0: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==A
+Column #1: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==AAAA
+Column #2: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==CNAME
+Column #3: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==MX
+Column #4: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==NS
+Column #5: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==PTR
+Column #6: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==SOA
+Column #7: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==SRV
+Column #8: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==TXT
+Column #9: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==AXFR
+Column #10: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==IXFR
+Column #11: COUNT(dns.flags.rcode)dns.flags.rcode and dns.flags.rcode==0
+Column #12: COUNT(dns.flags.rcode)dns.flags.rcode and dns.flags.rcode!=0
+                |   Column #0    |   Column #1    |   Column #2    |   Column #3    |   Column #4    |   Column #5    |   Column #6    |   Column #7    |   Column #8    |   Column #9    |   Column #10   |   Column #11   |   Column #12
+Time            |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT
+000.000-060.000               110               59                0               12                6                0               71                0                0                0                8              114               16
+060.000-120.000               108               86                0               12                8                4              124                0                0                0               26              167               29
+120.000-180.000                40               44                0                0               10                0               29                0                0                0                0               44                8
+===================================================================
+</pre>
+</p>
+
+<p>
+In the example above, in the first 60 seconds, we had 110 <tt>A</tt> queries, 59 <tt>AAAA</tt> queries; 114 successful responses and 16 unsuccessful responses.
+</p>
+
+
