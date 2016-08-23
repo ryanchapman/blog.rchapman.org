@@ -77,6 +77,11 @@
   </url>
   
   <url>
+    <loc>http://test2.rchapman.org/posts/Wireshark_tips_No1_DNS_traffic/</loc>
+    <lastmod>2014-03-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://test2.rchapman.org/posts/Wireshark_tips_No2_Cisco_Discovery_Protocol_Link_Layer_Discovery_Protocol/</loc>
     <lastmod>2014-03-30T00:00:00+00:00</lastmod>
   </url>

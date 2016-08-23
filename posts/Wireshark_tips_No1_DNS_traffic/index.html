@@ -1,0 +1,265 @@
+---
+redirect_from: /post/81258365640/wireshark-tips-1-dns-traffic
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Wireshark tips #1: DNS traffic &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Latest Post" href="/posts/latest">Latest Post</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Browse Posts" href="/">Browse Posts</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Wireshark tips #1: DNS traffic</h1>
+    
+    Published Sun, Mar 30, 2014<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <p><i>TShark 1.2.15, Oracle Enterprise Linux 6.5</i></p>
+
+<p>
+As part of a series on Wireshark, this is the first of many tips on using this versatile network tool.
+</p>
+
+<p>
+If you run a DNS server, you may want to quickly see what types of queries are coming into the server as well as the response codes.  The following query provides:
+</p>
+
+<p>
+<ol>
+<li>Number of <tt>A</tt> (IPv4) queries in the last minute</li>
+<li>Number of <tt>AAAA</tt> (IPv6) queries in the last minute</li>
+<li>Number of <tt>CNAME</tt> …</li>
+<li>Number of <tt>MX</tt> …</li>
+<li>Number of <tt>NS</tt> …</li>
+<li>Number of <tt>PTR</tt> …</li>
+<li>Number of <tt>SOA</tt> …</li>
+<li>Number of <tt>SRV</tt> …</li>
+<li>Number of <tt>TXT</tt> …</li>
+<li>Number of <tt>AXFR</tt> (complete zone transfers) …</li>
+<li>Number of <tt>IXFR</tt> (incremental zone transfers) …</li>
+<li>Number of Successful queries, which are those where the response code was zero (<tt>rcode==0</tt>)</li>
+<li>Number of Unsuccessful queries, which are those where the response code was non-zero (<tt>rcode!=0</tt>)</li>
+</ol>
+</p>
+
+<p>
+A complete listing of rcodes can be found at <a href="http://www.iana.org/assignments/dns-parameters/dns-parameters.xml#dns-parameters-6">http://www.iana.org/assignments/dns-parameters/dns-parameters.xml#dns-parameters-6</a>
+</p>
+
+<p>
+Note this query shows ingress and egress DNS traffic, so you'll see DNS queries/responses that were sent to the server where you are running shark as well as queries/responses that originated on the server where tshark is running.
+</p>
+
+<p>
+<pre>
+tshark -i eth0 -qz "io,stat,60,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==A,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==AAAA,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==CNAME,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==MX,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==NS,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==PTR,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==SOA,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==SRV,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==TXT,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==AXFR,COUNT(dns.qry.type)dns.qry.type and dns.qry.type==IXFR,COUNT(dns.flags.rcode)dns.flags.rcode and dns.flags.rcode==0,COUNT(dns.flags.rcode)dns.flags.rcode and dns.flags.rcode!=0" dst port 53 and dst host 10.100.5.5
+</pre>
+</p>
+
+<p>
+<em>Press ^C after 60 seconds or more to see results</em>
+</p>
+
+<p>
+<pre>
+^C3380 packets captured
+
+===================================================================
+IO Statistics
+Interval: 60.000 secs
+Column #0: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==A
+Column #1: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==AAAA
+Column #2: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==CNAME
+Column #3: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==MX
+Column #4: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==NS
+Column #5: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==PTR
+Column #6: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==SOA
+Column #7: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==SRV
+Column #8: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==TXT
+Column #9: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==AXFR
+Column #10: COUNT(dns.qry.type)dns.qry.type and dns.qry.type==IXFR
+Column #11: COUNT(dns.flags.rcode)dns.flags.rcode and dns.flags.rcode==0
+Column #12: COUNT(dns.flags.rcode)dns.flags.rcode and dns.flags.rcode!=0
+                |   Column #0    |   Column #1    |   Column #2    |   Column #3    |   Column #4    |   Column #5    |   Column #6    |   Column #7    |   Column #8    |   Column #9    |   Column #10   |   Column #11   |   Column #12
+Time            |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT |          COUNT
+000.000-060.000               110               59                0               12                6                0               71                0                0                0                8              114               16
+060.000-120.000               108               86                0               12                8                4              124                0                0                0               26              167               29
+120.000-180.000                40               44                0                0               10                0               29                0                0                0                0               44                8
+===================================================================
+</pre>
+</p>
+
+<p>
+In the example above, in the first 60 seconds, we had 110 <tt>A</tt> queries, 59 <tt>AAAA</tt> queries; 114 successful responses and 16 unsuccessful responses.
+</p>
+
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Wireshark%20tips%20%231%3a%20DNS%20traffic&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fWireshark_tips_No1_DNS_traffic%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fWireshark_tips_No1_DNS_traffic%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fWireshark_tips_No1_DNS_traffic%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Wireshark_tips_No1_DNS_traffic\/';
+    var disqus_title = 'Wireshark tips #1: DNS traffic';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Wireshark_tips_No1_DNS_traffic\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+
