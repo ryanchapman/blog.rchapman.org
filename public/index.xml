@@ -11,6 +11,142 @@
     <atom:link href="http://test2.rchapman.org/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Import an existing ssh key into YubiKey NEO PIV applet</title>
+      <link>http://test2.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</link>
+      <pubDate>Wed, 22 Jun 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</guid>
+      <description>&lt;p&gt;&lt;em&gt;yubico-piv-tool 1.4.0, Mac OS X 10.11.5&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;While you should generate your ssh keys on card or generate them on a sterile machine for escrow, you can also import an existing ssh key (usually found in ~/.ssh/id_rsa).  Below is a walkthrough on how to do that.  Be sure to import both the private and public side of your keypair; otherwise, ssh auth might not work.  You should probably create an encrypted disk and chdir to that disk when changing the private key to pem form.
+&lt;/p&gt;
+
+
+&lt;h2&gt;Private Key&lt;/h2&gt;
+
+&lt;p&gt;
+&lt;pre&gt;
+rchapman@Macbook:~$ cd /Volumes/encrypted/
+rchapman@Macbook:/Volumes/encrypted$ openssl rsa -in ~/.ssh/id_rsa -out id_rsa.pem -outform pem
+Enter pass phrase for /Users/rchapman/.ssh/id_rsa:
+writing RSA key
+
+rchapman@Macbook:/Volumes/encrypted$ head -1 id_rsa.pem
+-----BEGIN RSA PRIVATE KEY-----
+
+rchapman@Macbook:/Volumes/encrypted$ yubico-piv-tool -a import-key -s 9a -i id_rsa.pem
+Successfully imported a new private key.
+
+rchapman@Macbook:/Volumes/encrypted$ rm id_rsa.pem
+&lt;/pre&gt;
+&lt;/p&gt;
+
+
+&lt;h2&gt;Public Key&lt;/h2&gt;
+
+&lt;p&gt;
+&lt;pre&gt;
+rchapman@Macbook:/Volumes/encrypted$ ssh-keygen -e -f ~/.ssh/id_rsa.pub -m PKCS8 &gt; id_rsa.pub.pkcs8
+rchapman@Macbook:/Volumes/encrypted$ head -1 id_rsa.pub.pkcs8
+-----BEGIN PUBLIC KEY-----
+
+rchapman@Macbook:/Volumes/encrypted$ ~/bin/yubico-piv-tool -a verify -P 123456 -a selfsign-certificate -s 9a -S &#34;/CN=joe/O=Test/&#34; -i id_rsa.pub.pkcs8 -o 9a-cert.pem
+
+rchapman@Macbook:/Volumes/encrypted$ ~/bin/yubico-piv-tool -a verify -P 123456 -a import-certificate -s 9a -i 9a-cert.pem ; ~/bin/yubico-piv-tool -a status
+Successfully verified PIN.
+Successfully imported a new certificate.
+CHUID:  3019...fe00
+CCC:    f015...fe00
+Slot 9a:
+    Algorithm:     RSA2048
+    Subject DN:    CN=joe, O=Test
+    Issuer DN:     CN=joe, O=Test
+    Fingerprint:   cf...46
+    Not Before:    Jun 20 19:13:41 2016 GMT
+    Not After:     Jun 20 19:13:41 2017 GMT
+[...]
+PIN tries left:   15
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+Move .ssh/id_rsa and restart ssh-agent (otherwise it will be cached by the agent)
+&lt;br/&gt;
+&lt;pre&gt;
+rchapman@Macbook:/Volumes/encrypted$ cd ~/.ssh
+rchapman@Macbook:~/.ssh$ mv id_rsa ..
+rchapman@Macbook:~/.ssh$ pkill ssh-agent
+rchapman@Macbook:~/.ssh$ sudo launchctl start org.openbsd.ssh-agent
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;h2&gt;Set PIN and PIN Retries&lt;/h2&gt;
+
+&lt;p&gt;
+You should change the user PIN as well as the PIN Unlock Code (PUK) if you have not already.  The YubiKey NEO asks for the PIN every time it signs a nonce (to log you into a ssh server).  If you enter the PIN wrong a number of times (3 by default), then the PIN will be locked.  You can then use the PUK to unlock the PIN.  If you enter the PUK wrong a number of times (again, 3 by default), then the PIV applet will bulk erase it&#39;s memory, causing your private keys and certificates to be lost.  At that point, you have to reset the PIV applet and re-populate the certs and private keys.
+&lt;/p&gt;
+
+&lt;p&gt;To change the PIN and PUK retries from 3 to 15:&lt;br/&gt;
+&lt;pre&gt;
+rchapman@Macbook:~$ unset HISTFILE
+rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a verify -P 123456 -a pin-retries --pin-retries 15 --puk-retries 15
+&lt;/pre&gt;
+&lt;br/&gt;
+Note that this step will also set the PIN and PUK codes back to factory default, so you&#39;ll need to change your PIN/PUK codes after doing this step if you already had PIN/PUK codes set.
+&lt;/p&gt;
+
+&lt;p&gt;To change the PIN and PUK:&lt;br/&gt;
+In this example, we are changing the PIN from the default value of 123456 to 987600 and the PUK from the default of 12345678 to 98761234
+&lt;pre&gt;
+rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a change-pin --pin 123456 --new-pin=987600
+rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a change-puk --pin 12345678 --new-pin=98761234
+&lt;/pre&gt;
+
+&lt;p&gt;Change the management key&lt;br/&gt;
+Most security professionals would say you should change the management key as well.  This is a 24 byte key which resides in slot 9B.  If you forget it, you can still reset the PIV applet, which will reset the PIN, PUK, and 9B key back to defaults.
+&lt;br/&gt;
+&lt;pre&gt;
+rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a set-mgm-key -n 123456789012345678901234567890123456789012345678
+&lt;/pre&gt;
+Logout and log back in, then make sure the PIN, PUK and management key are not in ~/.bash_history
+&lt;/p&gt;
+
+
+&lt;h2&gt;Key Escrow&lt;/h2&gt;
+
+&lt;p&gt;
+If you want to encrypt the private key for storage in escrow:
+&lt;br/&gt;
+&lt;pre&gt;
+rchapman@Macbook:~$ cat ~/id_rsa | gpg --symmetric | base64
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+One place where you could store the encrypted base-64 encoded private key would be the password field of a password manager like 1Password.
+&lt;br/&gt;
+To decrypt it later:
+&lt;br/&gt;
+&lt;pre&gt;
+echo &#34;base64string&#34; | base64 -D | gpg --decrypt
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;h2&gt;Last steps&lt;/h2&gt;
+
+&lt;p&gt;
+Later, when you are sure you are happy with the encrypted version of the file, remove your private key from your workstation (after all, the reason for putting your private key on a hardware token is to prevent someone from stealing it off disk).
+&lt;br/&gt;
+&lt;pre&gt;
+rm ~/id_rsa id_rsa.pem
+&lt;/pre&gt;
+&lt;/p&gt;
+
+
+</description>
+    </item>
+    
+    <item>
       <title>SSH with Yubikey NEO</title>
       <link>http://test2.rchapman.org/posts/SSH_with_Yubikey_NEO/</link>
       <pubDate>Wed, 22 Jun 2016 00:00:00 +0000</pubDate>
@@ -315,6 +451,41 @@ rchapman@vagrant-ubuntu-trusty-64:~$
 &lt;/pre&gt;
 &lt;/p&gt;
 
+</description>
+    </item>
+    
+    <item>
+      <title>Vagrant: show port forwarding for all virtual machines</title>
+      <link>http://test2.rchapman.org/posts/Vagrant_show_port_forwarding_for_all_virtual_machines/</link>
+      <pubDate>Sat, 05 Dec 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Vagrant_show_port_forwarding_for_all_virtual_machines/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Mac OS X 10.10.5, vagrant 1.7.4&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;
+To get a list of all ports forwarded to vagrant virtual machines, use this one liner:
+
+
+&lt;script src=&#34;https://gist.github.com/ryanchapman/5c682613def88058e180.js&#34;&gt;&lt;/script&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+For example,
+&lt;pre&gt;
+rchapman@Chapmans-Macbook-Pro:~$ VB=/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage; for vm in $($VB list vms | awk &#39;{print $1}&#39; | tr -d &#39;&#34;&#39;); do $VB showvminfo $vm 2&gt;&amp;1 | grep &#39;State:.*running&#39; &amp;&gt;/dev/null || continue; perl -e &#39;print &#34;=&#34; x 80 . &#34;\n&#34;&#39;; echo $vm; $VB showvminfo $vm 2&gt;&amp;1 | egrep &#39;^(Name|Guest OS|UUID|Config file|Memory size|Number of CPUs):|NIC.*Rule|Name:.*Host path:&#39;; done
+================================================================================
+base_dev_8888888888888_88888
+Name:            base_dev_8888888888888_88888
+Guest OS:        Ubuntu (64-bit)
+UUID:            ffffffff-fff1-ffff-ffff-ffffffffffff
+Config file:     /Users/rchapman/VirtualBox VMs/base_dev_8888888888888_88888/base_dev_8888888888888_88888.vbox
+Memory size:     512MB
+Number of CPUs:  1
+NIC 1 Rule(0):   name = ssh, protocol = tcp, host ip = 127.0.0.1, host port = 2222, guest ip = , guest port = 22
+Name: &#39;vagrant&#39;, Host path: &#39;/Users/rchapman/gitroot/base&#39; (machine mapping), writable
+rchapman@Chapmans-Macbook-Pro:~$
+&lt;/pre&gt;
+&lt;/p&gt;
 </description>
     </item>
     
@@ -2508,6 +2679,75 @@ Yep, it works now.
     </item>
     
     <item>
+      <title>Who changed the permissions on that file?</title>
+      <link>http://test2.rchapman.org/posts/Who_changed_the_permissions_on_that_file/</link>
+      <pubDate>Sat, 22 Nov 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://test2.rchapman.org/posts/Who_changed_the_permissions_on_that_file/</guid>
+      <description>&lt;i&gt;Linux 3.8.13&lt;/i&gt;&lt;br/&gt;&lt;br/&gt;
+
+&lt;p&gt;
+Sometimes you have a situation where someone or something is changing the permissions on a file and you need to know who or what process is doing it.  Below is one method which uses the Linux audit mechanism, which has been around since 2.6.
+&lt;/p&gt;
+
+&lt;p&gt;
+&lt;pre&gt;
+[root@web01 /home/ryan]# /etc/init.d/auditd start
+
+[root@web01 /home/ryan]# auditctl -a exit,always -S fchmodat -S chmod -S fchmod
+WARNING - 32/64 bit syscall mismatch, you should specify an arch
+
+[root@web01 /home/ryan]# auditctl -w /home/ryan/timmy3 -p a
+
+[root@web01 /home/ryan]# auditctl -l
+-a always,exit -S chmod,fchmod,fchmodat
+-w /home/ryan/timmy3 -p a
+
+[root@web01 /home/ryan]# chmod 111 timmy3
+
+[root@web01 /home/ryan]# less /var/log/audit/audit.log
+[...]
+type=SYSCALL msg=audit(1416721355.647:32740): arch=c000003e syscall=268 success=yes exit=0 a0=ffffffffffffff9c a1=64b0f0 a2=49 a3=7fff4bb52f60 items=1 ppid=15195 pid=2405 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 ses=554114 tty=pts0 comm=&#34;chmod&#34; exe=&#34;/bin/chmod&#34; key=(null)
+type=CWD msg=audit(1416721355.647:32740):  cwd=&#34;/home/ryan&#34;
+type=PATH msg=audit(1416721355.647:32740): item=0 name=&#34;timmy3&#34; inode=761912 dev=fb:03 mode=0100644 ouid=0 ogid=0 rdev=00:00
+[...]
+&lt;/pre&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+If you are wanting to watch a file that is hard linked, then it could exist in multiple paths and you&#39;ll have to watch activity on the inode.  Continuing with the example above, let&#39;s hard link it to a file in another directory.
+
+&lt;pre&gt;
+[root@web01 /home/ryan]# df -h /home/ryan
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda3        30G  4.0G   25G  15% /
+
+[root@web01 /home/ryan]# ls -l /dev/vda3
+brw-rw---- 1 root disk 251, 3 Sep 24 13:48 /dev/vda3
+
+[root@web01 /home/ryan]# stat /home/ryan/timmy3
+  File: `/home/ryan/timmy3&#39;
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: fb03h/64259d    Inode: 761912      Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2014-11-22 21:49:11.000000000 -0700
+Modify: 2014-11-22 21:49:11.000000000 -0700
+Change: 2014-11-22 21:49:11.000000000 -0700
+
+[root@web01 /home/ryan]# auditctl -a exit,always -S fchmodat -S chmod -S fchmod -F devmajor=251 -F devminor=3 -F inode=761912
+No rules
+WARNING - 32/64 bit syscall mismatch, you should specify an arch
+Error sending add rule data request (Invalid argument)
+&lt;/pre&gt;
+
+and we hit a dead end.  You could re-compile audit with the patch at &lt;a href=&#34;https://www.redhat.com/archives/linux-audit/2013-September/msg00004.html&#34;&gt;https://www.redhat.com/archives/linux-audit/2013-September/msg00004.html&lt;/a&gt;, which would probably work.  I didn&#39;t try it though.
+
+
+
+</description>
+    </item>
+    
+    <item>
       <title>Eclipse Remote System Explorer fails to connect via ssh with algorithm negotiation failure</title>
       <link>http://test2.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</link>
       <pubDate>Tue, 08 Apr 2014 00:00:00 +0000</pubDate>
@@ -2560,337 +2800,289 @@ Examples of possible destination folders:
     </item>
     
     <item>
-      <title>Wireshark tips #5: Decrypting HTTPS</title>
-      <link>http://test2.rchapman.org/posts/Wireshark_tips_/</link>
+      <title>Wireshark tips #2: Cisco Discovery Protocol (CDP) and  Link Layer Discovery Protocol (LLDP)</title>
+      <link>http://test2.rchapman.org/posts/Wireshark_tips_No2_Cisco_Discovery_Protocol_Link_Layer_Discovery_Protocol/</link>
       <pubDate>Sun, 30 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Wireshark_tips_/</guid>
+      <guid>http://test2.rchapman.org/posts/Wireshark_tips_No2_Cisco_Discovery_Protocol_Link_Layer_Discovery_Protocol/</guid>
       <description>&lt;i&gt;TShark 1.2.15, Oracle Enterprise Linux 6.5&lt;/i&gt;&lt;br/&gt;&lt;br/&gt;
 
 &lt;p&gt;
-If you are on a web server that is serving SSL, then you can use tshark on that server to decrypt the traffic off the wire. Copy the RSA private key file that your web service is using to /root/private-rsa.key in PKCS#1 format (&lt;a href=&#34;http://www.cryptosys.net/pki/rsakeyformats.html&#34;&gt;PKCS#1 files&lt;/a&gt; begin with &#34;&lt;tt&gt;-----BEGIN RSA PRIVATE KEY-----&lt;/tt&gt;&#34;), then run:
+Ever wondered what switch or router port your server was plugged into? If your server is plugged into a Cisco switch or router, then chances are it is broadcasting Cisco Discovery Protocol packets periodically.  Other vendors use LLDP (ethertype 0x88cc). You can use tshark to  capture one of these packets on a physical server (CDP does not usually pass through to virtual machines) and determine what port you are plugged into.
+&lt;/p&gt;
+
+&lt;p&gt;Note that Cisco ASA firewalls do not support CDP, so if your server is plugged into an ASA, this tip won&#39;t do you any good.  If you find yourself on a VMware ESXi server, it does not come with tshark installed; however, you can use the following command instead: &lt;pre&gt;vim-cmd hostsvc/net/query_networkhint&lt;/pre&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
-&lt;pre&gt;
-tshark -o &#34;ssl.desegment_ssl_records: TRUE&#34; -o &#34;ssl.desegment_ssl_application_data: TRUE&#34; -o &#34;ssl.keys_list:,443,http,/root/private-rsa.key&#34; -o &#34;ssl.debug_file:rsa_private.log&#34; -R &#34;(tcp.port eq 443)&#34; port 443
-&lt;/pre&gt;
-&lt;/p&gt;
+&lt;pre&gt;tshark -i eth0 -V -f &#34;ether host 01:00:0c:cc:cc:cc or ether proto 0x88cc&#34; -c 2
+Running as user &#34;root&#34; and group &#34;root&#34;. This could be dangerous.
+Capturing on eth0
+Frame 1 (482 bytes on wire, 482 bytes captured)
+    Arrival Time: Apr 20, 2011 00:45:32.663667000
+    [Time delta from previous captured frame: 0.000000000 seconds]
+    [Time delta from previous displayed frame: 0.000000000 seconds]
+    [Time since reference or first frame: 0.000000000 seconds]
+    Frame Number: 1
+    Frame Length: 482 bytes
+    Capture Length: 482 bytes
+    [Frame is marked: False]
+    [Protocols in frame: eth:llc:cdp:data]
+IEEE 802.3 Ethernet
+    Destination: 01:00:0c:cc:cc:cc (01:00:0c:cc:cc:cc)
+        Address: 01:00:0c:cc:cc:cc (01:00:0c:cc:cc:cc)
+        .... ...1 .... .... .... .... = IG bit: Group address (multicast/broadcast)
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+    Source: 00:1a:2f:4b:bb:23 (00:1a:2f:4b:bb:23)
+        Address: 00:1a:2f:4b:bb:23 (00:1a:2f:4b:bb:23)
+        .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+    Length: 468
+Logical-Link Control
+    DSAP: SNAP (0xaa)
+    IG Bit: Individual
+    SSAP: SNAP (0xaa)
+    CR Bit: Command
+    Control field: U, func=UI (0x03)
+        000. 00.. = Command: Unnumbered Information (0x00)
+        .... ..11 = Frame type: Unnumbered frame (0x03)
+    Organization Code: Cisco (0x00000c)
+    PID: CDP (0x2000)
+Cisco Discovery Protocol
+    Version: 2
+    TTL: 180 seconds
+    Checksum: 0x6547 [correct]
+        [Good: True]
+        [Bad : False]
+    Device ID: INITECH-FLOOR1SW1.initech.com
+        Type: Device ID (0x0001)
+        Length: 33
+        Device ID: INITECH-FLOOR1SW1.initech.com
+    Software Version
+        Type: Software version (0x0005)
+        Length: 247
+        Software Version: Cisco IOS Software, C3750 Software (C3750-IPBASEK9-M), Version 12.2(50)SE3, RELEASE SOFTWARE (fc1)
+                          Technical Support: http://www.cisco.com/techsupport
+                          Copyright (c) 1986-2009 by Cisco Systems, Inc.
+                          Compiled Wed 22-Jul-09 06:19 by prod_rel_team
+    Platform: cisco WS-C3750G-48TS
+        Type: Platform (0x0006)
+        Length: 24
+        Platform: cisco WS-C3750G-48TS
+    Addresses
+        Type: Addresses (0x0002)
+        Length: 17
+        Number of addresses: 1
+        IP address: 10.1.1.3
+            Protocol type: NLPID
+            Protocol length: 1
+            Protocol: IP
+            Address length: 4
+            IP address: 10.1.1.3
+    Port ID: GigabitEthernet2/0/35
+        Type: Port ID (0x0003)
+        Length: 25
+        Sent through Interface: GigabitEthernet2/0/35
+    Capabilities
+        Type: Capabilities (0x0004)
+        Length: 8
+        Capabilities: 0x00000028
+            .... .... .... .... .... .... .... ...0 = Not a Router
+            .... .... .... .... .... .... .... ..0. = Not a Transparent Bridge
+            .... .... .... .... .... .... .... .0.. = Not a Source Route Bridge
+            .... .... .... .... .... .... .... 1... = Is  a Switch
+            .... .... .... .... .... .... ...0 .... = Not a Host
+            .... .... .... .... .... .... ..1. .... = Is  IGMP capable
+            .... .... .... .... .... .... .0.. .... = Not a Repeater
+    Protocol Hello: Cluster Management
+        Type: Protocol Hello (0x0008)
+        Length: 36
+        OUI: 0x00000C (Cisco)
+        Protocol ID: 0x0112 (Cluster Management)
+        Cluster Master IP: 0.0.0.0
+        UNKNOWN (IP?): 0xFFFFFFFF (255.255.255.255)
+        Version?: 0x01
+        Sub Version?: 0x02
+        Status?: 0x21
+        UNKNOWN: 0xFF
+        Cluster Commander MAC: 00:00:00:00:00:00
+        Switch&#39;s MAC: 00:16:c7:fb:bb:00
+        UNKNOWN: 0xFF
+        Management VLAN: 0
+    VTP Management Domain: INITECH_CORP
+        Type: VTP Management Domain (0x0009)
+        Length: 12
+        VTP Management Domain: INITECH_CORP
+    Native VLAN: 350
+        Type: Native VLAN (0x000a)
+        Length: 6
+        Native VLAN: 350
+    Duplex: Full
+        Type: Duplex (0x000b)
+        Length: 5
+        Duplex: Full
+    Trust Bitmap: 0x00
+        Type: Trust Bitmap (0x0012)
+        Length: 5
+        Trust Bitmap: 00
+    Untrusted port CoS: 0x00
+        Type: Untrusted Port CoS (0x0013)
+        Length: 5
+        Untrusted port CoS: 00
+    Management Addresses
+        Type: Management Address (0x0016)
+        Length: 17
+        Number of addresses: 1
+        IP address: 10.1.1.3
+            Protocol type: NLPID
+            Protocol length: 1
+            Protocol: IP
+            Address length: 4
+            IP address: 10.1.1.35
+    Power Available: 0 mW, 4294967295 mW
+        Type: Power Available (0x001a)
+        Length: 16
+        Request-ID: 0
+        Management-ID: 1
+        Power Available: 0 mW
+        Power Available: 4294967295 mW
 
-&lt;p&gt;Note that tshark has to capture the beginning of an SSL session in order to decrypt it.  If your SSL client machine is Windows, you can force a new SSL session by doing the following:
-&lt;ol&gt;
-&lt;li&gt;Internet Explorer &gt; Internet Preferences&lt;/li&gt;
-&lt;li&gt;On the General tab, click Delete…, and delete everything&lt;/li&gt;
-&lt;li&gt;On the Content tab, click &#34;Clear SSL state&#34;&lt;/li&gt;
-&lt;/ol&gt;
+Frame 2 (482 bytes on wire, 482 bytes captured)
+    Arrival Time: Apr 20, 2011 00:46:32.674563000
+    [Time delta from previous captured frame: 60.010896000 seconds]
+    [Time delta from previous displayed frame: 60.010896000 seconds]
+    [Time since reference or first frame: 60.010896000 seconds]
+    Frame Number: 2
+    Frame Length: 482 bytes
+    Capture Length: 482 bytes
+    [Frame is marked: False]
+    [Protocols in frame: eth:llc:cdp:data]
+IEEE 802.3 Ethernet
+    Destination: 01:00:0c:cc:cc:cc (01:00:0c:cc:cc:cc)
+        Address: 01:00:0c:cc:cc:cc (01:00:0c:cc:cc:cc)
+        .... ...1 .... .... .... .... = IG bit: Group address (multicast/broadcast)
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+    Source: 00:1a:2f:4b:bb:23 (00:1a:2f:4b:bb:23)
+        Address: 00:1a:2f:4b:bb:23 (00:1a:2f:4b:bb:23)
+        .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+    Length: 468
+Logical-Link Control
+    DSAP: SNAP (0xaa)
+    IG Bit: Individual
+    SSAP: SNAP (0xaa)
+    CR Bit: Command
+    Control field: U, func=UI (0x03)
+        000. 00.. = Command: Unnumbered Information (0x00)
+        .... ..11 = Frame type: Unnumbered frame (0x03)
+    Organization Code: Cisco (0x00000c)
+    PID: CDP (0x2000)
+Cisco Discovery Protocol
+    Version: 2
+    TTL: 180 seconds
+    Checksum: 0x6547 [correct]
+        [Good: True]
+        [Bad : False]
+    Device ID: INITECH-FLOOR1SW1.initech.com
+        Type: Device ID (0x0001)
+        Length: 33
+        Device ID: INITECH-FLOOR1SW1.initech.com
+    Software Version
+        Type: Software version (0x0005)
+        Length: 247
+        Software Version: Cisco IOS Software, C3750 Software (C3750-IPBASEK9-M), Version 12.2(50)SE3, RELEASE SOFTWARE (fc1)
+                          Technical Support: http://www.cisco.com/techsupport
+                          Copyright (c) 1986-2009 by Cisco Systems, Inc.
+                          Compiled Wed 22-Jul-09 06:19 by prod_rel_team
+    Platform: cisco WS-C3750G-48TS
+        Type: Platform (0x0006)
+        Length: 24
+        Platform: cisco WS-C3750G-48TS
+    Addresses
+        Type: Addresses (0x0002)
+        Length: 17
+        Number of addresses: 1
+        IP address: 10.1.1.3
+            Protocol type: NLPID
+            Protocol length: 1
+            Protocol: IP
+            Address length: 4
+            IP address: 10.1.1.3
+    Port ID: GigabitEthernet2/0/35
+        Type: Port ID (0x0003)
+        Length: 25
+        Sent through Interface: GigabitEthernet2/0/35
+    Capabilities
+        Type: Capabilities (0x0004)
+        Length: 8
+        Capabilities: 0x00000028
+            .... .... .... .... .... .... .... ...0 = Not a Router
+            .... .... .... .... .... .... .... ..0. = Not a Transparent Bridge
+            .... .... .... .... .... .... .... .0.. = Not a Source Route Bridge
+            .... .... .... .... .... .... .... 1... = Is  a Switch
+            .... .... .... .... .... .... ...0 .... = Not a Host
+            .... .... .... .... .... .... ..1. .... = Is  IGMP capable
+            .... .... .... .... .... .... .0.. .... = Not a Repeater
+    Protocol Hello: Cluster Management
+        Type: Protocol Hello (0x0008)
+        Length: 36
+        OUI: 0x00000C (Cisco)
+        Protocol ID: 0x0112 (Cluster Management)
+        Cluster Master IP: 0.0.0.0
+        UNKNOWN (IP?): 0xFFFFFFFF (255.255.255.255)
+        Version?: 0x01
+        Sub Version?: 0x02
+        Status?: 0x21
+        UNKNOWN: 0xFF
+        Cluster Commander MAC: 00:00:00:00:00:00
+        Switch&#39;s MAC: 00:16:c7:fb:bb:00
+        UNKNOWN: 0xFF
+        Management VLAN: 0
+    VTP Management Domain: INITECH_CORP
+        Type: VTP Management Domain (0x0009)
+        Length: 12
+        VTP Management Domain: INITECH_CORP
+    Native VLAN: 350
+        Type: Native VLAN (0x000a)
+        Length: 6
+        Native VLAN: 350
+    Duplex: Full
+        Type: Duplex (0x000b)
+        Length: 5
+        Duplex: Full
+    Trust Bitmap: 0x00
+        Type: Trust Bitmap (0x0012)
+        Length: 5
+        Trust Bitmap: 00
+    Untrusted port CoS: 0x00
+        Type: Untrusted Port CoS (0x0013)
+        Length: 5
+        Untrusted port CoS: 00
+    Management Addresses
+        Type: Management Address (0x0016)
+        Length: 17
+        Number of addresses: 1
+        IP address: 10.1.1.35
+            Protocol type: NLPID
+            Protocol length: 1
+            Protocol: IP
+            Address length: 4
+            IP address: 10.1.1.3
+    Power Available: 0 mW, 4294967295 mW
+        Type: Power Available (0x001a)
+        Length: 16
+        Request-ID: 0
+        Management-ID: 1
+        Power Available: 0 mW
+        Power Available: 4294967295 mW
+
+2 packets captured
+&lt;/pre&gt;
 &lt;/p&gt;
 
 &lt;p&gt;
-If you find that tshark is not showing HTTP traffic, meaning it&#39;s still encrypted, then check the decryption log &lt;tt&gt;rsa_private.log&lt;/tt&gt;
+In the example above, our server is plugged into switch port GigabitEthernet2/0/35 on the switch with the hostname INITECH-FLOOR1SW1.initech.com
 &lt;/p&gt;
-
-&lt;p&gt;
-Another option is to capture the traffic with tcpdump or tshark and decrypt it later using Wireshark.  To do that, in Wireshark,
-&lt;ol&gt;
-&lt;li&gt;Capture HTTPS traffic on server/load balancer using tcpdump or tshark:&lt;br/&gt;
-&lt;pre&gt;tcpdump -s 0 -w /tmp/ssl.cap&lt;/pre&gt;&lt;br/&gt;
-or
-&lt;pre&gt;tshark -F pcapng -w /tmp/ssl.pcapng port 443&lt;/pre&gt;
-&lt;/li&gt;
-&lt;li&gt;Edit &gt; Preferences&lt;/li&gt;
-&lt;li&gt;Expand Protocols&lt;/li&gt;
-&lt;li&gt;Select SSL&lt;/li&gt;
-&lt;li&gt;Click Edit… beside RSA keys list:&lt;/li&gt;
-&lt;li&gt;Click New&lt;/li&gt;
-&lt;li&gt;For IP address, enter &lt;tt&gt;0.0.0.0&lt;/tt&gt; (sometimes you have to explicitly put in the server/load balancer IP address here)&lt;/li&gt;
-&lt;li&gt;For Port, enter &lt;tt&gt;0&lt;/tt&gt; (sometimes you have to explicitly put in the server/load balancer SSL port here)&lt;/li&gt;
-&lt;li&gt;For Protocol, enter &lt;tt&gt;http&lt;/tt&gt;&lt;/li&gt;
-&lt;li&gt;For Key File, select the RSA private key file which you copied from the web server or load balancer&lt;/li&gt;
-&lt;li&gt;For Password, enter the password needed for the private key file (if there is not one, leave this field empty)&lt;/li&gt;
-&lt;li&gt;Click OK&lt;/li&gt;
-&lt;li&gt;Back on the SSL Preferences page, for SSL debug file, enter &lt;tt&gt;C:\rsa_debug.txt&lt;/tt&gt;&lt;/li&gt;
-&lt;li&gt;Make sure &#34;&lt;tt&gt;Reassemble SSL records spanning multiple TCP segments&lt;/tt&gt;&#34; is checked&lt;/li&gt;
-&lt;li&gt;Make sure &#34;&lt;tt&gt;Reassemble SSL Application Data spanning multiple SSL records&lt;/tt&gt;&#34; is checked&lt;/li&gt;
-&lt;li&gt;Click OK to close the SSL Preferences page&lt;/li&gt;
-&lt;li&gt;Load your capture file from the web server or load balancer.  As long as the SSL session initiation is in the capture, Wireshark should be able to decrypt the HTTPS packets and show the HTTP protocol information.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/p&gt;
-
-</description>
-    </item>
-    
-    <item>
-      <title>OpenVPN IPv6 Tunnel Fails on Windows</title>
-      <link>http://test2.rchapman.org/posts/OpenVPN_IPv6_Tunnel_Fails_on_Windows/</link>
-      <pubDate>Sun, 25 Aug 2013 00:00:00 +0000</pubDate>
-      
-      <guid>http://test2.rchapman.org/posts/OpenVPN_IPv6_Tunnel_Fails_on_Windows/</guid>
-      <description>&lt;i&gt;OpenVPN 2.3.2-I003, Windows 7 x86_64&lt;/i&gt;
-
-When attempting to establish a IPv6 tunnel on Windows, if you see the following error:
-
-&lt;pre&gt;
-NETSH: C:\Windows\system32\netsh.exe interface ipv6 set address Local Area Connection 2 2402:b300:100:aafc:4000:1234:0:1000 store=active
-ERROR: netsh command failed: returned error code 1
-&lt;/pre&gt;
-
-then you probably do not have IPv6 enabled on your Windows machine.
-
-IPv6 is controlled in the registry via the key HKLM\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters\DisabledComponents, the default value of which is 0x10.  To enable IPv6 on all network interfaces, change this value to 0x0.  There are several other options for this key; see &lt;a href=&#34;http://support.microsoft.com/kb/929852&#34;&gt;Microsoft KB 929852&lt;/a&gt; for more info.  In my tests, the only value I could get to work with OpenVPN was 0x0, although I also tried &lt;a href=&#34;http://go.microsoft.com/?linkid=9732984&#34;&gt;Microsoft Fix it 50443&lt;/a&gt;, which enables IPv6 on all tunnel interfaces.
-
-
-</description>
-    </item>
-    
-    <item>
-      <title>Enabling Google CalDAV for Mozilla Sunbird</title>
-      <link>http://test2.rchapman.org/posts/Enabling_Google_CalDAV_for_Mozilla_Sunbird/</link>
-      <pubDate>Tue, 13 Aug 2013 00:00:00 +0000</pubDate>
-      
-      <guid>http://test2.rchapman.org/posts/Enabling_Google_CalDAV_for_Mozilla_Sunbird/</guid>
-      <description>&lt;i&gt;Tested with: Gmail (or Google Apps), Mac OS X 10.5.4, Mozilla Sunbird 0.8&lt;/i&gt;&lt;br /&gt;&lt;br /&gt;Google recently enabled CalDAV access to Google Calendars.  It works with Sunbird, but the documentation on doing this is hard to find.  So here is how to do it, step by step.&lt;br /&gt;&lt;br /&gt;&lt;ol&gt;&lt;br /&gt;&lt;li&gt;&lt;a href=&#34;http://www.mozilla.org/projects/calendar/sunbird/&#34;&gt;Download&lt;/a&gt; and install Sunbird on your Mac.&lt;br /&gt;&lt;li&gt;Open Sunbird&lt;br /&gt;&lt;li&gt;Click File, then &#34;Subscribe to Remote Calendar...&#34;&lt;br /&gt;&lt;li&gt;When the &#34;Create a new calendar&#34; dialog box appears, select &#34;On the Network&#34; and click Continue&lt;br /&gt;&lt;li&gt;For Format, select &#34;CalDAV&#34; and for Location, enter &#34;https://www.google.com/calendar/dav/YOUR_GOOGLE_EMAIL/events&#34; (without the quotes)&lt;br /&gt;For example, assume your Gmail address is johndoe@gmail.com, then your Location would be https://www.google.com/calendar/dav/johndoe@gmail.com/events&lt;br /&gt;Let&#39;s assume you have Google Apps and your email is bill.jones@jonescorp.com, then your Location would be:&lt;br /&gt;https://www.google.com/calendar/dav/bill.jones@jonescorp.com/events&lt;br /&gt;&lt;li&gt;Click Continue&lt;br /&gt;&lt;li&gt;Next, your are asked to name your calendar.  For mine, I just typed my first name.  You can choose a color for calendar entries here and choose if your want alarms to go off in Sunbird.  Click Continue.&lt;br /&gt;&lt;li&gt;Click Done.&lt;br /&gt;&lt;/ol&gt;&lt;br /&gt;&lt;br /&gt;&lt;br /&gt;That&#39;s it.  By default, Sunbird will refresh remote calendars every 30 minutes. If you want to change this, go into the Preferences (Command ,)&lt;br /&gt;&lt;br /&gt;Since Google CalDAV syncing is in beta, you should direct all your questions to &lt;a href=&#34;http://groups.google.com/group/google-calendar-help-dataapi&#34;&gt;Google Groups - Calendar Help Dataapi&lt;/a&gt;&lt;div class=&#34;blogger-post-footer&#34;&gt;&amp;nbsp;&lt;/div&gt;
-
-
-</description>
-    </item>
-    
-    <item>
-      <title>Transparently proxying any tcp connection (including http and https without man-in-the-middle)</title>
-      <link>http://test2.rchapman.org/posts/Transparently_proxying_any_tcp_connection/</link>
-      <pubDate>Sun, 07 Apr 2013 00:00:00 +0000</pubDate>
-      
-      <guid>http://test2.rchapman.org/posts/Transparently_proxying_any_tcp_connection/</guid>
-      <description>I recently ran into a situation where a proxy server was being installed, but some applications were not proxy aware. To illustrate, this is what the network looked like:
-
-&lt;a href=&#34;http://www.flickr.com/photos/ryanchapman/8629661876/sizes/l/&#34;&gt;&lt;img src=&#34;http://farm9.staticflickr.com/8260/8629661876_51beaf7510_b.jpg&#34;&gt;&lt;/a&gt;
-
-Here we have a web server running proxy unaware applications.  The web server does not have routes to the internet; it must use a proxy server to communicate with web sites located on the public internet.
-
-The solution is to intercept all HTTP (port 80) and HTTPS (port 443) traffic at the firewall.  For http, we&#39;ll use squid and for https, we&#39;ll use a custom program I wrote.
-
-First up, http.  In vyatta, configure the webproxy with:
-
-&lt;pre&gt;
-set service webproxy listen-address 10.18.11.5
-commit
-save
-&lt;/pre&gt;
-
-
-The squid service will start up after committing the changes, but some changes need to be made to the config file.  Edit /etc/squid3/squid.conf to look like this:
-
-&lt;pre&gt;
-#
-# autogenerated by vyatta-update-webproxy.pl
-#
-
-acl manager proto cache_object
-acl localhost src 127.0.0.1/32
-acl to_localhost dst 127.0.0.0/8
-acl net src all
-acl SSL_ports port 443
-acl Safe_ports port 80          # http
-acl Safe_ports port 21          # ftp
-acl Safe_ports port 443         # https
-acl Safe_ports port 70          # gopher
-acl Safe_ports port 210         # wais
-acl Safe_ports port 1025-65535  # unregistered ports
-acl Safe_ports port 280         # http-mgmt
-acl Safe_ports port 488         # gss-http
-acl Safe_ports port 591         # filemaker
-acl Safe_ports port 777         # multiling http
-acl CONNECT method CONNECT
-
-http_access allow manager localhost
-http_access deny manager
-http_access deny !Safe_ports
-http_access deny CONNECT !SSL_ports
-http_access allow localhost
-http_access allow net
-http_access deny all
-
-cache_dir ufs /var/spool/squid3 100 16 256
-cache_mem 20 MB
-access_log /var/log/squid3/access.log squid
-
-cache_store_log none
-
-http_port 10.18.11.5:3128 transparent
-
-forwarded_for off
-
-# added by Ryan
-visible_hostname fw01-1.web.lan
-cache_mgr youremail@yourdomain.com
-# Do not send the following domains to the proxy
-acl DIRECTS dstdomain .lan
-never_direct allow all
-always_direct allow DIRECTS
-nonhierarchical_direct off
-# Stop sending requests to a peer if it does not respond within 5 seconds
-peer_connect_timeout 5 seconds
-# When all peers are available, balance requests between proxy1/2.  If those two go down, send requests to the lastresort
-cache_peer 1.2.3.4 parent 80 0 proxy-only no-query name=proxy1 round-robin weight=999999
-cache_peer 1.2.3.5 parent 80 0 proxy-only no-query name=proxy2 round-robin weight=999999
-cache_peer 1.2.3.6 parent 80 0 proxy-only no-query name=proxy-lastresort round-robin weight=1
-&lt;/pre&gt;
-
-Restart squid3 with &lt;code&gt;/etc/init.d/squid3 restart&lt;/code&gt;.  Note that you&#39;ll want to edit vyatta-update-webproxy.pl to make sure the changes we placed in the squid config stay around after a re-commit (this was the best suggestion on the vyatta forums).
-
-A http request from the web server (10.18.11.40) will now be forwarded to the proxies transparently:
-
-&lt;pre&gt;
-[root@web01 ~]# nc www.google.com 80
-HEAD / HTTP/1.0
-
-HTTP/1.0 200 OK
-P3P: CP=&#34;This is not a P3P policy! See http://www.google.com/support/accounts/bin/answer.py?hl=en&amp;answer=151657 for more info.&#34;
-Date: Sun, 07 Apr 2013 21:35:13 GMT
-Server: gws
-Expires: -1
-Set-Cookie: NID=67=DUffxHjxxlJbUCbh58qhFLVJffrvGVX8lMm96QaFzfwjFyGNz4VlHPziZUozs0zh9cUwzxWX-WSftJ-JCPC652SYCVP5lXHIGCYXBabW3A8J1toyxBe1n7Lu8oqmiXEV; expires=Mon, 07-Oct-2013 21:35:13 GMT; path=/; domain=.; HttpOnly
-Content-Type: text/html; charset=ISO-8859-1
-Cache-Control: private, max-age=0
-X-Frame-Options: SAMEORIGIN
-X-XSS-Protection: 1; mode=block
-X-Cache: MISS from fw01-1.web.lan
-X-Cache-Lookup: MISS from fw01-1.web.lan:3128
-Via: 1.0 fw01-1.web.lan (squid/3.1.6)
-Connection: close
-
-[root@web01 ~]#
-&lt;/pre&gt;
-
-
-Second, https.  This one is a little trickier.  The squid solutions I found on the internet suggested using a man-in-the-middle strategy, where squid decrypts the SSL/TLS data and then re-encrypts it.  I wasn&#39;t fond of this method because not only it is technically difficult to pull off, it raises some ethical issues.  Another way is to transparently do what proxy aware applications perform:
-&lt;ol&gt;
-&lt;li&gt;Application wants to connect to www.google.com on port 443.  It first checks the environment for the variable https_proxy.  Let&#39;s assume https_proxy=http://1.2.3.4:80
-&lt;li&gt;Application makes connection to proxy server at 1.2.3.4 on port 80
-&lt;li&gt;Application sends &#34;CONNECT www.google.com:443 HTTP/1.1\r\nHost:www.google.com\r\n\r\n&#34;
-&lt;li&gt;Proxy server responds &#34;HTTP/1.0 200 Connection established&#34;
-&lt;li&gt;Application speaks TLS as if it had directly connected to www.google.com:443 originally
-&lt;/ol&gt;
-
-I&#39;ve written a program in Golang called any_proxy, available on &lt;a href=&#34;https://github.com/ryanchapman/go-any-proxy&#34;&gt;Github&lt;/a&gt; that can transparently proxy https (there is also a newer version called &lt;a href=&#34;http://github.com/ryanchapman/go-any-proxy&#34;&gt;any_proxy&lt;/a&gt; which supports proxying of any tcp protocol). Here is a network timing diagram to illustrate what&#39;s going on:
-&lt;a href=&#34;http://www.flickr.com/photos/ryanchapman/8628595105/sizes/l/&#34;&gt;&lt;img src=&#34;http://farm9.staticflickr.com/8112/8628595105_4d1fc309dc_b.jpg&#34;&gt;&lt;/a&gt;
-
-Compiling:
-&lt;ol&gt;
-&lt;li&gt;Make sure you have golang installed on your machine. Binaries are available from &lt;a href=&#34;http://golang.org&#34;&gt;golang.org&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Clone the go-any-proxy repo with &lt;code&gt;git clone git://github.com/ryanchapman/go-any-proxy.git&lt;/code&gt;
-&lt;li&gt;Compile with &lt;code&gt;./make.bash&lt;/code&gt;
-&lt;/ol&gt;
-
-Installing:
-&lt;ol&gt;
-&lt;li&gt;Secure copy any_proxy to your vyatta:&lt;br&gt;
-&lt;pre&gt;scp any_proxy fw01-1.web.lan:/root&lt;/pre&gt;
-&lt;li&gt;Ssh to your vyatta:&lt;br&gt;
-&lt;pre&gt;ssh ryan@fw01-1.web.lan&lt;/pre&gt;
-&lt;li&gt;Make sure you already set up the squid webproxy earlier. Add a firewall rule to have 443 traffic redirected to any_proxy:&lt;br&gt;
-&lt;pre&gt;iptables -t nat -A WEBPROXY -p tcp --dport 443 redir ports 3129&lt;/pre&gt;
-&lt;li&gt;Start the proxy:
-&lt;pre&gt;/root/any_proxy -l :3129 -p &#34;1.2.3.4:80,1.2.3.5:80,1.2.3.6:80&#34;&lt;/pre&gt;
-&lt;li&gt;You should now be able to connect to a site with https now:
-&lt;pre&gt;
-[root@web01 ~]# openssl s_client -host www.google.com -port 443
-CONNECTED(00000003)
-depth=2 C = US, O = Equifax, OU = Equifax Secure Certificate Authority
-verify return:1
-depth=1 C = US, O = Google Inc, CN = Google Internet Authority
-verify return:1
-depth=0 C = US, ST = California, L = Mountain View, O = Google Inc, CN = www.google.com
-verify return:1
----
-Certificate chain
- 0 s:/C=US/ST=California/L=Mountain View/O=Google Inc/CN=www.google.com
-   i:/C=US/O=Google Inc/CN=Google Internet Authority
- 1 s:/C=US/O=Google Inc/CN=Google Internet Authority
-   i:/C=US/O=Equifax/OU=Equifax Secure Certificate Authority
----
-Server certificate
------BEGIN CERTIFICATE-----
-MIIDgDCCAumgAwIBAgIKKZxzswABAACCpzANBgkqhkiG9w0BAQUFADBGMQswCQYD
-VQQGEwJVUzETMBEGA1UEChMKR29vZ2xlIEluYzEiMCAGA1UEAxMZR29vZ2xlIElu
-dGVybmV0IEF1dGhvcml0eTAeFw0xMzAzMjcxMzI4MjJaFw0xMzEyMzExNTU4NTBa
-MGgxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1N
-b3VudGFpbiBWaWV3MRMwEQYDVQQKEwpHb29nbGUgSW5jMRcwFQYDVQQDEw53d3cu
-Z29vZ2xlLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1zqnIRAV0QRL
-49U0b7wi+rF0wdkY3BcWHdmYgBmF81QH6854F8NBFdECnPOpLpSIcB+r7NjK4Gj6
-PQ0Kfg1BkqBC5fy1D5QeW5MOMuftbraURLu9LrELBG/DN2K5KVegQE60yitLOhU/
-wSc/ac5sEdsfx6T1HaPm4eByQ5S8fhcCAwEAAaOCAVEwggFNMB0GA1UdJQQWMBQG
-CCsGAQUFBwMBBggrBgEFBQcDAjAdBgNVHQ4EFgQUeTiJyDmB+bnMsRpBVwCCswsj
-JLEwHwYDVR0jBBgwFoAUv8Aw6/VDET5nup6R+/xq2uNrEiQwWwYDVR0fBFQwUjBQ
-oE6gTIZKaHR0cDovL3d3dy5nc3RhdGljLmNvbS9Hb29nbGVJbnRlcm5ldEF1dGhv
-cml0eS9Hb29nbGVJbnRlcm5ldEF1dGhvcml0eS5jcmwwZgYIKwYBBQUHAQEEWjBY
-MFYGCCsGAQUFBzAChkpodHRwOi8vd3d3LmdzdGF0aWMuY29tL0dvb2dsZUludGVy
-bmV0QXV0aG9yaXR5L0dvb2dsZUludGVybmV0QXV0aG9yaXR5LmNydDAMBgNVHRMB
-Af8EAjAAMBkGA1UdEQQSMBCCDnd3dy5nb29nbGUuY29tMA0GCSqGSIb3DQEBBQUA
-A4GBAKAluLPebUSSuwF2wyablQT08GGyQQ0A+SW8gQXy7obaXpQJa/gw5BaZz64w
-qMs4Bhmw7AECfq4nPDfY0k9eC4sIHOO95MwGXcH+14IFFDiF4o2f1q1SQQIbdS19
-eepmrzYfjNn6KM0dahsnSf1zViIRYdu9gZ3HVwwfif1foidR
------END CERTIFICATE-----
-subject=/C=US/ST=California/L=Mountain View/O=Google Inc/CN=www.google.com
-issuer=/C=US/O=Google Inc/CN=Google Internet Authority
----
-No client certificate CA names sent
----
-SSL handshake has read 1887 bytes and written 298 bytes
----
-New, TLSv1/SSLv3, Cipher is RC4-SHA
-Server public key is 1024 bit
-Secure Renegotiation IS supported
-Compression: NONE
-Expansion: NONE
-SSL-Session:
-    Protocol  : TLSv1
-    Cipher    : RC4-SHA
-    Session-ID: 20100F0A1526BDADC3E7E278D2925738CAC56CB49A209CB0F3E036FFD57EEFF5
-    Session-ID-ctx:
-    Master-Key: FE00D81636D02CF0259B4945A16B37A0ACF267918635D23D9034F46886993C0291A0E639573534413FC176D9A4E1253E
-    Key-Arg   : None
-    Krb5 Principal: None
-    PSK identity: None
-    PSK identity hint: None
-    TLS session ticket lifetime hint: 100800 (seconds)
-    TLS session ticket:
-    0000 - 1c f0 4d b2 70 a7 14 13-a4 e4 25 f4 dd 29 c8 52   ..M.p.....%..).R
-    0010 - 96 22 0f a5 c7 2f e0 c5-ef 99 db 1c e8 8d 66 a8   .&#34;.../........f.
-    0020 - c4 b1 c1 87 12 69 10 a3-c1 a8 7e 8f 32 3e 03 9e   .....i....~.2&gt;..
-    0030 - 97 8b 7e a5 b4 64 75 50-69 98 f7 da 11 d8 83 20   ..~..duPi.......
-    0040 - 67 3a dc 66 11 8a b0 08-61 3b 94 53 7e c4 2e e5   g:.f....a;.S~...
-    0050 - 9d dd 38 34 e6 de 42 69-88 a2 d4 8c be 94 aa 38   ..84..Bi.......8
-    0060 - 2d be f3 b7 81 93 48 48-fc 53 af d3 98 87 c8 a8   -.....HH.S......
-    0070 - d0 41 dc ab 1e fd 5f 05-34 ac 2f d3 b4 ec 43 c1   .A...._.4./...C.
-    0080 - ac 84 0b ce 6f 98 6c 0c-3a d7 03 d7 40 f2 33 5d   ....o.l.:...@.3]
-    0090 - d3 cd 75 f5                                       ..u.
-
-    Start Time: 1365373842
-    Timeout   : 300 (sec)
-    Verify return code: 0 (ok)
----
-HEAD / HTTP/1.0
-
-HTTP/1.0 200 OK
-Date: Sun, 07 Apr 2013 22:30:47 GMT
-Expires: -1
-Cache-Control: private, max-age=0
-Content-Type: text/html; charset=ISO-8859-1
-Set-Cookie: PREF=ID=e458ec6f20965cef:FF=0:TM=1365373847:LM=1365373847:S=IEPlOV-aQ9f_RF-u; expires=Tue, 07-Apr-2015 22:30:47 GMT; path=/; domain=.google.com
-Set-Cookie: NID=67=BlzgMe73-RN5tlryHoZcQGdRxrJfJpwNkBjfyJ-Zl-0ucm4HwkzpjPIVyTFR_IFqvCoCPOuHgEa566XAGfmCYI1nQgydCjRoqM8-wu__n-H7nIC5nt1JukFP1YtLc0BL; expires=Mon, 07-Oct-2013 22:30:47 GMT; path=/; domain=.google.com; HttpOnly
-P3P: CP=&#34;This is not a P3P policy! See http://www.google.com/support/accounts/bin/answer.py?hl=en&amp;answer=151657 for more info.&#34;
-Server: gws
-X-XSS-Protection: 1; mode=block
-X-Frame-Options: SAMEORIGIN
-
-read:errno=0
-[root@web01 ~]#
-&lt;/pre&gt;
-&lt;/ol&gt;
-
-Of course, you&#39;ll want to make sure the services start on reboot.  That is left as an exercise for the reader.
-Feel free to leave comments or send pull requests with any improvements to the code.
-
 
 </description>
     </item>

@@ -1,0 +1,197 @@
+---
+title: "Using fstatfs from a 32-bit program on a 64-bit system"
+date: "2013-06-02"
+redirect_from: "/post/51952799861/using-fstatfs-from-a-32-bit-program-on-a-64-bit-system"
+categories: 
+    - "fstatfs"
+    - "fstatfs64"
+    - "EOVERFLOW"
+    - "x86_64"
+    - "i386"
+    - "amd64"
+    - "glibc"
+---
+
+<p><i>CentOS 5.9, Linux 2.6.18-308.24.1.el5.centos.plus, glibc 2.5-107</i></p>
+
+<p>Recently at work, <a href="https://www.linkedin.com/pub/zack-dannar/43/a40/60a">Zack Dannar</a> and I ran into an issue on a 64-bit system where a 32-bit process was making a call to fstatfs() which was failing. An strace of the process showed the following:</p>
+
+<p>
+<pre>
+...
+01:00:28.335337 fstatfs(3, 0xffccebf0)  = -1 EOVERFLOW (Value too large for defined data type)
+...
+</pre>
+</p>
+
+<p>
+The call was failing with an errno of EOVERFLOW. Odd. We wrote a simple program to see if the issue would reproduce easily:
+</p>
+
+<p>
+<pre>
+#include &lt;fcntl.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/vfs.h&gt;
+
+int main(void)
+{
+    int fd;
+    if((fd=open("test.txt", O_RDONLY)) == -1) {
+        perror("open()");
+        exit(1);
+    }
+
+    struct statfs buf;
+    if(fstatfs(fd, &buf) == -1)
+        perror("fstatfs()");
+
+    close(fd);
+}
+</pre>
+</p>
+
+<p>
+and compiled it as a 32-bit binary:
+</p>
+
+<p>
+<pre>
+$ gcc fstatfstest.c -o fstatfstest -m32
+
+$ /tmp/fstatfstest
+fstatfs(): Value too large for defined data type
+</pre>
+</p>
+
+<p>
+Searching the Linux man pages, we find that fstatfs() and its associated structure are defined as:
+</p>
+
+<p>
+<pre>
+int fstatfs(int fd, struct statfs *buf);
+
+struct statfs {
+    long    f_type;     /* type of filesystem (see below) */
+    long    f_bsize;    /* optimal transfer block size */
+    long    f_blocks;   /* total data blocks in file system */
+    long    f_bfree;    /* free blocks in fs */
+    long    f_bavail;   /* free blocks avail to non-superuser */
+    long    f_files;    /* total file nodes in file system */
+    long    f_ffree;    /* free file nodes in fs */
+    fsid_t  f_fsid;     /* file system id */
+    long    f_namelen;  /* maximum length of filenames */
+};
+</pre>
+</p>
+
+<p>
+The only problem is that a long is 4 bytes on i386 and 8 bytes on x86_64, so when a 32-bit program passes a statfs structure into a fstatfs() call, an attempt is made to stuff the result into a structure that is not big enough (in some cases).  This issue occurred on a CentOS 5 system with an XFS file system that is heavy on the metadata (it creates and removes lots of files often).  On our CentOS 5 systems, by default the inode max percent (imaxpct) is 25%.
+</p>
+
+<p>
+<pre>
+$ xfs_info /dev/sdc1
+meta-data=/dev/sdc1              isize=256    agcount=32, agsize=49194800 blks
+         =                       sectsz=512   attr=1
+data     =                       bsize=4096   blocks=1574233600, imaxpct=25
+         =                       sunit=16     swidth=352 blks, unwritten=1
+naming   =version 2              bsize=4096
+log      =internal               bsize=4096   blocks=32768, version=2
+         =                       sectsz=512   sunit=16 blks, lazy-count=0
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+
+</pre>
+</p>
+
+<p>
+We know that the ceiling of a 4 byte long is 2,147,483,647, so let's see if we have more inodes than that:
+</p>
+
+<p>
+<pre>
+$ df -i /dev/sdc1
+Filesystem               Inodes     IUsed      IFree IUse% Mounted on
+/dev/sdc1            6296934400 118578362 6178356038    2% /exports
+</pre>
+<p>
+
+<p>
+Yep, 6 billion is certainly more than ~ 2 billion, so my best guess is that when fstatfs() tries to copy 6,296,934,400 into f_files, it is overrunning.  We know b_blocks is ok from the xfs_info output, but f_bfree, f_bavail and f_ffree are also candidates.  Checking our Oracle Enterprise Linux 6 systems, I saw that they have imaxpct set to 5% by default (Oracle Enterprise Linux 6 is based on Red Hat Enterprise Linux 6).  Hopefully having the imaxpct lower will prevent the same situation from occurring on those systems.
+</p>
+
+<p>
+Long story short, if you run into this problem and must use fstatfs, then defining your own struct and passing that to fstatfs64() instead of fstatfs() should work:
+</p>
+
+<p>
+<pre>
+#include &lt;stdio.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;sys/stat.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;sys/vfs.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;string.h&gt;
+
+struct kernel_statfs64 {
+  long int f_type;      /* type of file system (see below) */
+  long int f_bsize;     /* optimal transfer block size */
+  long long f_blocks;   /* total data blocks in file system */
+  long long f_bfree;    /* free blocks in fs */
+  long long f_bavail;   /* free blocks available to unprivileged user */
+  long long f_files;    /* total file nodes in file system */
+  long long f_ffree;    /* free file nodes in fs */
+  long long f_fsid;     /* file system id */
+  long int f_namelen;   /* maximum length of filenames */
+  long int f_frsize;    /* fragment size (since Linux 2.6) */
+  long int f_spare[5];
+};
+
+int main(void) {
+    unsigned int fd = open("test.txt", O_RDONLY);
+    if(fd == -1)
+        perror("open()");
+
+    struct kernel_statfs64 buf;
+    memset(&buf, 0, sizeof(&buf));
+    int result;
+    result = fstatfs64(fd, &buf);
+
+    printf("fstatfs64 returned %d\n", result);
+    if(result == -1)
+        perror("statfs()");
+
+    switch(buf.f_type) {
+        case 0x58465342:
+            printf("XFS file system\n"); break; ;;
+        case 0x6969:
+            printf("NFS file system\n"); break; ;;
+        default:
+            printf("Unknown file system type (0x%x)\n", buf.f_type); ;;
+    }
+
+    return 0;
+}
+</pre>
+</p>
+
+<p>
+Compiling and running confirms the fix:
+</p>
+
+<p>
+<pre>
+$ gcc fstatfstest.c -o fstatfstest -m32
+
+$ /tmp/fstatfstest
+fstatfs returned 0
+XFS file system
+</pre>
+</p>
+

@@ -1,0 +1,23 @@
+---
+title: "Wireshark tips #4: do not let tshark fill up your tmp directory"
+date: "2014-03-30"
+redirect_from: "/post/81262915792/wireshark-tips-4-do-not-let-tshark-fill-up-your-tmp"
+categories: 
+    - "Wireshark"
+    - "tshark"
+---
+
+<i>TShark 1.2.15, Oracle Enterprise Linux 6.5</i><br/><br/>
+
+<p>
+By default, tshark will write its capture data to the <tt>/tmp</tt> directory.  If you do not have a large <tt>/tmp</tt> and run tshark for a long period of time, you may find that <tt>/tmp</tt> gets filled up.
+</p>
+
+<p>To tell tshark to write to a different directory, set the <tt>TMPDIR</tt> environment variable before starting it.</p>
+
+<p>
+<pre>
+env TMPDIR=/scratch/
+</pre>
+</p>
+

@@ -1,0 +1,36 @@
+---
+title: "Vagrant: show port forwarding for all virtual machines"
+date: "2015-12-05"
+redirect_from: "/post/134584016604/vagrant-show-port-forwarding-for-all-virtual"
+categories: 
+    - "Vagrant"
+    - "Mac OS"
+    - "VBoxManage"
+---
+
+<p><em>Mac OS X 10.10.5, vagrant 1.7.4</em></p>
+
+<p>
+To get a list of all ports forwarded to vagrant virtual machines, use this one liner:
+
+
+<script src="https://gist.github.com/ryanchapman/5c682613def88058e180.js"></script>
+</p>
+
+<p>
+For example,
+<pre>
+rchapman@Chapmans-Macbook-Pro:~$ VB=/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage; for vm in $($VB list vms | awk '{print $1}' | tr -d '"'); do $VB showvminfo $vm 2>&1 | grep 'State:.*running' &>/dev/null || continue; perl -e 'print "=" x 80 . "\n"'; echo $vm; $VB showvminfo $vm 2>&1 | egrep '^(Name|Guest OS|UUID|Config file|Memory size|Number of CPUs):|NIC.*Rule|Name:.*Host path:'; done
+================================================================================
+base_dev_8888888888888_88888
+Name:            base_dev_8888888888888_88888
+Guest OS:        Ubuntu (64-bit)
+UUID:            ffffffff-fff1-ffff-ffff-ffffffffffff
+Config file:     /Users/rchapman/VirtualBox VMs/base_dev_8888888888888_88888/base_dev_8888888888888_88888.vbox
+Memory size:     512MB
+Number of CPUs:  1
+NIC 1 Rule(0):   name = ssh, protocol = tcp, host ip = 127.0.0.1, host port = 2222, guest ip = , guest port = 22
+Name: 'vagrant', Host path: '/Users/rchapman/gitroot/base' (machine mapping), writable
+rchapman@Chapmans-Macbook-Pro:~$
+</pre>
+</p>

@@ -1,0 +1,71 @@
+---
+title: "Who changed the permissions on that file?"
+date: "2014-11-22"
+redirect_from: "/post/103347067679/who-changed-the-permissions-on-that-file"
+categories: 
+    - "Linux"
+    - "auditd"
+    - "auditctl"
+    - "audit"
+---
+
+<i>Linux 3.8.13</i><br/><br/>
+
+<p>
+Sometimes you have a situation where someone or something is changing the permissions on a file and you need to know who or what process is doing it.  Below is one method which uses the Linux audit mechanism, which has been around since 2.6.
+</p>
+
+<p>
+<pre>
+[root@web01 /home/ryan]# /etc/init.d/auditd start
+
+[root@web01 /home/ryan]# auditctl -a exit,always -S fchmodat -S chmod -S fchmod
+WARNING - 32/64 bit syscall mismatch, you should specify an arch
+
+[root@web01 /home/ryan]# auditctl -w /home/ryan/timmy3 -p a
+
+[root@web01 /home/ryan]# auditctl -l
+-a always,exit -S chmod,fchmod,fchmodat
+-w /home/ryan/timmy3 -p a
+
+[root@web01 /home/ryan]# chmod 111 timmy3
+
+[root@web01 /home/ryan]# less /var/log/audit/audit.log
+[...]
+type=SYSCALL msg=audit(1416721355.647:32740): arch=c000003e syscall=268 success=yes exit=0 a0=ffffffffffffff9c a1=64b0f0 a2=49 a3=7fff4bb52f60 items=1 ppid=15195 pid=2405 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 ses=554114 tty=pts0 comm="chmod" exe="/bin/chmod" key=(null)
+type=CWD msg=audit(1416721355.647:32740):  cwd="/home/ryan"
+type=PATH msg=audit(1416721355.647:32740): item=0 name="timmy3" inode=761912 dev=fb:03 mode=0100644 ouid=0 ogid=0 rdev=00:00
+[...]
+</pre>
+</p>
+
+<p>
+If you are wanting to watch a file that is hard linked, then it could exist in multiple paths and you'll have to watch activity on the inode.  Continuing with the example above, let's hard link it to a file in another directory.
+
+<pre>
+[root@web01 /home/ryan]# df -h /home/ryan
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda3        30G  4.0G   25G  15% /
+
+[root@web01 /home/ryan]# ls -l /dev/vda3
+brw-rw---- 1 root disk 251, 3 Sep 24 13:48 /dev/vda3
+
+[root@web01 /home/ryan]# stat /home/ryan/timmy3
+  File: `/home/ryan/timmy3'
+  Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+Device: fb03h/64259d    Inode: 761912      Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2014-11-22 21:49:11.000000000 -0700
+Modify: 2014-11-22 21:49:11.000000000 -0700
+Change: 2014-11-22 21:49:11.000000000 -0700
+
+[root@web01 /home/ryan]# auditctl -a exit,always -S fchmodat -S chmod -S fchmod -F devmajor=251 -F devminor=3 -F inode=761912
+No rules
+WARNING - 32/64 bit syscall mismatch, you should specify an arch
+Error sending add rule data request (Invalid argument)
+</pre>
+
+and we hit a dead end.  You could re-compile audit with the patch at <a href="https://www.redhat.com/archives/linux-audit/2013-September/msg00004.html">https://www.redhat.com/archives/linux-audit/2013-September/msg00004.html</a>, which would probably work.  I didn't try it though.
+
+
+

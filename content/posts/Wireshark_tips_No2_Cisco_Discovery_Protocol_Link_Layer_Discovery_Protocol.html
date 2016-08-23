@@ -1,0 +1,292 @@
+---
+title: "Wireshark tips #2: Cisco Discovery Protocol (CDP) and  Link Layer Discovery Protocol (LLDP)"
+date: "2014-03-30"
+redirect_from: "/post/81260034482/wireshark-tips-2-cisco-discovery-protocol-cdp"
+categories: 
+    - "Wireshark"
+    - "tshark"
+    - "Cisco Discovery Protocol"
+    - "CDP"
+    - "Link Layer Discovery Protocol"
+    - "LLDP"
+---
+
+<i>TShark 1.2.15, Oracle Enterprise Linux 6.5</i><br/><br/>
+
+<p>
+Ever wondered what switch or router port your server was plugged into? If your server is plugged into a Cisco switch or router, then chances are it is broadcasting Cisco Discovery Protocol packets periodically.  Other vendors use LLDP (ethertype 0x88cc). You can use tshark to  capture one of these packets on a physical server (CDP does not usually pass through to virtual machines) and determine what port you are plugged into.
+</p>
+
+<p>Note that Cisco ASA firewalls do not support CDP, so if your server is plugged into an ASA, this tip won't do you any good.  If you find yourself on a VMware ESXi server, it does not come with tshark installed; however, you can use the following command instead: <pre>vim-cmd hostsvc/net/query_networkhint</pre>
+</p>
+
+<p>
+<pre>tshark -i eth0 -V -f "ether host 01:00:0c:cc:cc:cc or ether proto 0x88cc" -c 2
+Running as user "root" and group "root". This could be dangerous.
+Capturing on eth0
+Frame 1 (482 bytes on wire, 482 bytes captured)
+    Arrival Time: Apr 20, 2011 00:45:32.663667000
+    [Time delta from previous captured frame: 0.000000000 seconds]
+    [Time delta from previous displayed frame: 0.000000000 seconds]
+    [Time since reference or first frame: 0.000000000 seconds]
+    Frame Number: 1
+    Frame Length: 482 bytes
+    Capture Length: 482 bytes
+    [Frame is marked: False]
+    [Protocols in frame: eth:llc:cdp:data]
+IEEE 802.3 Ethernet
+    Destination: 01:00:0c:cc:cc:cc (01:00:0c:cc:cc:cc)
+        Address: 01:00:0c:cc:cc:cc (01:00:0c:cc:cc:cc)
+        .... ...1 .... .... .... .... = IG bit: Group address (multicast/broadcast)
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+    Source: 00:1a:2f:4b:bb:23 (00:1a:2f:4b:bb:23)
+        Address: 00:1a:2f:4b:bb:23 (00:1a:2f:4b:bb:23)
+        .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+    Length: 468
+Logical-Link Control
+    DSAP: SNAP (0xaa)
+    IG Bit: Individual
+    SSAP: SNAP (0xaa)
+    CR Bit: Command
+    Control field: U, func=UI (0x03)
+        000. 00.. = Command: Unnumbered Information (0x00)
+        .... ..11 = Frame type: Unnumbered frame (0x03)
+    Organization Code: Cisco (0x00000c)
+    PID: CDP (0x2000)
+Cisco Discovery Protocol
+    Version: 2
+    TTL: 180 seconds
+    Checksum: 0x6547 [correct]
+        [Good: True]
+        [Bad : False]
+    Device ID: INITECH-FLOOR1SW1.initech.com
+        Type: Device ID (0x0001)
+        Length: 33
+        Device ID: INITECH-FLOOR1SW1.initech.com
+    Software Version
+        Type: Software version (0x0005)
+        Length: 247
+        Software Version: Cisco IOS Software, C3750 Software (C3750-IPBASEK9-M), Version 12.2(50)SE3, RELEASE SOFTWARE (fc1)
+                          Technical Support: http://www.cisco.com/techsupport
+                          Copyright (c) 1986-2009 by Cisco Systems, Inc.
+                          Compiled Wed 22-Jul-09 06:19 by prod_rel_team
+    Platform: cisco WS-C3750G-48TS
+        Type: Platform (0x0006)
+        Length: 24
+        Platform: cisco WS-C3750G-48TS
+    Addresses
+        Type: Addresses (0x0002)
+        Length: 17
+        Number of addresses: 1
+        IP address: 10.1.1.3
+            Protocol type: NLPID
+            Protocol length: 1
+            Protocol: IP
+            Address length: 4
+            IP address: 10.1.1.3
+    Port ID: GigabitEthernet2/0/35
+        Type: Port ID (0x0003)
+        Length: 25
+        Sent through Interface: GigabitEthernet2/0/35
+    Capabilities
+        Type: Capabilities (0x0004)
+        Length: 8
+        Capabilities: 0x00000028
+            .... .... .... .... .... .... .... ...0 = Not a Router
+            .... .... .... .... .... .... .... ..0. = Not a Transparent Bridge
+            .... .... .... .... .... .... .... .0.. = Not a Source Route Bridge
+            .... .... .... .... .... .... .... 1... = Is  a Switch
+            .... .... .... .... .... .... ...0 .... = Not a Host
+            .... .... .... .... .... .... ..1. .... = Is  IGMP capable
+            .... .... .... .... .... .... .0.. .... = Not a Repeater
+    Protocol Hello: Cluster Management
+        Type: Protocol Hello (0x0008)
+        Length: 36
+        OUI: 0x00000C (Cisco)
+        Protocol ID: 0x0112 (Cluster Management)
+        Cluster Master IP: 0.0.0.0
+        UNKNOWN (IP?): 0xFFFFFFFF (255.255.255.255)
+        Version?: 0x01
+        Sub Version?: 0x02
+        Status?: 0x21
+        UNKNOWN: 0xFF
+        Cluster Commander MAC: 00:00:00:00:00:00
+        Switch's MAC: 00:16:c7:fb:bb:00
+        UNKNOWN: 0xFF
+        Management VLAN: 0
+    VTP Management Domain: INITECH_CORP
+        Type: VTP Management Domain (0x0009)
+        Length: 12
+        VTP Management Domain: INITECH_CORP
+    Native VLAN: 350
+        Type: Native VLAN (0x000a)
+        Length: 6
+        Native VLAN: 350
+    Duplex: Full
+        Type: Duplex (0x000b)
+        Length: 5
+        Duplex: Full
+    Trust Bitmap: 0x00
+        Type: Trust Bitmap (0x0012)
+        Length: 5
+        Trust Bitmap: 00
+    Untrusted port CoS: 0x00
+        Type: Untrusted Port CoS (0x0013)
+        Length: 5
+        Untrusted port CoS: 00
+    Management Addresses
+        Type: Management Address (0x0016)
+        Length: 17
+        Number of addresses: 1
+        IP address: 10.1.1.3
+            Protocol type: NLPID
+            Protocol length: 1
+            Protocol: IP
+            Address length: 4
+            IP address: 10.1.1.35
+    Power Available: 0 mW, 4294967295 mW
+        Type: Power Available (0x001a)
+        Length: 16
+        Request-ID: 0
+        Management-ID: 1
+        Power Available: 0 mW
+        Power Available: 4294967295 mW
+
+Frame 2 (482 bytes on wire, 482 bytes captured)
+    Arrival Time: Apr 20, 2011 00:46:32.674563000
+    [Time delta from previous captured frame: 60.010896000 seconds]
+    [Time delta from previous displayed frame: 60.010896000 seconds]
+    [Time since reference or first frame: 60.010896000 seconds]
+    Frame Number: 2
+    Frame Length: 482 bytes
+    Capture Length: 482 bytes
+    [Frame is marked: False]
+    [Protocols in frame: eth:llc:cdp:data]
+IEEE 802.3 Ethernet
+    Destination: 01:00:0c:cc:cc:cc (01:00:0c:cc:cc:cc)
+        Address: 01:00:0c:cc:cc:cc (01:00:0c:cc:cc:cc)
+        .... ...1 .... .... .... .... = IG bit: Group address (multicast/broadcast)
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+    Source: 00:1a:2f:4b:bb:23 (00:1a:2f:4b:bb:23)
+        Address: 00:1a:2f:4b:bb:23 (00:1a:2f:4b:bb:23)
+        .... ...0 .... .... .... .... = IG bit: Individual address (unicast)
+        .... ..0. .... .... .... .... = LG bit: Globally unique address (factory default)
+    Length: 468
+Logical-Link Control
+    DSAP: SNAP (0xaa)
+    IG Bit: Individual
+    SSAP: SNAP (0xaa)
+    CR Bit: Command
+    Control field: U, func=UI (0x03)
+        000. 00.. = Command: Unnumbered Information (0x00)
+        .... ..11 = Frame type: Unnumbered frame (0x03)
+    Organization Code: Cisco (0x00000c)
+    PID: CDP (0x2000)
+Cisco Discovery Protocol
+    Version: 2
+    TTL: 180 seconds
+    Checksum: 0x6547 [correct]
+        [Good: True]
+        [Bad : False]
+    Device ID: INITECH-FLOOR1SW1.initech.com
+        Type: Device ID (0x0001)
+        Length: 33
+        Device ID: INITECH-FLOOR1SW1.initech.com
+    Software Version
+        Type: Software version (0x0005)
+        Length: 247
+        Software Version: Cisco IOS Software, C3750 Software (C3750-IPBASEK9-M), Version 12.2(50)SE3, RELEASE SOFTWARE (fc1)
+                          Technical Support: http://www.cisco.com/techsupport
+                          Copyright (c) 1986-2009 by Cisco Systems, Inc.
+                          Compiled Wed 22-Jul-09 06:19 by prod_rel_team
+    Platform: cisco WS-C3750G-48TS
+        Type: Platform (0x0006)
+        Length: 24
+        Platform: cisco WS-C3750G-48TS
+    Addresses
+        Type: Addresses (0x0002)
+        Length: 17
+        Number of addresses: 1
+        IP address: 10.1.1.3
+            Protocol type: NLPID
+            Protocol length: 1
+            Protocol: IP
+            Address length: 4
+            IP address: 10.1.1.3
+    Port ID: GigabitEthernet2/0/35
+        Type: Port ID (0x0003)
+        Length: 25
+        Sent through Interface: GigabitEthernet2/0/35
+    Capabilities
+        Type: Capabilities (0x0004)
+        Length: 8
+        Capabilities: 0x00000028
+            .... .... .... .... .... .... .... ...0 = Not a Router
+            .... .... .... .... .... .... .... ..0. = Not a Transparent Bridge
+            .... .... .... .... .... .... .... .0.. = Not a Source Route Bridge
+            .... .... .... .... .... .... .... 1... = Is  a Switch
+            .... .... .... .... .... .... ...0 .... = Not a Host
+            .... .... .... .... .... .... ..1. .... = Is  IGMP capable
+            .... .... .... .... .... .... .0.. .... = Not a Repeater
+    Protocol Hello: Cluster Management
+        Type: Protocol Hello (0x0008)
+        Length: 36
+        OUI: 0x00000C (Cisco)
+        Protocol ID: 0x0112 (Cluster Management)
+        Cluster Master IP: 0.0.0.0
+        UNKNOWN (IP?): 0xFFFFFFFF (255.255.255.255)
+        Version?: 0x01
+        Sub Version?: 0x02
+        Status?: 0x21
+        UNKNOWN: 0xFF
+        Cluster Commander MAC: 00:00:00:00:00:00
+        Switch's MAC: 00:16:c7:fb:bb:00
+        UNKNOWN: 0xFF
+        Management VLAN: 0
+    VTP Management Domain: INITECH_CORP
+        Type: VTP Management Domain (0x0009)
+        Length: 12
+        VTP Management Domain: INITECH_CORP
+    Native VLAN: 350
+        Type: Native VLAN (0x000a)
+        Length: 6
+        Native VLAN: 350
+    Duplex: Full
+        Type: Duplex (0x000b)
+        Length: 5
+        Duplex: Full
+    Trust Bitmap: 0x00
+        Type: Trust Bitmap (0x0012)
+        Length: 5
+        Trust Bitmap: 00
+    Untrusted port CoS: 0x00
+        Type: Untrusted Port CoS (0x0013)
+        Length: 5
+        Untrusted port CoS: 00
+    Management Addresses
+        Type: Management Address (0x0016)
+        Length: 17
+        Number of addresses: 1
+        IP address: 10.1.1.35
+            Protocol type: NLPID
+            Protocol length: 1
+            Protocol: IP
+            Address length: 4
+            IP address: 10.1.1.3
+    Power Available: 0 mW, 4294967295 mW
+        Type: Power Available (0x001a)
+        Length: 16
+        Request-ID: 0
+        Management-ID: 1
+        Power Available: 0 mW
+        Power Available: 4294967295 mW
+
+2 packets captured
+</pre>
+</p>
+
+<p>
+In the example above, our server is plugged into switch port GigabitEthernet2/0/35 on the switch with the hostname INITECH-FLOOR1SW1.initech.com
+</p>
+
