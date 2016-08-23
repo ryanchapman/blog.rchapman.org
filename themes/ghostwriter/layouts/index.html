@@ -9,10 +9,13 @@
     {{ end }}
 
     <ol class="post-list">
-        {{ $pag := .Paginate (where .Data.Pages "Type" "post") }}
-        {{ range $pag.Pages }}
+        {{ range first 10 .Data.Pages }}
             {{ partial "post-stub.html" . }}
         {{ end }}
+        <!-- {{ $pag := .Paginate (where .Data.Pages "Type" "post") }}
+        {{ range $pag.Pages }}
+            {{ partial "post-stub.html" . }}
+        {{ end }} -->
     </ol>
 
     <div class="post-navigation">

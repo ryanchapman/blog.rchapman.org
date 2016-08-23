@@ -14,7 +14,7 @@ disqusShortname = "blog-rchapman-org"
     tag = "tags"
 
 [Params]
-    intro = true
+    intro = false
     headline = "blog.rchapman.org"
     description = ""
     github = "https://github.com/ryanchapman"
@@ -28,21 +28,26 @@ disqusShortname = "blog-rchapman-org"
     post = "/:year/:month/:day/:filename/"
 
 [[menu.main]]
-    name = "Blog"
-    url = "/posts"
+    name = "Latest Post"
+    url = "/posts/latest"
     weight = 1
 
 [[menu.main]]
-    name = "Projects"
-    url = "/project/"
+    name = "Browse Posts"
+    url = "/posts"
     weight = 2
+
+#[[menu.main]]
+#    name = "Projects"
+#    url = "/project/"
+#    weight = 3
 
 [[menu.main]]
     name = "Contact"
     url = "/page/contact/"
-    weight = 3
+    weight = 4
 
 [[menu.main]]
     name = "About"
     url = "/page/about/"
-    weight = 4
+    weight = 5
