@@ -7,6 +7,11 @@
   </url>
   
   <url>
+    <loc>http://test2.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</loc>
+    <lastmod>2016-06-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://test2.rchapman.org/posts/SSH_with_Yubikey_NEO/</loc>
     <lastmod>2016-06-22T00:00:00+00:00</lastmod>
   </url>
@@ -19,6 +24,11 @@
   <url>
     <loc>http://test2.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</loc>
     <lastmod>2016-02-10T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Vagrant_show_port_forwarding_for_all_virtual_machines/</loc>
+    <lastmod>2015-12-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -57,12 +67,32 @@
   </url>
   
   <url>
+    <loc>http://test2.rchapman.org/posts/Who_changed_the_permissions_on_that_file/</loc>
+    <lastmod>2014-11-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://test2.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</loc>
     <lastmod>2014-04-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://test2.rchapman.org/posts/Wireshark_tips_/</loc>
+    <loc>http://test2.rchapman.org/posts/Wireshark_tips_No2_Cisco_Discovery_Protocol_Link_Layer_Discovery_Protocol/</loc>
+    <lastmod>2014-03-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Wireshark_tips_No3_mysql_queries_broken_down_by_type/</loc>
+    <lastmod>2014-03-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Wireshark_tips_No4_do_not_let_tshark_fill_up_your_tmp_directory/</loc>
+    <lastmod>2014-03-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Wireshark_tips_No5_Decrypting_HTTPS/</loc>
     <lastmod>2014-03-30T00:00:00+00:00</lastmod>
   </url>
   
@@ -74,6 +104,11 @@
   <url>
     <loc>http://test2.rchapman.org/posts/Enabling_Google_CalDAV_for_Mozilla_Sunbird/</loc>
     <lastmod>2013-08-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/Using_fstatfs_from_a_32-bit_program_on_a_64-bit_system/</loc>
+    <lastmod>2013-06-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -129,6 +164,11 @@
   <url>
     <loc>http://test2.rchapman.org/posts/How_to_enable_international_mode_on_Griffin_iTrip_AutoPilot/</loc>
     <lastmod>2009-06-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://test2.rchapman.org/posts/iPhone_AutoCorrect_Dictionary_Location/</loc>
+    <lastmod>2009-02-27T00:00:00+00:00</lastmod>
   </url>
   
   <url>

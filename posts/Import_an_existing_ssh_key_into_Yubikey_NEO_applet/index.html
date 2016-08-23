@@ -1,0 +1,312 @@
+---
+redirect_from: /post/146295228584/import-an-existing-ssh-key-into-yubikey-neo-piv
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Import an existing ssh key into YubiKey NEO PIV applet &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17-DEV" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://test2.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://test2.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Latest Post" href="/posts/latest">Latest Post</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Browse Posts" href="/">Browse Posts</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Contact" href="/page/contact/">Contact</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="About" href="/page/about/">About</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Import an existing ssh key into YubiKey NEO PIV applet</h1>
+    
+    Published Wed, Jun 22, 2016<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <p><em>yubico-piv-tool 1.4.0, Mac OS X 10.11.5</em></p>
+
+<p>While you should generate your ssh keys on card or generate them on a sterile machine for escrow, you can also import an existing ssh key (usually found in ~/.ssh/id_rsa).  Below is a walkthrough on how to do that.  Be sure to import both the private and public side of your keypair; otherwise, ssh auth might not work.  You should probably create an encrypted disk and chdir to that disk when changing the private key to pem form.
+</p>
+
+
+<h2>Private Key</h2>
+
+<p>
+<pre>
+rchapman@Macbook:~$ cd /Volumes/encrypted/
+rchapman@Macbook:/Volumes/encrypted$ openssl rsa -in ~/.ssh/id_rsa -out id_rsa.pem -outform pem
+Enter pass phrase for /Users/rchapman/.ssh/id_rsa:
+writing RSA key
+
+rchapman@Macbook:/Volumes/encrypted$ head -1 id_rsa.pem
+-----BEGIN RSA PRIVATE KEY-----
+
+rchapman@Macbook:/Volumes/encrypted$ yubico-piv-tool -a import-key -s 9a -i id_rsa.pem
+Successfully imported a new private key.
+
+rchapman@Macbook:/Volumes/encrypted$ rm id_rsa.pem
+</pre>
+</p>
+
+
+<h2>Public Key</h2>
+
+<p>
+<pre>
+rchapman@Macbook:/Volumes/encrypted$ ssh-keygen -e -f ~/.ssh/id_rsa.pub -m PKCS8 > id_rsa.pub.pkcs8
+rchapman@Macbook:/Volumes/encrypted$ head -1 id_rsa.pub.pkcs8
+-----BEGIN PUBLIC KEY-----
+
+rchapman@Macbook:/Volumes/encrypted$ ~/bin/yubico-piv-tool -a verify -P 123456 -a selfsign-certificate -s 9a -S "/CN=joe/O=Test/" -i id_rsa.pub.pkcs8 -o 9a-cert.pem
+
+rchapman@Macbook:/Volumes/encrypted$ ~/bin/yubico-piv-tool -a verify -P 123456 -a import-certificate -s 9a -i 9a-cert.pem ; ~/bin/yubico-piv-tool -a status
+Successfully verified PIN.
+Successfully imported a new certificate.
+CHUID:  3019...fe00
+CCC:    f015...fe00
+Slot 9a:
+    Algorithm:     RSA2048
+    Subject DN:    CN=joe, O=Test
+    Issuer DN:     CN=joe, O=Test
+    Fingerprint:   cf...46
+    Not Before:    Jun 20 19:13:41 2016 GMT
+    Not After:     Jun 20 19:13:41 2017 GMT
+[...]
+PIN tries left:   15
+</pre>
+</p>
+
+<p>
+Move .ssh/id_rsa and restart ssh-agent (otherwise it will be cached by the agent)
+<br/>
+<pre>
+rchapman@Macbook:/Volumes/encrypted$ cd ~/.ssh
+rchapman@Macbook:~/.ssh$ mv id_rsa ..
+rchapman@Macbook:~/.ssh$ pkill ssh-agent
+rchapman@Macbook:~/.ssh$ sudo launchctl start org.openbsd.ssh-agent
+</pre>
+</p>
+
+<h2>Set PIN and PIN Retries</h2>
+
+<p>
+You should change the user PIN as well as the PIN Unlock Code (PUK) if you have not already.  The YubiKey NEO asks for the PIN every time it signs a nonce (to log you into a ssh server).  If you enter the PIN wrong a number of times (3 by default), then the PIN will be locked.  You can then use the PUK to unlock the PIN.  If you enter the PUK wrong a number of times (again, 3 by default), then the PIV applet will bulk erase it's memory, causing your private keys and certificates to be lost.  At that point, you have to reset the PIV applet and re-populate the certs and private keys.
+</p>
+
+<p>To change the PIN and PUK retries from 3 to 15:<br/>
+<pre>
+rchapman@Macbook:~$ unset HISTFILE
+rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a verify -P 123456 -a pin-retries --pin-retries 15 --puk-retries 15
+</pre>
+<br/>
+Note that this step will also set the PIN and PUK codes back to factory default, so you'll need to change your PIN/PUK codes after doing this step if you already had PIN/PUK codes set.
+</p>
+
+<p>To change the PIN and PUK:<br/>
+In this example, we are changing the PIN from the default value of 123456 to 987600 and the PUK from the default of 12345678 to 98761234
+<pre>
+rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a change-pin --pin 123456 --new-pin=987600
+rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a change-puk --pin 12345678 --new-pin=98761234
+</pre>
+
+<p>Change the management key<br/>
+Most security professionals would say you should change the management key as well.  This is a 24 byte key which resides in slot 9B.  If you forget it, you can still reset the PIV applet, which will reset the PIN, PUK, and 9B key back to defaults.
+<br/>
+<pre>
+rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a set-mgm-key -n 123456789012345678901234567890123456789012345678
+</pre>
+Logout and log back in, then make sure the PIN, PUK and management key are not in ~/.bash_history
+</p>
+
+
+<h2>Key Escrow</h2>
+
+<p>
+If you want to encrypt the private key for storage in escrow:
+<br/>
+<pre>
+rchapman@Macbook:~$ cat ~/id_rsa | gpg --symmetric | base64
+</pre>
+</p>
+
+<p>
+One place where you could store the encrypted base-64 encoded private key would be the password field of a password manager like 1Password.
+<br/>
+To decrypt it later:
+<br/>
+<pre>
+echo "base64string" | base64 -D | gpg --decrypt
+</pre>
+</p>
+
+<h2>Last steps</h2>
+
+<p>
+Later, when you are sure you are happy with the encrypted version of the file, remove your private key from your workstation (after all, the reason for putting your private key on a hardware token is to prevent someone from stealing it off disk).
+<br/>
+<pre>
+rm ~/id_rsa id_rsa.pem
+</pre>
+</p>
+
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Import%20an%20existing%20ssh%20key%20into%20YubiKey%20NEO%20PIV%20applet&url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fImport_an_existing_ssh_key_into_Yubikey_NEO_applet%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2ftest2.rchapman.org%2fposts%2fImport_an_existing_ssh_key_into_Yubikey_NEO_applet%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2ftest2.rchapman.org%2fposts%2fImport_an_existing_ssh_key_into_Yubikey_NEO_applet%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/test2.rchapman.org\/posts\/Import_an_existing_ssh_key_into_Yubikey_NEO_applet\/';
+    var disqus_title = 'Import an existing ssh key into YubiKey NEO PIV applet';
+    var disqus_url = 'http:\/\/test2.rchapman.org\/posts\/Import_an_existing_ssh_key_into_Yubikey_NEO_applet\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://test2.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/test2">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://test2.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://test2.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://test2.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+
