@@ -3,7 +3,7 @@
 redirect_from: 
   - {{ .Params.redirect_from -}}
 {{ if eq . (index $.Site.Pages 0) }}
-  - /latest
+  - /posts/latest
 {{ end -}}
 ---
 {{ end -}}
