@@ -1,4 +1,4 @@
-baseurl = "http://test2.rchapman.org/"
+baseurl = "http://blog.rchapman.org/"
 title = "Ryan A. Chapman"
 theme = "ghostwriter"
 languageCode = "en-us"
@@ -8,7 +8,7 @@ disqusShortname = "blog-rchapman-org"
 
 [Author]
     name = "Ryan A. Chapman"
-    profile = "https://google.com/+XXX"
+    profile = "https://plus.google.com/u/0/116175235833210820781"
 
 [Taxonomies]
     tag = "tags"
@@ -42,12 +42,12 @@ disqusShortname = "blog-rchapman-org"
 #    url = "/project/"
 #    weight = 3
 
-[[menu.main]]
-    name = "Contact"
-    url = "/page/contact/"
-    weight = 3
+#[[menu.main]]
+#    name = "Contact"
+#    url = "/page/contact/"
+#    weight = 3
 
-[[menu.main]]
-    name = "About"
-    url = "/page/about/"
-    weight = 4
+#[[menu.main]]
+#    name = "About"
+#    url = "/page/about/"
+#    weight = 4
