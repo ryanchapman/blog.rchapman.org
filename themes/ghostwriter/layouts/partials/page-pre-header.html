@@ -1,9 +1,9 @@
 {{ if .Params.redirect_from -}}
 ---
 redirect_from: 
-  - {{ .Params.redirect_from -}}
-{{ if eq . (index $.Site.Pages 0) }}
+  - {{ .Params.redirect_from }}
+{{- if eq . (index $.Site.Pages 0) }}
   - /posts/latest
-{{ end -}}
+{{- end }}
 ---
 {{ end -}}
