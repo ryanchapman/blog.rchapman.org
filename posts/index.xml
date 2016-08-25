@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Ryan A. Chapman</title>
-    <link>http://test2.rchapman.org/posts/</link>
+    <link>http://blog.rchapman.org/posts/</link>
     <description>Recent content in Posts on Ryan A. Chapman</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Ryan A. Chapman</copyright>
     <lastBuildDate>Wed, 22 Jun 2016 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://test2.rchapman.org/posts/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://blog.rchapman.org/posts/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Import an existing ssh key into YubiKey NEO PIV applet</title>
-      <link>http://test2.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</link>
+      <link>http://blog.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</link>
       <pubDate>Wed, 22 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</guid>
+      <guid>http://blog.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</guid>
       <description>&lt;p&gt;&lt;em&gt;yubico-piv-tool 1.4.0, Mac OS X 10.11.5&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;While you should generate your ssh keys on card or generate them on a sterile machine for escrow, you can also import an existing ssh key (usually found in ~/.ssh/id_rsa).  Below is a walkthrough on how to do that.  Be sure to import both the private and public side of your keypair; otherwise, ssh auth might not work.  You should probably create an encrypted disk and chdir to that disk when changing the private key to pem form.
@@ -148,10 +148,10 @@ rm ~/id_rsa id_rsa.pem
     
     <item>
       <title>SSH with Yubikey NEO</title>
-      <link>http://test2.rchapman.org/posts/SSH_with_Yubikey_NEO/</link>
+      <link>http://blog.rchapman.org/posts/SSH_with_Yubikey_NEO/</link>
       <pubDate>Wed, 22 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/SSH_with_Yubikey_NEO/</guid>
+      <guid>http://blog.rchapman.org/posts/SSH_with_Yubikey_NEO/</guid>
       <description>&lt;p&gt;&lt;em&gt;&lt;/em&gt;YubiKey NEO, openssh 6.9, Mac OS X 10.11.5&lt;/p&gt;
 
 &lt;h2&gt;Using a YubiKey NEO to store your ssh private key&lt;/h2&gt;&lt;br/&gt;
@@ -227,10 +227,10 @@ $ mkdir -p ~/.ssh/conns/
     
     <item>
       <title>Yubikey NEO for Physical Access Control</title>
-      <link>http://test2.rchapman.org/posts/Yubikey_NEO_for_Physical_Access_Control/</link>
+      <link>http://blog.rchapman.org/posts/Yubikey_NEO_for_Physical_Access_Control/</link>
       <pubDate>Wed, 15 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Yubikey_NEO_for_Physical_Access_Control/</guid>
+      <guid>http://blog.rchapman.org/posts/Yubikey_NEO_for_Physical_Access_Control/</guid>
       <description>&lt;p&gt;
 After discovering that many physical access control systems are not secure (for example, proximity cards based on 125kHz), I wanted to figure out if there was a system based on public key crypto, which would be secure.  Turns out there is.  The U.S. Government has been using physical access control systems based on public key crypto for years.  NIST designed the system and called it PIV for Personal Identity Verification.  Unfortunately, information on this technology is extremely hard to come by.  I started by trying to get info from the PIV card manufacturers, but found they have no interest in speaking to anyone unless they are purchasing a large quantity of cards.  Even though I had $1000 in hand I was willing to spend to get a PIV card software dev kit, my requests went unanswered.
 &lt;/p&gt;
@@ -270,10 +270,10 @@ Enjoy.  If you have questions or suggestions for improvement, please send me a m
     
     <item>
       <title>Smart card: installing Hello World on a Gemalto IDPrime PIV 2.0 card</title>
-      <link>http://test2.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</link>
+      <link>http://blog.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</link>
       <pubDate>Wed, 10 Feb 2016 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</guid>
+      <guid>http://blog.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</guid>
       <description>&lt;p&gt;&lt;em&gt;&lt;a href=&#34;https://github.com/martinpaljak/GlobalPlatformPro&#34;&gt;GlobalPlatformPro&lt;/a&gt;, &lt;a href=&#34;http://www.smartcardfocus.us/shop/ilp/id~680/gemalto-idprime-piv-card-v2/p/index.shtml&#34;&gt;Gemalto IDPrime PIV 2.0 card&lt;/a&gt;, &lt;a href=&#34;http://www.smartcardfocus.com/shop/ilp/id~478/gemalto-prox-du-idbridge-cl3000-/p/index.shtml&#34;&gt;Gemalto IDBridge CL3000 Dual Interface Smart Card Reader&lt;/a&gt;, Ubuntu 14.4&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
 
 &lt;p&gt;
@@ -456,10 +456,10 @@ rchapman@vagrant-ubuntu-trusty-64:~$
     
     <item>
       <title>Vagrant: show port forwarding for all virtual machines</title>
-      <link>http://test2.rchapman.org/posts/Vagrant_show_port_forwarding_for_all_virtual_machines/</link>
+      <link>http://blog.rchapman.org/posts/Vagrant_show_port_forwarding_for_all_virtual_machines/</link>
       <pubDate>Sat, 05 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Vagrant_show_port_forwarding_for_all_virtual_machines/</guid>
+      <guid>http://blog.rchapman.org/posts/Vagrant_show_port_forwarding_for_all_virtual_machines/</guid>
       <description>&lt;p&gt;&lt;em&gt;Mac OS X 10.10.5, vagrant 1.7.4&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;
@@ -491,10 +491,10 @@ rchapman@Chapmans-Macbook-Pro:~$
     
     <item>
       <title>Securely allowing rancid to back up IOS configs</title>
-      <link>http://test2.rchapman.org/posts/Securely_allowing_rancid_to_back_up_IOS_configs/</link>
+      <link>http://blog.rchapman.org/posts/Securely_allowing_rancid_to_back_up_IOS_configs/</link>
       <pubDate>Wed, 25 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Securely_allowing_rancid_to_back_up_IOS_configs/</guid>
+      <guid>http://blog.rchapman.org/posts/Securely_allowing_rancid_to_back_up_IOS_configs/</guid>
       <description>&lt;p&gt;&lt;em&gt;Cisco IOS-XE 3.7, rancid-git 2.3.9 on Ubuntu 14.4, git 1.9.1&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;
@@ -606,10 +606,10 @@ In my testing, this was enough for the rancid program (I use the git fork at htt
     
     <item>
       <title>Loading an openssh pubkey on Cisco IOS</title>
-      <link>http://test2.rchapman.org/posts/Loading_an_openssh_pubkey_on_Cisco_IOS/</link>
+      <link>http://blog.rchapman.org/posts/Loading_an_openssh_pubkey_on_Cisco_IOS/</link>
       <pubDate>Sun, 22 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Loading_an_openssh_pubkey_on_Cisco_IOS/</guid>
+      <guid>http://blog.rchapman.org/posts/Loading_an_openssh_pubkey_on_Cisco_IOS/</guid>
       <description>&lt;p&gt;&lt;em&gt;Mac OS X 10.10.5, Cisco IOS-XE 3.7, JunOS 12.3R6.6&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
 
 &lt;p&gt;
@@ -715,10 +715,10 @@ Yep. It works.
     
     <item>
       <title>ASA: DAP LUA function list</title>
-      <link>http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/</link>
+      <link>http://blog.rchapman.org/posts/ASA_DAP_Lua_function_list/</link>
       <pubDate>Sat, 07 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/ASA_DAP_Lua_function_list/</guid>
+      <guid>http://blog.rchapman.org/posts/ASA_DAP_Lua_function_list/</guid>
       <description>&lt;p&gt;&lt;em&gt;ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;
@@ -915,10 +915,10 @@ DAP_TRACE: Username: rchapmandap, DAP_close: A4
     
     <item>
       <title>ASA: debugging AnyConnect and radius</title>
-      <link>http://test2.rchapman.org/posts/ASA_debugging_AnyConnect_and_radius/</link>
+      <link>http://blog.rchapman.org/posts/ASA_debugging_AnyConnect_and_radius/</link>
       <pubDate>Sun, 01 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/ASA_debugging_AnyConnect_and_radius/</guid>
+      <guid>http://blog.rchapman.org/posts/ASA_debugging_AnyConnect_and_radius/</guid>
       <description>&lt;p&gt;&lt;em&gt;Ubuntu 14.04 (Linux 3.13.0-48), freeradius 2.1.12, ASA 9.4.2 (which runs Lua 5.0.2), AnyConnect 4.2&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
 
 &lt;p&gt;Setting up communications between an ASA and a radius server can be tricky, because it&#39;s hard to know what attributes the radius server is sending back and are being applied to a user session.  One method is to use wireshark to capture the communications between the ASA and radius server.  Another is to enable debugging on the ASA with &lt;tt&gt;debug dap trace&lt;/tt&gt;. An easier way is to just have the attributes printed out on the end-user device when they log in.&lt;/p&gt;
@@ -992,10 +992,10 @@ test            Cleartext-Password := &#34;test123&#34;
     
     <item>
       <title>ASA: Deny IP due to Land Attack from a.b.c.d to a.b.c.d</title>
-      <link>http://test2.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</link>
+      <link>http://blog.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</link>
       <pubDate>Wed, 28 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</guid>
+      <guid>http://blog.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</guid>
       <description>
 
 &lt;p&gt;&lt;em&gt;ASA 5516-X in HA pair, ASA 9.5(1)&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
@@ -1357,10 +1357,10 @@ fw1/pri/act#
     
     <item>
       <title>Getting shell on a RouterBoard</title>
-      <link>http://test2.rchapman.org/posts/Getting_shell_on_a_RouterBoard/</link>
+      <link>http://blog.rchapman.org/posts/Getting_shell_on_a_RouterBoard/</link>
       <pubDate>Tue, 08 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Getting_shell_on_a_RouterBoard/</guid>
+      <guid>http://blog.rchapman.org/posts/Getting_shell_on_a_RouterBoard/</guid>
       <description>&lt;p&gt;&lt;em&gt;Cloud Router Switch CRS125-24G-1S-RM, RouterOS 6.24, Mac OS X 10.8.5 (dhcpd/tftp running on Mac)&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
 
 &lt;p&gt;Ever wondered if you could get a real shell on a RouterBoard? The answer is yes, yes you can. I recently wanted to know how RouterOS on a Mikrotik CRS125-24G-1S-RM actually sets up VLANs internally so that I can duplicate a complicated set up that I already have on a Ubiquiti EdgeRouter. Below is how to get a busybox shell via ssh or the console.  Once you are in, you&#39;ll see that the busybox included is pretty limited; however, you can upload a fully operational busybox via the RouterOS web admin interface (WebFig) and then execute that one.  With the new busybox, things like ifconfig, dmesg, ls, vconfig, and many more will work.&lt;/p&gt;
@@ -2392,10 +2392,10 @@ Hmm, I always thought the DNS resolver on MikroTik was dnsmasq under the covers.
     
     <item>
       <title>Troubleshooting EAP-TLS with freeradius</title>
-      <link>http://test2.rchapman.org/posts/Troubleshooting_EAP-TLS_with_freeradius/</link>
+      <link>http://blog.rchapman.org/posts/Troubleshooting_EAP-TLS_with_freeradius/</link>
       <pubDate>Thu, 02 Jul 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Troubleshooting_EAP-TLS_with_freeradius/</guid>
+      <guid>http://blog.rchapman.org/posts/Troubleshooting_EAP-TLS_with_freeradius/</guid>
       <description>&lt;p&gt;&lt;em&gt;Ubuntu 14.04 (Linux 3.13.0-53), freeradius 2.1.12, wpa_supplicant 2.4, &lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;I&#39;m in the process of setting up wifi to use one of the more secure authentication methods, EAP-TLS (well, more secure than WPA-PSK or WPA2-PSK). WPA-Enterprise with 802.1x using EAP-TLS uses the same mechanism that protects web sites, TLS.  Anyway, I followed the great instructions Thomas Hruska put together at http://cubicspot.blogspot.com/2013/04/setting-up-wpa2-enterprise-aes-with.html but it wouldn&#39;t work.  After figuring out the problem, I set out to document here the troubleshooting steps.&lt;/p&gt;
@@ -2680,10 +2680,10 @@ Yep, it works now.
     
     <item>
       <title>Who changed the permissions on that file?</title>
-      <link>http://test2.rchapman.org/posts/Who_changed_the_permissions_on_that_file/</link>
+      <link>http://blog.rchapman.org/posts/Who_changed_the_permissions_on_that_file/</link>
       <pubDate>Sat, 22 Nov 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Who_changed_the_permissions_on_that_file/</guid>
+      <guid>http://blog.rchapman.org/posts/Who_changed_the_permissions_on_that_file/</guid>
       <description>&lt;i&gt;Linux 3.8.13&lt;/i&gt;&lt;br/&gt;&lt;br/&gt;
 
 &lt;p&gt;
@@ -2749,10 +2749,10 @@ and we hit a dead end.  You could re-compile audit with the patch at &lt;a href=
     
     <item>
       <title>Eclipse Remote System Explorer fails to connect via ssh with algorithm negotiation failure</title>
-      <link>http://test2.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</link>
+      <link>http://blog.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</link>
       <pubDate>Tue, 08 Apr 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</guid>
+      <guid>http://blog.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</guid>
       <description>&lt;i&gt;Windows 7 SP1, Java JRE 1.7.0_51-b13 (32-bit), Eclipse Kepler Service Release 2 build 20140224-0627, Eclipse Plugin RSE SSH Services 3.2.100.201305201712&lt;/i&gt;&lt;br/&gt;&lt;br/&gt;
 
 If you use a Java IDE or any other Java program that makes ssh connections to a server that has anything over 128 bit encryption turned on, then you&#39;ll see that it fails with the error:
@@ -2801,10 +2801,10 @@ Examples of possible destination folders:
     
     <item>
       <title>Wireshark tips #1: DNS traffic</title>
-      <link>http://test2.rchapman.org/posts/Wireshark_tips_No1_DNS_traffic/</link>
+      <link>http://blog.rchapman.org/posts/Wireshark_tips_No1_DNS_traffic/</link>
       <pubDate>Sun, 30 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://test2.rchapman.org/posts/Wireshark_tips_No1_DNS_traffic/</guid>
+      <guid>http://blog.rchapman.org/posts/Wireshark_tips_No1_DNS_traffic/</guid>
       <description>&lt;p&gt;&lt;i&gt;TShark 1.2.15, Oracle Enterprise Linux 6.5&lt;/i&gt;&lt;/p&gt;
 
 &lt;p&gt;
