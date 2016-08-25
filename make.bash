@@ -51,7 +51,7 @@ function _run
 function local
 {
     run hugo
-    run hugo server --baseUrl=http://localhost:1313/ --renderToDisk --verbose
+    run hugo server --renderToDisk --verbose
 }
 
 function deploy
@@ -73,7 +73,7 @@ function deploy
     else
         logit "Checking if we need to delete remote gh-pages branch: no"
     fi
-    run git subtree push --prefix=public git@github.com:ryanchapman/test2.git gh-pages
+    run git subtree push --prefix=public git@github.com:ryanchapman/blog.rchapman.org.git gh-pages
 }
 
 #################################
