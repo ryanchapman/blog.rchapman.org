@@ -1,2 +1,1 @@
-- Change all references of "test2" (the github repo) to the eventual destination on github, e.g. github.com/ryanchapman/blog.rchapman.org
 - Move old posts to disqus if possible.  Just want to preserve comment history.  If can't move over, maybe include widget to load them from tumblr?
