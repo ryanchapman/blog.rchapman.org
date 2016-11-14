@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Ryan A. Chapman</title>
-    <link>http://blog.rchapman.org/posts/</link>
-    <description>Recent content in Posts on Ryan A. Chapman</description>
+    <title>Posts-rsses on Ryan A. Chapman</title>
+    <link>http://blog.rchapman.org/posts/index.xml</link>
+    <description>Recent content in Posts-rsses on Ryan A. Chapman</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Ryan A. Chapman</copyright>
@@ -270,10 +270,10 @@ Enjoy.  If you have questions or suggestions for improvement, please send me a m
     
     <item>
       <title>Smart card: installing Hello World on a Gemalto IDPrime PIV 2.0 card</title>
-      <link>http://blog.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</link>
+      <link>http://blog.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2/</link>
       <pubDate>Wed, 10 Feb 2016 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</guid>
+      <guid>http://blog.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2/</guid>
       <description>&lt;p&gt;&lt;em&gt;&lt;a href=&#34;https://github.com/martinpaljak/GlobalPlatformPro&#34;&gt;GlobalPlatformPro&lt;/a&gt;, &lt;a href=&#34;http://www.smartcardfocus.us/shop/ilp/id~680/gemalto-idprime-piv-card-v2/p/index.shtml&#34;&gt;Gemalto IDPrime PIV 2.0 card&lt;/a&gt;, &lt;a href=&#34;http://www.smartcardfocus.com/shop/ilp/id~478/gemalto-prox-du-idbridge-cl3000-/p/index.shtml&#34;&gt;Gemalto IDBridge CL3000 Dual Interface Smart Card Reader&lt;/a&gt;, Ubuntu 14.4&lt;/em&gt;&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
 
 &lt;p&gt;
