@@ -1,0 +1,355 @@
+---
+redirect_from: 
+  - /post/139042855034/smart-card-installing-hello-world-on-a-gemalto
+---
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>Smart card: installing Hello World on a Gemalto IDPrime PIV 2.0 card &middot; Ryan A. Chapman</title>
+        <meta name="description" content="">
+        <meta name="HandheldFriendly" content="True">
+        <meta name="MobileOptimized" content="320">
+        <meta name="generator" content="Hugo 0.17" />
+        <meta name="robots" content="index,follow">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
+        <link rel="stylesheet" href="http://blog.rchapman.org/css/highlight.css">
+        <link rel="stylesheet" href="http://blog.rchapman.org/css/style.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&subset=latin,cyrillic-ext,latin-ext,cyrillic">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'XXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+        <div id="wrapper">
+            <header class="site-header">
+                <div class="container">
+                    <div class="site-title-wrapper">
+                        
+                            <h1 class="site-title">
+                                <a title="Ryan A. Chapman" href="http://blog.rchapman.org/">Ryan A. Chapman</a>
+                            </h1>
+                        
+                        <a class="button-square" href="http://blog.rchapman.org/index.xml"><i class="fa fa-rss"></i></a>
+                        
+                            <a class="button-square button-social hint--top" data-hint="Twitter" title="Twitter" href="https://twitter.com/ryanchapman">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Github" title="Github" href="https://github.com/ryanchapman">
+                                <i class="fa fa-github-alt"></i>
+                            </a>
+                        
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="LinkedIn" title="LinkedIn" href="https://linkedin.com/in/ryanachapman/">
+                                <i class="fa fa-linkedin"></i>
+                            </a>
+                        
+                        
+                            <a class="button-square button-social hint--top" data-hint="Google+" title="Google+" href="https://plus.google.com/u/0/116175235833210820781">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                        
+                    </div>
+
+                    <ul class="site-nav">
+                        
+    <li class="site-nav-item">
+        <a title="Latest Post" href="/posts/latest">Latest Post</a>
+    </li>
+
+    <li class="site-nav-item">
+        <a title="Browse Posts" href="/">Browse Posts</a>
+    </li>
+
+                    </ul>
+                </div>
+            </header>
+
+            <div id="container">
+
+
+<div class="container">
+    <article class="post-container">
+        <header class="post-header">
+    <h1 class="post-title">Smart card: installing Hello World on a Gemalto IDPrime PIV 2.0 card</h1>
+    
+    Published Wed, Feb 10, 2016<br/>
+</header>
+
+
+        <div class="post-content clearfix">
+    
+
+    <p><em><a href="https://github.com/martinpaljak/GlobalPlatformPro">GlobalPlatformPro</a>, <a href="http://www.smartcardfocus.us/shop/ilp/id~680/gemalto-idprime-piv-card-v2/p/index.shtml">Gemalto IDPrime PIV 2.0 card</a>, <a href="http://www.smartcardfocus.com/shop/ilp/id~478/gemalto-prox-du-idbridge-cl3000-/p/index.shtml">Gemalto IDBridge CL3000 Dual Interface Smart Card Reader</a>, Ubuntu 14.4</em><br/><br/></p>
+
+<p>
+Information on how to load your own applets onto a Gemalto PIV card are hard to come by, so below is a quick write up of how to do it.  This also gets you GlobalPlatform access to the card, which is difficult to figure out due to little documentation available on the key diversification used.  The spec sheet for the Gemalto IDPrime PIV 2.0 card can be found <a href="http://www.gemalto.com/products/piv_card/download/IDPrime_PIV_Card_v2_0_SCP01_OTP_Data_Model_Samples.pdf">here</a>.
+</p>
+
+<p>
+Make sure your smart card reader is attached. If it isn't you may have to restart pcscd to get it to show up:
+
+<pre>
+rchapman@vagrant-ubuntu-trusty-64:~$ opensc-tool -l
+No smart card readers found.
+
+rchapman@vagrant-ubuntu-trusty-64:~$ sudo service pcscd restart
+[sudo] password for rchapman:
+ * Restarting PCSC Lite resource manager pcscd                                                                                                 [ OK ]
+
+rchapman@vagrant-ubuntu-trusty-64:~$ opensc-tool -l
+# Detected readers (pcsc)
+Nr.  Card  Features  Name
+0    No              Gemalto Prox-DU [Prox-DU HID_15100775] 00 00
+1    Yes             Gemalto Prox-DU [Prox-DU HID_15100775] 00 01
+</pre>
+</p>
+
+<p>
+Download GlobalPlatformPro
+
+<pre>
+rchapman@vagrant-ubuntu-trusty-64:~$ wget https://github.com/martinpaljak/GlobalPlatformPro/releases/download/v0.3.6/gp.jar
+--2016-02-10 06:06:51--  https://github.com/martinpaljak/GlobalPlatformPro/releases/download/v0.3.6/gp.jar
+Resolving github.com (github.com)... 192.30.252.131
+Connecting to github.com (github.com)|192.30.252.131|:443... connected.
+[...]
+HTTP request sent, awaiting response... 200 OK
+Length: 995937 (973K) [application/octet-stream]
+Saving to: ‘gp.jar’
+
+100%[============================================================================================================>] 995,937      915KB/s   in 1.1s
+
+2016-02-10 06:06:53 (915 KB/s) - ‘gp.jar’ saved [995937/995937]
+
+</pre>
+</p>
+
+<p>
+Make sure you can list the applets on the card.  Be careful, some cards will lock you out if you fail to authenticate to the card a certain number of times.  From my experience with the Gemalto card I bought from the Gemalto WEB store, it didn't lock me out even though it took me over a hundred attempts to get the auth working.  The key below works with the Gemalto IDPrime PIV 2.0 cards I purchased from the Gemalto WEB store as well as smartcardfocus.us.
+
+<pre>
+rchapman@vagrant-ubuntu-trusty-64:~$ java -jar ~/gp.jar -visa2 -key 47454D5850524553534F53414D504C45 -mode clr --list
+AID: A000000003000000 (|........|)
+     ISD INITIALIZED: Security Domain, Card lock, Card terminate, CVM (PIN) management
+
+AID: A000000308000010000100 (|...........|)
+     App SELECTABLE: Default selected, CVM (PIN) management
+
+AID: A000000308000010000200 (|...........|)
+     App SELECTABLE: CVM (PIN) management
+
+AID: A0000000620001 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000620002 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000620003 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000620101 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A000000062010101 (|....b...|)
+     ExM LOADED: (none)
+
+AID: A0000000620102 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000620201 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A0000000030000 (|.......|)
+     ExM LOADED: (none)
+
+AID: A0000000620202 (|....b..|)
+     ExM LOADED: (none)
+
+AID: A000000018100106 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100201 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100101 (|........|)
+     ExM LOADED: (none)
+     A000000018534441 (|.....SDA|)
+
+AID: A00000015100 (|....Q.|)
+     ExM LOADED: (none)
+
+AID: A000000018100108 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100109 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100401 (|........|)
+     ExM LOADED: (none)
+
+AID: A000000018100402 (|........|)
+     ExM LOADED: (none)
+
+AID: A00000030800001000 (|.........|)
+     ExM LOADED: (none)
+     A000000308000010000100 (|...........|)
+     A000000308000010000200 (|...........|)
+
+rchapman@vagrant-ubuntu-trusty-64:~$
+</pre>
+</p>
+
+<p>
+Download gpshell to obtain the hello world applet, already compiled into a cap file:
+
+<pre>
+rchapman@vagrant-ubuntu-trusty-64:~$ curl -Lo gpshell.tar.gz 'http://downloads.sourceforge.net/project/globalplatform/GPShell/GPShell-1.4.4/gpshell-1.4.4.tar.gz?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fglobalplatform%2Ffiles%2FGPShell%2FGPShell-1.4.4%2F&ts=1455092038&use_mirror=superb-dca2'
+[...]
+
+rchapman@vagrant-ubuntu-trusty-64:~$ tar zxvf gpshell.tar.gz
+[...]
+gpshell-1.4.4/helloworld.cap
+[...]
+</pre>
+</p>
+
+<p>
+Install the hello world applet:
+
+<pre>
+rchapman@vagrant-ubuntu-trusty-64:~$ java -jar ~/gp.jar -visa2 -key 47454D5850524553534F53414D504C45 -mode clr --install gpshell-1.4.4/helloworld.cap
+CAP loaded
+</pre>
+</p>
+
+<p>
+List applets again to find AID (applet ID) of hello world.  It should be D0D1D2D3D4D501.
+
+<pre>
+rchapman@vagrant-ubuntu-trusty-64:~$ java -jar ~/gp.jar -visa2 -key 47454D5850524553534F53414D504C45 -mode clr --list | grep -A 4 'AID: D0D1D2D3D4D501 '
+AID: D0D1D2D3D4D501 (|.......|)
+     ExM LOADED: (none)
+     D0D1D2D3D4D50101 (|........|)
+</pre>
+</p>
+
+<p>
+Run the applet on the card by selecting the AID D0D1D2D3D4D501, then send any valid APDU (doesn't matter what it is, the app will always return "Hello World!")
+
+<pre>
+rchapman@vagrant-ubuntu-trusty-64:~$ opensc-tool -s "00 A4 04 00 07 D0 D1 D2 D3 D4 D5 01" -s "00:CB:3F:FF:05:5C:03:5F:C1:02:00"
+Using reader with a card: Gemalto Prox-DU [Prox-DU HID_15100775] 00 01
+Sending: 00 A4 04 00 07 D0 D1 D2 D3 D4 D5 01
+Received (SW1=0x90, SW2=0x00)
+Sending: 00 CB 3F FF 05 5C 03 5F C1 02 00
+Received (SW1=0x90, SW2=0x00):
+48 65 6C 6C 6F 20 57 6F 72 6C 64 21 Hello World!
+</pre>
+</p>
+
+<p>
+If you want to uninstall the applet from the card, run:
+
+<pre>
+rchapman@vagrant-ubuntu-trusty-64:~$ java -jar ~/gp.jar -visa2 -key 47454D5850524553534F53414D504C45 -mode clr --delete D0D1D2D3D4D501 --deletedeps
+rchapman@vagrant-ubuntu-trusty-64:~$
+</pre>
+</p>
+
+
+</div>
+
+
+        <footer class="post-footer clearfix">
+    
+
+    <div class="share">
+        <a class="icon-twitter" href="http://twitter.com/share?text=Smart%20card%3a%20installing%20Hello%20World%20on%20a%20Gemalto%20IDPrime%20PIV%202.0%20card&url=http%3a%2f%2fblog.rchapman.org%2fposts%2fSmart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2%2f"
+            onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <i class="fa fa-twitter"></i>
+            <span class="hidden">Twitter</span>
+        </a>
+
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.rchapman.org%2fposts%2fSmart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2%2f"
+            onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+            <i class="fa fa-facebook"></i>
+            <span class="hidden">Facebook</span>
+        </a>
+
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.rchapman.org%2fposts%2fSmart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2%2f"
+           onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+           <i class="fa fa-google-plus"></i>
+            <span class="hidden">Google+</span>
+        </a>
+    </div>
+</footer>
+
+            <div class="comments">
+        <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'blog-rchapman-org';
+    var disqus_identifier = 'http:\/\/blog.rchapman.org\/posts\/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2\/';
+    var disqus_title = 'Smart card: installing Hello World on a Gemalto IDPrime PIV 2.0 card';
+    var disqus_url = 'http:\/\/blog.rchapman.org\/posts\/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+
+    </article>
+</div>
+
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="site-title-wrapper">
+                    <h1 class="site-title">
+                        <a title="Ryan A. Chapman" href="http://blog.rchapman.org/">Ryan A. Chapman</a>
+                    </h1>
+                    <a class="button-square button-jump-top js-jump-top" href="#">
+                        <i class="fa fa-angle-up"></i>
+                    </a>
+                </div>
+
+                <p class="footer-copyright">
+                    <span>&copy; 2016 / Powered by <a href="http://gohugo.io/">Hugo</a> / <a href="https://github.com/ryanchapman/blog.rchapman.org">Blog source</a></span>
+                </p>
+                <p class="footer-copyright">
+                    <span><a href="https://github.com/roryg/ghostwriter">Ghostwriter theme</a> By <a href="http://jollygoodthemes.com">JollyGoodThemes</a></span>
+                    <span>/ <a href="https://github.com/jbub/ghostwriter">Ported</a> to Hugo By <a href="https://github.com/jbub">jbub</a></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="http://blog.rchapman.org/js/jquery-1.11.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.5/highlight.min.js"></script>
+        <script src="http://blog.rchapman.org/js/jquery.fitvids.js"></script>
+        <script src="http://blog.rchapman.org/js/scripts.js"></script>
+    </body>
+</html>
+

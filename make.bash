@@ -76,12 +76,23 @@ function deploy
     run git subtree push --prefix=public git@github.com:ryanchapman/blog.rchapman.org.git gh-pages
 }
 
+function usage
+{
+    echo "usage: $(basename $0) <command> [arguments]"
+    echo
+    echo "Commands:"
+    echo
+    echo "    deploy          Deploy site to github pages"
+    echo "    local           Start local webserver for development"
+    echo
+}
+
 #################################
 # main
 #################################
 
 function main () {
-    func_to_exec=${1}
+    func_to_exec=${1:-usage}
     type ${func_to_exec} 2>&1 | grep -q 'function' >&/dev/null || {
         logit "$(basename $0): ERROR: function '${func_to_exec}' not found."
         exit 1
