@@ -106,6 +106,15 @@ ga('send', 'pageview');
 <h2>Private Key</h2>
 
 <p>
+Below, for the touch-policy, you can choose always, cached, or never.  Setting it to always will require you to touch the YubiKey
+every time a nonce needs to be signed (every SSH connection for example).  The entry of your PIN is still required unless you set --pin-policy to never.
+The cached touch-policy will cause the YubiKey to require you to touch it when a nonce needs to be signed, but it won't ask you to touch again for 15 seconds.
+Never will of course never require you to touch the YubiKey.  The recommended setting for touch-policy is always or cached.
+If you choose never, then rogue programs can steal your PIN by watching keypresses as you enter it.  Setting it to cached or 
+always prevents this type of attack.
+
+If you are using a YubiKey NEO, then remove the --touch-policy option.  The NEO does not support it yet.  Only
+the YubiKey 4 and YubiKey 4 nano support --touch-policy as of this writing (December 2016).
 <pre>
 rchapman@Macbook:~$ cd /Volumes/encrypted/
 rchapman@Macbook:/Volumes/encrypted$ openssl rsa -in ~/.ssh/id_rsa -out id_rsa.pem -outform pem
@@ -115,7 +124,7 @@ writing RSA key
 rchapman@Macbook:/Volumes/encrypted$ head -1 id_rsa.pem
 -----BEGIN RSA PRIVATE KEY-----
 
-rchapman@Macbook:/Volumes/encrypted$ yubico-piv-tool -a import-key -s 9a -i id_rsa.pem
+rchapman@Macbook:/Volumes/encrypted$ yubico-piv-tool -a import-key --touch-policy cached -s 9a -i id_rsa.pem
 Successfully imported a new private key.
 
 rchapman@Macbook:/Volumes/encrypted$ rm id_rsa.pem
@@ -183,7 +192,9 @@ rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a change-pin --pin 123456 --new-pin=9
 rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a change-puk --pin 12345678 --new-pin=98761234
 </pre>
 
-<p>Change the management key<br/>
+<h2>Change the Management Key</h2>
+
+<p>
 Most security professionals would say you should change the management key as well.  This is a 24 byte key which resides in slot 9B.  If you forget it, you can still reset the PIV applet, which will reset the PIN, PUK, and 9B key back to defaults.
 <br/>
 <pre>
@@ -192,6 +203,13 @@ rchapman@Macbook:~$ ~/bin/yubico-piv-tool -a set-mgm-key -n 12345678901234567890
 Logout and log back in, then make sure the PIN, PUK and management key are not in ~/.bash_history
 </p>
 
+
+<h2>Require Touching the YubiKey for Signing</h2>
+<p>
+Requiring the YubiKey to be touched before it will sign a nonce improves security as it prevents a program from caching the PIN and re-presenting it. An example of a program that does this is OpenVPN with PKCS11 turned on.
+<br/>
+
+</p>
 
 <h2>Key Escrow</h2>
 
