@@ -1,6 +1,6 @@
 ---
 redirect_from: 
-  - /post/4921771133/how-to-connect-or-disconnect-a-pptp-vpn-session
+  - /post/16690892045/create-eager-zero-hard-disks-from-powercli-powershell
 ---
 
 <!DOCTYPE html>
@@ -8,7 +8,7 @@ redirect_from:
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>How to connect or disconnect a PPTP VPN session from the command line (terminal) &middot; Ryan A. Chapman</title>
+        <title>Create eager zero hard disks from PowerCLI (PowerShell) &middot; Ryan A. Chapman</title>
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
@@ -87,9 +87,9 @@ ga('send', 'pageview');
 <div class="container">
     <article class="post-container">
         <header class="post-header">
-    <h1 class="post-title">How to connect or disconnect a PPTP VPN session from the command line (terminal)</h1>
+    <h1 class="post-title">Create eager zero hard disks from PowerCLI (PowerShell)</h1>
     
-    Published Sun, Jan 20, 2008<br/>
+    Published Sun, Jan 29, 2012<br/>
     
 
 </header>
@@ -98,8 +98,18 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <i>Mac OS X 10.5.1</i><br /><br />Below is how to establish a PPTP VPN session from the command line in OS X.  Note you must first set up the VPN connection in System Preferences-&gt;Network.  I use this to connect to a Cisco 827H router running IOS.  If there is any interest, I'll post instructions on how to setup an IOS router for PPTP or IPSEC VPN connections (your choice, but the IPSEC requires the Cisco VPN Client for Mac).<br /><br />I'm saving everything to ~/bin in the example below.  Make modifications as you see fit.<br /><ol><br /><li>Open Script Editor and paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  if exists VPNservice then connect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.scpt<br /><br /><br /></li><li>In Script Editor, File-&gt;New, then paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  set isConnected to connected of current configuration of VPNservice<br />  if isConnected then disconnect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.scpt<br /><br /><br /></li><li>Open your favorite text editor, such as vi, and paste the following shell script:<br /><pre><br />#!/bin/sh -<br />osascript pptp_connect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.sh<br /><br /><br /></li><li>Paste the following shell script in a new text editor window:<br /><pre><br />#!/bin/sh -<br />osascript pptp_disconnect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.sh<br /><br /><br /></li><li>Execute the following command to make the scripts executable by everyone:<br /><pre><br />chmod +x ~/bin/pptp_*.sh<br /></pre><br /><br />Now in your terminal, you can execute <tt>~/bin/pptp_connect.sh</tt> or <tt>~/bin/pptp_disconnect.sh</tt> to establish or tear down your PPTP connection.<br /><br />This works with L2TP VPN connections also.  Where you see "VPN (PPTP)" simply change it to "VPN (L2TP)".<br /></li></ol><div class="blogger-post-footer">&nbsp;</div>
-
+    <p><em><em>Microsoft PowerShell 2.0, </em>VMware PowerCLI  5.0.0.3501, VMware ESXi 4.1.0</em></p>
+<p><strong>New-EagerZeroHardDisk</strong> is a PowerShell function I wrote to create hard disks that are eagerly scrubbed, meaning that ESX will create the hard disk in Thick format and then write zeroes to the disk.  The ESX SDK refers to this as eagerlyScrub, while other documents refer to the process as eagerzero.</p>
+<p>Zeroing disks at creation time <em>should</em> create a vmdk in a contiguous region on the physical hard disks, preventing fragmentation and seek times versus a hard disk that is thin.  <strike>I say <em>should</em>, but I'm not sure if this is true.  If you have knowledge on this, please leave a message in the comments.</strike> Update: according to a <a href="http://www.ntpro.nl/blog/archives/2233-Mythbusting-goes-virtual-Dutch-VMUG-2012.html">presentation given by Eric Sloof and Mattias Sundling on ntpro.nl</a>, eager zeroed disks have (slides 41-43) 651% faster throughput and 4.5x faster seeks than lazy zeroed disks.  Compared to thin provisioned disks, eagered zero disks have 632% faster throughput and 4.8x faster seeks.</p>
+<p>The function is available on github:</p>
+<p><a href="https://github.com/ryanchapman/vmware_scripts">https://github.com/ryanchapman/vmware_scripts</a></p>
+<p>git clone git@github.com:ryanchapman/vmware_scripts.git</p>
+<p>Once you clone the git repository, source the script in PowerShell with:</p>
+<pre>PS C:\TEMP\vmware_scripts&gt; . .\New-EagerZeroDisk.ps1</pre>
+<p>Documentation on the function can be had by using the help command:</p>
+<pre>PS C:\TEMP\vmware_scripts&gt; help New-EagerZeroHardDisk -Full</pre>
+<p> </p>
+<a href="http://farm8.staticflickr.com/7034/6781425441_c7ff4eab42_b.jpg"><img src="http://farm8.staticflickr.com/7034/6781425441_c7ff4eab42.jpg"></a>
 
 
 </div>
@@ -109,19 +119,19 @@ ga('send', 'pageview');
     
 
     <div class="share">
-        <a class="icon-twitter" href="http://twitter.com/share?text=How%20to%20connect%20or%20disconnect%20a%20PPTP%20VPN%20session%20from%20the%20command%20line%20%28terminal%29&url=http%3a%2f%2fblog.rchapman.org%2fposts%2fhow_to_connect_or_disconnect_a_pptp_vpn_session_from_the_command_line%2f"
+        <a class="icon-twitter" href="http://twitter.com/share?text=Create%20eager%20zero%20hard%20disks%20from%20PowerCLI%20%28PowerShell%29&url=http%3a%2f%2fblog.rchapman.org%2fposts%2fcreate_eager_zero_hard_disks_from_powercli_powershell%2f"
             onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
             <i class="fa fa-twitter"></i>
             <span class="hidden">Twitter</span>
         </a>
 
-        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.rchapman.org%2fposts%2fhow_to_connect_or_disconnect_a_pptp_vpn_session_from_the_command_line%2f"
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.rchapman.org%2fposts%2fcreate_eager_zero_hard_disks_from_powercli_powershell%2f"
             onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
             <i class="fa fa-facebook"></i>
             <span class="hidden">Facebook</span>
         </a>
 
-        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.rchapman.org%2fposts%2fhow_to_connect_or_disconnect_a_pptp_vpn_session_from_the_command_line%2f"
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.rchapman.org%2fposts%2fcreate_eager_zero_hard_disks_from_powercli_powershell%2f"
            onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
            <i class="fa fa-google-plus"></i>
             <span class="hidden">Google+</span>
