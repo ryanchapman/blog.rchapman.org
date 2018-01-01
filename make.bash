@@ -65,14 +65,14 @@ function deploy
     fi
     run git status
     run git push origin master
-    logit "Checking if we need to delete remote gh-pages branch"
-    run git branch -r | grep gh-pages >/dev/null 
-    if [[ $? == 0 ]]; then
-        logit "Checking if we need to delete remote gh-pages branch: yes"
+    #logit "Checking if we need to delete remote gh-pages branch"
+    #run git branch -r | grep gh-pages >/dev/null 
+    #if [[ $? == 0 ]]; then
+    #    logit "Checking if we need to delete remote gh-pages branch: yes"
         run git push origin --delete gh-pages
-    else
-        logit "Checking if we need to delete remote gh-pages branch: no"
-    fi
+    #else
+    #    logit "Checking if we need to delete remote gh-pages branch: no"
+    #fi
     run git subtree push --prefix=public git@github.com:ryanchapman/blog.rchapman.org.git gh-pages
 }
 
