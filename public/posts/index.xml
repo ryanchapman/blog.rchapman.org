@@ -14,203 +14,203 @@
     
     <item>
       <title>Import an existing ssh key into YubiKey NEO PIV applet</title>
-      <link>http://blog.rchapman.org/posts/import_an_existing_ssh_key_into_yubikey_neo_applet/</link>
+      <link>http://blog.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</link>
       <pubDate>Wed, 22 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/import_an_existing_ssh_key_into_yubikey_neo_applet/</guid>
+      <guid>http://blog.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</guid>
       <description>yubico-piv-tool 1.4.0, Mac OS X 10.11.5
 While you should generate your ssh keys on card or generate them on a sterile machine for escrow, you can also import an existing ssh key (usually found in ~/.ssh/id_rsa). Below is a walkthrough on how to do that. Be sure to import both the private and public side of your keypair; otherwise, ssh auth might not work. You should probably create an encrypted disk and chdir to that disk when changing the private key to pem form.</description>
     </item>
     
     <item>
       <title>SSH with Yubikey NEO</title>
-      <link>http://blog.rchapman.org/posts/ssh_with_yubikey_neo/</link>
+      <link>http://blog.rchapman.org/posts/SSH_with_Yubikey_NEO/</link>
       <pubDate>Wed, 22 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/ssh_with_yubikey_neo/</guid>
+      <guid>http://blog.rchapman.org/posts/SSH_with_Yubikey_NEO/</guid>
       <description>YubiKey NEO, openssh 6.9, Mac OS X 10.11.5
 Using a YubiKey NEO to store your ssh private key  Install opensc using brew or downloading a .dmg file from GitHub at https://github.com/OpenSC/OpenSC/releases Find where the opensc-pkcs11 library is located. Linux tends to name the file opensc-pkcs11.so. Mac installs using brew also name the library file opensc-pkcs11.so. Another possibility on Mac is opensc-pkcs11.dylib.  $ find /Library /usr/local/Cellar /lib /lib64 /usr/lib /usr/lib64 -name opensc-pkcs11.</description>
     </item>
     
     <item>
       <title>Yubikey NEO for Physical Access Control</title>
-      <link>http://blog.rchapman.org/posts/yubikey_neo_for_physical_access_control/</link>
+      <link>http://blog.rchapman.org/posts/Yubikey_NEO_for_Physical_Access_Control/</link>
       <pubDate>Wed, 15 Jun 2016 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/yubikey_neo_for_physical_access_control/</guid>
+      <guid>http://blog.rchapman.org/posts/Yubikey_NEO_for_Physical_Access_Control/</guid>
       <description>After discovering that many physical access control systems are not secure (for example, proximity cards based on 125kHz), I wanted to figure out if there was a system based on public key crypto, which would be secure. Turns out there is. The U.S. Government has been using physical access control systems based on public key crypto for years. NIST designed the system and called it PIV for Personal Identity Verification.</description>
     </item>
     
     <item>
       <title>Smart card: installing Hello World on a Gemalto IDPrime PIV 2.0 card</title>
-      <link>http://blog.rchapman.org/posts/smart_card_installing_hello_world_on_a_gemalto_idprime_piv_2.0_card/</link>
+      <link>http://blog.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</link>
       <pubDate>Wed, 10 Feb 2016 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/smart_card_installing_hello_world_on_a_gemalto_idprime_piv_2.0_card/</guid>
+      <guid>http://blog.rchapman.org/posts/Smart_card_installing_Hello_World_on_a_Gemalto_IDPrime_PIV_2.0_card/</guid>
       <description>GlobalPlatformPro, Gemalto IDPrime PIV 2.0 card, Gemalto IDBridge CL3000 Dual Interface Smart Card Reader, Ubuntu 14.4
  Information on how to load your own applets onto a Gemalto PIV card are hard to come by, so below is a quick write up of how to do it. This also gets you GlobalPlatform access to the card, which is difficult to figure out due to little documentation available on the key diversification used.</description>
     </item>
     
     <item>
       <title>Vagrant: show port forwarding for all virtual machines</title>
-      <link>http://blog.rchapman.org/posts/vagrant_show_port_forwarding_for_all_virtual_machines/</link>
+      <link>http://blog.rchapman.org/posts/Vagrant_show_port_forwarding_for_all_virtual_machines/</link>
       <pubDate>Sat, 05 Dec 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/vagrant_show_port_forwarding_for_all_virtual_machines/</guid>
+      <guid>http://blog.rchapman.org/posts/Vagrant_show_port_forwarding_for_all_virtual_machines/</guid>
       <description>Mac OS X 10.10.5, vagrant 1.7.4
  To get a list of all ports forwarded to vagrant virtual machines, use this one liner:   For example,  rchapman@Chapmans-Macbook-Pro:~$ VB=/Applications/VirtualBox.app/Contents/Resources/VirtualBoxVM.app/Contents/MacOS/VBoxManage; for vm in $($VB list vms | awk &#39;{print $1}&#39; | tr -d &#39;&#34;&#39;); do $VB showvminfo $vm 2&amp;1 | grep &#39;State:.*running&#39; &amp;/dev/null || continue; perl -e &#39;print &#34;=&#34; x 80 . &#34;\n&#34;&#39;; echo $vm; $VB showvminfo $vm 2&amp;1 | egrep &#39;^(Name|Guest OS|UUID|Config file|Memory size|Number of CPUs):|NIC.</description>
     </item>
     
     <item>
       <title>Securely allowing rancid to back up IOS configs</title>
-      <link>http://blog.rchapman.org/posts/securely_allowing_rancid_to_back_up_ios_configs/</link>
+      <link>http://blog.rchapman.org/posts/Securely_allowing_rancid_to_back_up_IOS_configs/</link>
       <pubDate>Wed, 25 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/securely_allowing_rancid_to_back_up_ios_configs/</guid>
+      <guid>http://blog.rchapman.org/posts/Securely_allowing_rancid_to_back_up_IOS_configs/</guid>
       <description>Cisco IOS-XE 3.7, rancid-git 2.3.9 on Ubuntu 14.4, git 1.9.1
  I use rancid to back up configs of network devices, but giving an automated process like rancid full access to switches, routers, and firewalls is a horrible idea. If someone breaks into the Linux rancid account (or wherever the rancid program runs), they pretty much own your network because the rancid scripts either have the password or ssh private key for logging into network devices.</description>
     </item>
     
     <item>
       <title>Loading an openssh pubkey on Cisco IOS</title>
-      <link>http://blog.rchapman.org/posts/loading_an_openssh_pubkey_on_cisco_ios/</link>
+      <link>http://blog.rchapman.org/posts/Loading_an_openssh_pubkey_on_Cisco_IOS/</link>
       <pubDate>Sun, 22 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/loading_an_openssh_pubkey_on_cisco_ios/</guid>
+      <guid>http://blog.rchapman.org/posts/Loading_an_openssh_pubkey_on_Cisco_IOS/</guid>
       <description>Mac OS X 10.10.5, Cisco IOS-XE 3.7, JunOS 12.3R6.6
  I work primarily on a Mac and want to be able to ssh to Cisco IOS equipment with ssh keys; however, Cisco does not make it easy to load keys. On JunOS, this is as easy as:  Ryans-MacBook-Pro:~ $ ssh 1.2.3.4 -l rac --- JUNOS 12.3R6.6 built 2014-03-13 06:57:48 UTC {master:0} rac configure Entering configuration mode {master:0}[edit] rac# edit system login {master:0}[edit system login] rchapman# set user test class read-only authentication ssh-rsa &#34;</description>
     </item>
     
     <item>
       <title>ASA: DAP LUA function list</title>
-      <link>http://blog.rchapman.org/posts/asa_dap_lua_function_list/</link>
+      <link>http://blog.rchapman.org/posts/ASA_DAP_Lua_function_list/</link>
       <pubDate>Sat, 07 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/asa_dap_lua_function_list/</guid>
+      <guid>http://blog.rchapman.org/posts/ASA_DAP_Lua_function_list/</guid>
       <description>ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS
  On the internets, I haven&#39;t been able to locate a list of Lua functions available for use with Dynamic Access Policies (DAP) on Cisco&#39;s ASA firewall. So I decided to just use Lua running on the ASA to tell me what functions and variables are in global scope. Not quite as good as documentation, but it works for now.  To set it up it, open ASDM and  Go to Configuration  Remote Access VPN  Dynamic Access Policies Add Policy Name: list_globals Description: prints a list of Lua globals to the ASA CLI ACL Priority: 50 (or whatever priority you want to assign) User had ALL of the following AAA Attribute values.</description>
     </item>
     
     <item>
       <title>ASA: debugging AnyConnect and radius</title>
-      <link>http://blog.rchapman.org/posts/asa_debugging_anyconnect_and_radius/</link>
+      <link>http://blog.rchapman.org/posts/ASA_debugging_AnyConnect_and_radius/</link>
       <pubDate>Sun, 01 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/asa_debugging_anyconnect_and_radius/</guid>
+      <guid>http://blog.rchapman.org/posts/ASA_debugging_AnyConnect_and_radius/</guid>
       <description>Ubuntu 14.04 (Linux 3.13.0-48), freeradius 2.1.12, ASA 9.4.2 (which runs Lua 5.0.2), AnyConnect 4.2
 Setting up communications between an ASA and a radius server can be tricky, because it&#39;s hard to know what attributes the radius server is sending back and are being applied to a user session. One method is to use wireshark to capture the communications between the ASA and radius server. Another is to enable debugging on the ASA with debug dap trace.</description>
     </item>
     
     <item>
       <title>ASA: Deny IP due to Land Attack from a.b.c.d to a.b.c.d</title>
-      <link>http://blog.rchapman.org/posts/asa_deny_ip_due_to_land_attack_from_a_b_c_d_to_a_b_c_d/</link>
+      <link>http://blog.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</link>
       <pubDate>Wed, 28 Oct 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/asa_deny_ip_due_to_land_attack_from_a_b_c_d_to_a_b_c_d/</guid>
+      <guid>http://blog.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</guid>
       <description>ASA 5516-X in HA pair, ASA 9.5(1)
 On an ASA I help manage, the logs were full of messages like &amp;ldquo;Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4&amp;rdquo;. A Land attack is defined as when a packet is received that has the same source and destination IP addresses. Some definitions also say that the source and destination ports will match, but that was not true in my case.</description>
     </item>
     
     <item>
       <title>Getting shell on a RouterBoard</title>
-      <link>http://blog.rchapman.org/posts/getting_shell_on_a_routerboard/</link>
+      <link>http://blog.rchapman.org/posts/Getting_shell_on_a_RouterBoard/</link>
       <pubDate>Tue, 08 Sep 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/getting_shell_on_a_routerboard/</guid>
+      <guid>http://blog.rchapman.org/posts/Getting_shell_on_a_RouterBoard/</guid>
       <description>Cloud Router Switch CRS125-24G-1S-RM, RouterOS 6.24, Mac OS X 10.8.5 (dhcpd/tftp running on Mac)
 Ever wondered if you could get a real shell on a RouterBoard? The answer is yes, yes you can. I recently wanted to know how RouterOS on a Mikrotik CRS125-24G-1S-RM actually sets up VLANs internally so that I can duplicate a complicated set up that I already have on a Ubiquiti EdgeRouter. Below is how to get a busybox shell via ssh or the console.</description>
     </item>
     
     <item>
       <title>Troubleshooting EAP-TLS with freeradius</title>
-      <link>http://blog.rchapman.org/posts/troubleshooting_eap-tls_with_freeradius/</link>
+      <link>http://blog.rchapman.org/posts/Troubleshooting_EAP-TLS_with_freeradius/</link>
       <pubDate>Thu, 02 Jul 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/troubleshooting_eap-tls_with_freeradius/</guid>
+      <guid>http://blog.rchapman.org/posts/Troubleshooting_EAP-TLS_with_freeradius/</guid>
       <description>Ubuntu 14.04 (Linux 3.13.0-53), freeradius 2.1.12, wpa_supplicant 2.4, 
 I&#39;m in the process of setting up wifi to use one of the more secure authentication methods, EAP-TLS (well, more secure than WPA-PSK or WPA2-PSK). WPA-Enterprise with 802.1x using EAP-TLS uses the same mechanism that protects web sites, TLS. Anyway, I followed the great instructions Thomas Hruska put together at http://cubicspot.blogspot.com/2013/04/setting-up-wpa2-enterprise-aes-with.html but it wouldn&#39;t work. After figuring out the problem, I set out to document here the troubleshooting steps.</description>
     </item>
     
     <item>
       <title>Who changed the permissions on that file?</title>
-      <link>http://blog.rchapman.org/posts/who_changed_the_permissions_on_that_file/</link>
+      <link>http://blog.rchapman.org/posts/Who_changed_the_permissions_on_that_file/</link>
       <pubDate>Sat, 22 Nov 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/who_changed_the_permissions_on_that_file/</guid>
+      <guid>http://blog.rchapman.org/posts/Who_changed_the_permissions_on_that_file/</guid>
       <description>Linux 3.8.13  Sometimes you have a situation where someone or something is changing the permissions on a file and you need to know who or what process is doing it. Below is one method which uses the Linux audit mechanism, which has been around since 2.6.   [root@web01 /home/ryan]# /etc/init.d/auditd start [root@web01 /home/ryan]# auditctl -a exit,always -S fchmodat -S chmod -S fchmod WARNING - 32/64 bit syscall mismatch, you should specify an arch [root@web01 /home/ryan]# auditctl -w /home/ryan/timmy3 -p a [root@web01 /home/ryan]# auditctl -l -a always,exit -S chmod,fchmod,fchmodat -w /home/ryan/timmy3 -p a [root@web01 /home/ryan]# chmod 111 timmy3 [root@web01 /home/ryan]# less /var/log/audit/audit.</description>
     </item>
     
     <item>
       <title>Eclipse Remote System Explorer fails to connect via ssh with algorithm negotiation failure</title>
-      <link>http://blog.rchapman.org/posts/eclipse_remote_system_explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</link>
+      <link>http://blog.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</link>
       <pubDate>Tue, 08 Apr 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/eclipse_remote_system_explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</guid>
+      <guid>http://blog.rchapman.org/posts/Eclipse_Remote_System_Explorer_fails_to_connect_via_ssh_with_algorithm_negotiation_failure/</guid>
       <description>Windows 7 SP1, Java JRE 1.7.0_51-b13 (32-bit), Eclipse Kepler Service Release 2 build 20140224-0627, Eclipse Plugin RSE SSH Services 3.2.100.201305201712 If you use a Java IDE or any other Java program that makes ssh connections to a server that has anything over 128 bit encryption turned on, then you&#39;ll see that it fails with the error:  RSEG1066 Failed to connect sshd on HMSWEBXX01.ZZZ.LAN:22 Algorithm negotiation failed   By default, the Java Development Kit and Java Runtime Environment do not offer ciphers larger than 128 bits.</description>
     </item>
     
     <item>
       <title>Wireshark tips #1: DNS traffic</title>
-      <link>http://blog.rchapman.org/posts/wireshark_tips_no1_dns_traffic/</link>
+      <link>http://blog.rchapman.org/posts/Wireshark_tips_No1_DNS_traffic/</link>
       <pubDate>Sun, 30 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/wireshark_tips_no1_dns_traffic/</guid>
+      <guid>http://blog.rchapman.org/posts/Wireshark_tips_No1_DNS_traffic/</guid>
       <description>TShark 1.2.15, Oracle Enterprise Linux 6.5
  As part of a series on Wireshark, this is the first of many tips on using this versatile network tool.  If you run a DNS server, you may want to quickly see what types of queries are coming into the server as well as the response codes. The following query provides:   Number of A (IPv4) queries in the last minute Number of AAAA (IPv6) queries in the last minute Number of CNAME … Number of MX … Number of NS … Number of PTR … Number of SOA … Number of SRV … Number of TXT … Number of AXFR (complete zone transfers) … Number of IXFR (incremental zone transfers) … Number of Successful queries, which are those where the response code was zero (rcode==0) Number of Unsuccessful queries, which are those where the response code was non-zero (rcode!</description>
     </item>
     
     <item>
       <title>Wireshark tips #2: Cisco Discovery Protocol (CDP) and  Link Layer Discovery Protocol (LLDP)</title>
-      <link>http://blog.rchapman.org/posts/wireshark_tips_no2_cisco_discovery_protocol_link_layer_discovery_protocol/</link>
+      <link>http://blog.rchapman.org/posts/Wireshark_tips_No2_Cisco_Discovery_Protocol_Link_Layer_Discovery_Protocol/</link>
       <pubDate>Sun, 30 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/wireshark_tips_no2_cisco_discovery_protocol_link_layer_discovery_protocol/</guid>
+      <guid>http://blog.rchapman.org/posts/Wireshark_tips_No2_Cisco_Discovery_Protocol_Link_Layer_Discovery_Protocol/</guid>
       <description>TShark 1.2.15, Oracle Enterprise Linux 6.5  Ever wondered what switch or router port your server was plugged into? If your server is plugged into a Cisco switch or router, then chances are it is broadcasting Cisco Discovery Protocol packets periodically. Other vendors use LLDP (ethertype 0x88cc). You can use tshark to capture one of these packets on a physical server (CDP does not usually pass through to virtual machines) and determine what port you are plugged into.</description>
     </item>
     
     <item>
       <title>Wireshark tips #3: mysql queries broken down by type (SELECT, INSERT, ...)</title>
-      <link>http://blog.rchapman.org/posts/wireshark_tips_no3_mysql_queries_broken_down_by_type/</link>
+      <link>http://blog.rchapman.org/posts/Wireshark_tips_No3_mysql_queries_broken_down_by_type/</link>
       <pubDate>Sun, 30 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/wireshark_tips_no3_mysql_queries_broken_down_by_type/</guid>
+      <guid>http://blog.rchapman.org/posts/Wireshark_tips_No3_mysql_queries_broken_down_by_type/</guid>
       <description>TShark 1.2.15, Oracle Enterprise Linux 6.5  The query below captures mysql traffic for 10 seconds and then reports:  SELECTs per second during each one second interval INSERTs … UPDATEs … COMMITs … ROLLBACKs … CREATE TABLEs … DESCRIBEs … ALTER TABLEs … TRUNCATE TABLEs … DROP TABLEs … USEs … CREATE DATABASEs … DROP DATABASEs … CREATE INDEXes … DROP INDEXes …  Note that the schema is usually not shown, as it was probably selected at the beginning of the mysql session.</description>
     </item>
     
     <item>
       <title>Wireshark tips #4: do not let tshark fill up your tmp directory</title>
-      <link>http://blog.rchapman.org/posts/wireshark_tips_no4_do_not_let_tshark_fill_up_your_tmp_directory/</link>
+      <link>http://blog.rchapman.org/posts/Wireshark_tips_No4_do_not_let_tshark_fill_up_your_tmp_directory/</link>
       <pubDate>Sun, 30 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/wireshark_tips_no4_do_not_let_tshark_fill_up_your_tmp_directory/</guid>
+      <guid>http://blog.rchapman.org/posts/Wireshark_tips_No4_do_not_let_tshark_fill_up_your_tmp_directory/</guid>
       <description>TShark 1.2.15, Oracle Enterprise Linux 6.5  By default, tshark will write its capture data to the /tmp directory. If you do not have a large /tmp and run tshark for a long period of time, you may find that /tmp gets filled up. To tell tshark to write to a different directory, set the TMPDIR environment variable before starting it.
   env TMPDIR=/scratch/  </description>
     </item>
     
     <item>
       <title>Wireshark tips #5: Decrypting HTTPS</title>
-      <link>http://blog.rchapman.org/posts/wireshark_tips_no5_decrypting_https/</link>
+      <link>http://blog.rchapman.org/posts/Wireshark_tips_No5_Decrypting_HTTPS/</link>
       <pubDate>Sun, 30 Mar 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/wireshark_tips_no5_decrypting_https/</guid>
+      <guid>http://blog.rchapman.org/posts/Wireshark_tips_No5_Decrypting_HTTPS/</guid>
       <description>TShark 1.2.15, Oracle Enterprise Linux 6.5  If you are on a web server that is serving SSL, then you can use tshark on that server to decrypt the traffic off the wire. Copy the RSA private key file that your web service is using to /root/private-rsa.key in PKCS#1 format (PKCS#1 files begin with &#34;-----BEGIN RSA PRIVATE KEY-----&#34;), then run:   tshark -o &#34;ssl.desegment_ssl_records: TRUE&#34; -o &#34;ssl.desegment_ssl_application_data: TRUE&#34; -o &#34;</description>
     </item>
     
     <item>
       <title>OpenVPN IPv6 Tunnel Fails on Windows</title>
-      <link>http://blog.rchapman.org/posts/openvpn_ipv6_tunnel_fails_on_windows/</link>
+      <link>http://blog.rchapman.org/posts/OpenVPN_IPv6_Tunnel_Fails_on_Windows/</link>
       <pubDate>Sun, 25 Aug 2013 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/openvpn_ipv6_tunnel_fails_on_windows/</guid>
+      <guid>http://blog.rchapman.org/posts/OpenVPN_IPv6_Tunnel_Fails_on_Windows/</guid>
       <description>OpenVPN 2.3.2-I003, Windows 7 x86_64 When attempting to establish a IPv6 tunnel on Windows, if you see the following error:  NETSH: C:\Windows\system32\netsh.exe interface ipv6 set address Local Area Connection 2 2402:b300:100:aafc:4000:1234:0:1000 store=active ERROR: netsh command failed: returned error code 1  then you probably do not have IPv6 enabled on your Windows machine. IPv6 is controlled in the registry via the key HKLM\SYSTEM\CurrentControlSet\services\TCPIP6\Parameters\DisabledComponents, the default value of which is 0x10.</description>
     </item>
     
     <item>
       <title>Enabling Google CalDAV for Mozilla Sunbird</title>
-      <link>http://blog.rchapman.org/posts/enabling_google_caldav_for_mozilla_sunbird/</link>
+      <link>http://blog.rchapman.org/posts/Enabling_Google_CalDAV_for_Mozilla_Sunbird/</link>
       <pubDate>Tue, 13 Aug 2013 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/enabling_google_caldav_for_mozilla_sunbird/</guid>
+      <guid>http://blog.rchapman.org/posts/Enabling_Google_CalDAV_for_Mozilla_Sunbird/</guid>
       <description>Tested with: Gmail (or Google Apps), Mac OS X 10.5.4, Mozilla Sunbird 0.8
 Google recently enabled CalDAV access to Google Calendars. It works with Sunbird, but the documentation on doing this is hard to find. So here is how to do it, step by step.
 
@@ -222,10 +222,10 @@ When the &#34;Create a new calendar&#34; dialog box appears, select &#34;</descr
     
     <item>
       <title>Using fstatfs from a 32-bit program on a 64-bit system</title>
-      <link>http://blog.rchapman.org/posts/using_fstatfs_from_a_32-bit_program_on_a_64-bit_system/</link>
+      <link>http://blog.rchapman.org/posts/Using_fstatfs_from_a_32-bit_program_on_a_64-bit_system/</link>
       <pubDate>Sun, 02 Jun 2013 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/using_fstatfs_from_a_32-bit_program_on_a_64-bit_system/</guid>
+      <guid>http://blog.rchapman.org/posts/Using_fstatfs_from_a_32-bit_program_on_a_64-bit_system/</guid>
       <description>CentOS 5.9, Linux 2.6.18-308.24.1.el5.centos.plus, glibc 2.5-107
 Recently at work, Zack Dannar and I ran into an issue on a 64-bit system where a 32-bit process was making a call to fstatfs() which was failing. An strace of the process showed the following:
   ... 01:00:28.335337 fstatfs(3, 0xffccebf0) = -1 EOVERFLOW (Value too large for defined data type) ...   The call was failing with an errno of EOVERFLOW. Odd.</description>
@@ -233,19 +233,19 @@ Recently at work, Zack Dannar and I ran into an issue on a 64-bit system where a
     
     <item>
       <title>Transparently proxying any tcp connection (including http and https without man-in-the-middle)</title>
-      <link>http://blog.rchapman.org/posts/transparently_proxying_any_tcp_connection/</link>
+      <link>http://blog.rchapman.org/posts/Transparently_proxying_any_tcp_connection/</link>
       <pubDate>Sun, 07 Apr 2013 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/transparently_proxying_any_tcp_connection/</guid>
+      <guid>http://blog.rchapman.org/posts/Transparently_proxying_any_tcp_connection/</guid>
       <description>I recently ran into a situation where a proxy server was being installed, but some applications were not proxy aware. To illustrate, this is what the network looked like:  Here we have a web server running proxy unaware applications. The web server does not have routes to the internet; it must use a proxy server to communicate with web sites located on the public internet. The solution is to intercept all HTTP (port 80) and HTTPS (port 443) traffic at the firewall.</description>
     </item>
     
     <item>
       <title>Linux System Call Table for x86 64</title>
-      <link>http://blog.rchapman.org/posts/linux_system_call_table_for_x86_64/</link>
+      <link>http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/</link>
       <pubDate>Thu, 29 Nov 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/linux_system_call_table_for_x86_64/</guid>
+      <guid>http://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/</guid>
       <description>Linux 4.7 (pulled from github.com/torvalds/linux on Jul 20 2016), x86_64
 Note: 64-bit x86 uses syscall instead of interrupt 0x80. The result value will be in %rax
 To find the implementation of a system call, grep the kernel tree for SYSCALL_DEFINE.\?(syscall,
@@ -254,19 +254,19 @@ For example, to find the read system call:  illusion:/usr/src/linux-source-3.19$
     
     <item>
       <title>Configuring BMC or iDRAC from ESXi or Linux</title>
-      <link>http://blog.rchapman.org/posts/configuring_bmc_or_idrac_from_esxi_or_linux/</link>
+      <link>http://blog.rchapman.org/posts/Configuring_BMC_or_iDRAC_from_ESXi_or_Linux/</link>
       <pubDate>Thu, 01 Mar 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/configuring_bmc_or_idrac_from_esxi_or_linux/</guid>
+      <guid>http://blog.rchapman.org/posts/Configuring_BMC_or_iDRAC_from_ESXi_or_Linux/</guid>
       <description>VMware ESX 4.1u1, ipmitool 1.8.11, Dell C2100 with BMC or Dell R710 with Enterprise iDRAC6 ESXi Ever needed to gain access to the iDRAC or BMC in your Dell machine? Recently, I needed remote console (KVM) access to a server. I knew that the BMC that provides console access on a Dell C2100 had been configured, but I didn&#39;t know the IP address. Turns out if you compile ipmitool as a 32-bit binary, then you can copy it over to an ESXi host and get information about the BMC/iDRAC.</description>
     </item>
     
     <item>
       <title>Create eager zero hard disks from PowerCLI (PowerShell)</title>
-      <link>http://blog.rchapman.org/posts/create_eager_zero_hard_disks_from_powercli_powershell/</link>
+      <link>http://blog.rchapman.org/posts/Create_eager_zero_hard_disks_from_PowerCLI_PowerShell/</link>
       <pubDate>Sun, 29 Jan 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/create_eager_zero_hard_disks_from_powercli_powershell/</guid>
+      <guid>http://blog.rchapman.org/posts/Create_eager_zero_hard_disks_from_PowerCLI_PowerShell/</guid>
       <description>Microsoft PowerShell 2.0, VMware PowerCLI 5.0.0.3501, VMware ESXi 4.1.0
 New-EagerZeroHardDisk is a PowerShell function I wrote to create hard disks that are eagerly scrubbed, meaning that ESX will create the hard disk in Thick format and then write zeroes to the disk. The ESX SDK refers to this as eagerlyScrub, while other documents refer to the process as eagerzero.
 Zeroing disks at creation time should create a vmdk in a contiguous region on the physical hard disks, preventing fragmentation and seek times versus a hard disk that is thin.</description>
@@ -274,20 +274,20 @@ Zeroing disks at creation time should create a vmdk in a contiguous region on th
     
     <item>
       <title>PXE booting from one PXE server to another</title>
-      <link>http://blog.rchapman.org/posts/pxe_booting_from_one_pxe_server_to_another/</link>
+      <link>http://blog.rchapman.org/posts/PXE_Booting_From_One_PXE_Server_To_Another/</link>
       <pubDate>Sun, 29 Jan 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/pxe_booting_from_one_pxe_server_to_another/</guid>
+      <guid>http://blog.rchapman.org/posts/PXE_Booting_From_One_PXE_Server_To_Another/</guid>
       <description>Linux 2.6.18, Syslinux 4.02, nasm 2.09
 I&#39;ve spent the past several days trying to figure out how to add a new PXE server to our environment at work. We have a corporate PXE server which I do not have access to, but I can request that a hook be put into place on the main PXE server and build my own. It seems this process is typically called PXE chaining.</description>
     </item>
     
     <item>
       <title>Bypassing snoopy logging</title>
-      <link>http://blog.rchapman.org/posts/bypassing_snoopy_logging/</link>
+      <link>http://blog.rchapman.org/posts/Bypassing_snoopy_logging/</link>
       <pubDate>Fri, 15 Apr 2011 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/bypassing_snoopy_logging/</guid>
+      <guid>http://blog.rchapman.org/posts/Bypassing_snoopy_logging/</guid>
       <description>snoopy v1.8.0, CentOS 5.5 64-bit x86_64 (Linux kernel 2.6.18)
 
 I came across the snoopy logging program today, which is a way for system administrators to log every single program that is executed on a system. While the authors promote it&#39;s use for troubleshooting purposes, some system administrators use it for logging user activity. The snoopy authors advise against this use, because it is easily circumvented. I couldn&#39;t find any articles on the internets on how to circumvent it, so I decided it would be fun to dive in and try to figure it out.</description>
@@ -295,10 +295,10 @@ I came across the snoopy logging program today, which is a way for system admini
     
     <item>
       <title>Screen will only display 8 colors instead of 16</title>
-      <link>http://blog.rchapman.org/posts/screen_will_only_display_8_colors_instead_of_16/</link>
+      <link>http://blog.rchapman.org/posts/Screen_will_only_display_8_colors_instead_of_16/</link>
       <pubDate>Tue, 05 Oct 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/screen_will_only_display_8_colors_instead_of_16/</guid>
+      <guid>http://blog.rchapman.org/posts/Screen_will_only_display_8_colors_instead_of_16/</guid>
       <description>screen, TERM=xterm-256color
 I am using screen and when I changed my terminal type to xterm-256color, with TERM=xterm-256color, I found that when 256color2.pl was run, the system colors palette only showed 8 colors. The bold versions were the same.
 After much searching on the ncurses message boards, I found this little gem:
@@ -308,10 +308,10 @@ Put that in your .screenrc and you should be all set.</description>
     
     <item>
       <title>Getting Line Drawing to Work with putty</title>
-      <link>http://blog.rchapman.org/posts/getting_line_drawing_to_work_with_putty/</link>
+      <link>http://blog.rchapman.org/posts/Getting_Line_Drawing_to_Work_with_putty/</link>
       <pubDate>Thu, 30 Sep 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/getting_line_drawing_to_work_with_putty/</guid>
+      <guid>http://blog.rchapman.org/posts/Getting_Line_Drawing_to_Work_with_putty/</guid>
       <description>putty
 If you are having trouble getting solid lines to draw in your putty session, you may need to change the following:
 
@@ -326,20 +326,20 @@ You may need to also change Handling of line drawing characters: to Use font in 
     
     <item>
       <title>Finding network traffic generated by programs</title>
-      <link>http://blog.rchapman.org/posts/finding_network_traffic_generated_by_programs/</link>
+      <link>http://blog.rchapman.org/posts/Finding_network_traffic_generated_by_programs/</link>
       <pubDate>Wed, 09 Dec 2009 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/finding_network_traffic_generated_by_programs/</guid>
+      <guid>http://blog.rchapman.org/posts/Finding_network_traffic_generated_by_programs/</guid>
       <description>Mac OS X 10.5.4
 Occasionally, I need to see the network traffic by process (program). For example, I want to see what programs are generating network traffic. Some programs, like Google Updater and Microsoft Update, install themselves and run in the background without my knowledge. Or maybe I&#39;m seeing a lot of network traffic when there should be none. I then need to know what process is generating the traffic so I can shut it down.</description>
     </item>
     
     <item>
       <title>Forwarding iPhone to Google Voice Voicemail</title>
-      <link>http://blog.rchapman.org/posts/forwarding_iphone_to_google_voice_voicemail/</link>
+      <link>http://blog.rchapman.org/posts/Forwarding_iPhone_to_Google_Voice_Voicemail/</link>
       <pubDate>Thu, 20 Aug 2009 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/forwarding_iphone_to_google_voice_voicemail/</guid>
+      <guid>http://blog.rchapman.org/posts/Forwarding_iPhone_to_Google_Voice_Voicemail/</guid>
       <description>Google Voice, iPhone or any other GSM phone
 Did you recently sign up for Google Voice, only to find out that when people call your old cell phone number, AT&amp;T&#39;s voicemail system answers the call instead of Google Voice? If so, follow the instructions below to forward your cell calls to Google Voice instead of AT&amp;T voicemail.
 In this example, my Google Voice number is (406) 555-1234 and my cell phone number is (404) 333-1234.</description>
@@ -347,20 +347,20 @@ In this example, my Google Voice number is (406) 555-1234 and my cell phone numb
     
     <item>
       <title>How to enable international mode (extended frequency range 87.9) on Griffin iTrip AutoPilot</title>
-      <link>http://blog.rchapman.org/posts/how_to_enable_international_mode_on_griffin_itrip_autopilot/</link>
+      <link>http://blog.rchapman.org/posts/How_to_enable_international_mode_on_Griffin_iTrip_AutoPilot/</link>
       <pubDate>Thu, 11 Jun 2009 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/how_to_enable_international_mode_on_griffin_itrip_autopilot/</guid>
+      <guid>http://blog.rchapman.org/posts/How_to_enable_international_mode_on_Griffin_iTrip_AutoPilot/</guid>
       <description>iTrip Auto 1034IV1 2.17, Nov 21 2008, 131136
 After buying an iTrip AutoPilot at Best Buy on June 11, 2009, I found that the instructions for enabling international mode had changed from what is described in other forums. The old way was to go to the screen with the Griffin logo, then hold down the middle button until the logo turned upside down. On my model, the way to enable international mode is:</description>
     </item>
     
     <item>
       <title>iPhone AutoCorrect dictionary location</title>
-      <link>http://blog.rchapman.org/posts/iphone_autocorrect_dictionary_location/</link>
+      <link>http://blog.rchapman.org/posts/iPhone_AutoCorrect_Dictionary_Location/</link>
       <pubDate>Fri, 27 Feb 2009 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/iphone_autocorrect_dictionary_location/</guid>
+      <guid>http://blog.rchapman.org/posts/iPhone_AutoCorrect_Dictionary_Location/</guid>
       <description>iPhone 3G 2.2.1
 I&#39;ve been frustrated with the fact that the user cannot edit the autocorrect dictionary on the iPhone, so I looked around today and found the location of the US English database file to be:
 /System/Library/TextInput/TextInput_en.bundle/Unigrams-en_US.dat. There is also an index file with a file suffix of .idx in the same directory.
@@ -369,10 +369,10 @@ I also found that someone has written a Java program called iphoneshop to edit n
     
     <item>
       <title>How to get FieldTest application icon to always show up on the iPhone</title>
-      <link>http://blog.rchapman.org/posts/how_to_get_fieldtest_application_icon_to_always_show_up_on_the_iphone/</link>
+      <link>http://blog.rchapman.org/posts/How_to_get_FieldTest_application_icon_to_always_show_up_on_the_iPhone/</link>
       <pubDate>Fri, 20 Feb 2009 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/how_to_get_fieldtest_application_icon_to_always_show_up_on_the_iphone/</guid>
+      <guid>http://blog.rchapman.org/posts/How_to_get_FieldTest_application_icon_to_always_show_up_on_the_iPhone/</guid>
       <description>Tags: iPhone iPhone 3G 2.2.1, jailbroken
 The preferred way to bring up the FieldTest application on the iPhone is to type *3001#12345# and press Call. My iPhone always responds with the error &#34;Error performing request. Unknown Error.&#34; Here is a way to always have the FieldTest icon always appear on the Springboard.
 
@@ -382,10 +382,10 @@ Become root by typing su [enter].</description>
     
     <item>
       <title>Capture packets on a Mac</title>
-      <link>http://blog.rchapman.org/posts/capture_packets_on_a_mac/</link>
+      <link>http://blog.rchapman.org/posts/Capture_packets_on_a_Mac/</link>
       <pubDate>Tue, 26 Aug 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/capture_packets_on_a_mac/</guid>
+      <guid>http://blog.rchapman.org/posts/Capture_packets_on_a_Mac/</guid>
       <description>Mac OS X 10.5.4
 For some reason, Wireshark keeps crashing X11 on my machine, so it isn&#39;t an option. If you have the same problem, here is how to capture and decode HTTP traffic from the command line, using tcpdump:
 tcpdump -n -i en1 -s 0 -A port 80 and host www.yahoo.com
@@ -396,10 +396,10 @@ Options:
     
     <item>
       <title>Setting Up Gmail To Work With Blackberry (BIS)</title>
-      <link>http://blog.rchapman.org/posts/setting_up_gmail_to_work_with_blackberry/</link>
+      <link>http://blog.rchapman.org/posts/Setting_Up_Gmail_To_Work_With_Blackberry/</link>
       <pubDate>Wed, 13 Aug 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/setting_up_gmail_to_work_with_blackberry/</guid>
+      <guid>http://blog.rchapman.org/posts/Setting_Up_Gmail_To_Work_With_Blackberry/</guid>
       <description>Tested with: Gmail (or Google Apps), Blackberry 8830, Blackberry Internet Service (BIS)
 This does not apply to Blackberry Enterprise Server (BES). If your company has given you a Blackberry and it works with Exchange, Lotus Notes, or Groupwise, then you are operating in BES mode. You&#39;ll need to make sure your cell company has set up BES and BIS on your Blackberry for this to work.
 I&#39;ve used my Blackberry in many different scenarios: with Lotus Notes (BES), Microsoft Exchange (BES), and now I&#39;ve moved to Google Apps, which allows me to receive mail for free at my address nospam@heatery.</description>
@@ -407,29 +407,29 @@ I&#39;ve used my Blackberry in many different scenarios: with Lotus Notes (BES),
     
     <item>
       <title>Syncing your Blackberry&#39;s calendar with your Google calendar</title>
-      <link>http://blog.rchapman.org/posts/syncing_your_blackberrys_calendar_with_your_google_calendar/</link>
+      <link>http://blog.rchapman.org/posts/Syncing_your_Blackberrys_calendar_with_your_Google_Calendar/</link>
       <pubDate>Wed, 13 Aug 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/syncing_your_blackberrys_calendar_with_your_google_calendar/</guid>
+      <guid>http://blog.rchapman.org/posts/Syncing_your_Blackberrys_calendar_with_your_Google_Calendar/</guid>
       <description>Tested with: Gmail (or Google Apps), Blackberry 8830
 Tired of maintaining two or more calendars? Maybe you only keep your calendar on your Blackberry. If so, this tip will backup your calendar to a Gmail (or Google Apps) account. If you use Outlook 2003 or 2007 on your Windows desktop, you could then install Google Sync for Outlook. With both Google Sync for Outlook and Google Sync for Blackberry installed, you can enter something in your Outlook calendar and it will get pushed to your Blackberry in a few minutes.</description>
     </item>
     
     <item>
       <title>Mounting a Linux NFS point on a Mac client</title>
-      <link>http://blog.rchapman.org/posts/mounting_a_linux_nfs_point_on_a_mac_client/</link>
+      <link>http://blog.rchapman.org/posts/Mounting_a_Linux_NFS_point_on_a_Mac_client/</link>
       <pubDate>Thu, 15 May 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/mounting_a_linux_nfs_point_on_a_mac_client/</guid>
+      <guid>http://blog.rchapman.org/posts/Mounting_a_Linux_NFS_point_on_a_Mac_client/</guid>
       <description>Mac OS X 10.5.2, Linux (Debian) kernel 2.6.21.5 Quick tip for anyone trying to connect to a Linux server&#39;s NFS share from a Mac. The Finder provides a way to do this (from the menu bar, Go-&amp;gt;Connect to server, then nfs://&amp;lt;server_name&amp;gt;/&amp;lt;mount_point&amp;gt;). Turns out this may not work if your distribution of Linux requires NFS connections to come from a trusted port. The solution requires you to open a terminal and type:</description>
     </item>
     
     <item>
       <title>Replace the Dock Icon Created by a VMware Fusion Application</title>
-      <link>http://blog.rchapman.org/posts/replace_the_dock_icon_created_by_a_vmware_fusion_application/</link>
+      <link>http://blog.rchapman.org/posts/Replace_the_Dock_Icon_Created_by_a_VMware_Fusion_Application/</link>
       <pubDate>Thu, 17 Apr 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/replace_the_dock_icon_created_by_a_vmware_fusion_application/</guid>
+      <guid>http://blog.rchapman.org/posts/Replace_the_Dock_Icon_Created_by_a_VMware_Fusion_Application/</guid>
       <description>Mac OS X 10.5.2, VMware Fusion Version 1.1 (62573)Update: According to the official VMware blog, changing the permissions is not necessary, so you may be able to skip steps 7-12.
 
 
@@ -439,20 +439,20 @@ Does the above grainy low-resolution icon of a Windows application (Bridge) runn
     
     <item>
       <title>FileMon replacement for Mac</title>
-      <link>http://blog.rchapman.org/posts/filemon_replacement_for_mac/</link>
+      <link>http://blog.rchapman.org/posts/FileMon_replacement_for_Mac/</link>
       <pubDate>Wed, 19 Mar 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/filemon_replacement_for_mac/</guid>
+      <guid>http://blog.rchapman.org/posts/FileMon_replacement_for_Mac/</guid>
       <description>Mac OS X 10.5.2
 Since switching to a Mac in January of 2008, I&#39;ve been looking for a replacement of the Sysinternals tools, especially FileMon. For those who don&#39;t know, FileMon is a program which shows file activity in real-time (file accesses, changes). I found a utility on the Mac that is almost the same: fseventer. The only thing fseventer lacks is the ability to print file accesses--it only prints file/directory changes.</description>
     </item>
     
     <item>
       <title>Getting 1Password to work with Safari 3.1</title>
-      <link>http://blog.rchapman.org/posts/getting_1password_to_work_with_safari_3.1/</link>
+      <link>http://blog.rchapman.org/posts/Getting_1Password_to_work_with_Safari_3.1/</link>
       <pubDate>Tue, 18 Mar 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/getting_1password_to_work_with_safari_3.1/</guid>
+      <guid>http://blog.rchapman.org/posts/Getting_1Password_to_work_with_Safari_3.1/</guid>
       <description>Mac OS X 10.5.2, 1Password 2.5.11 (build 6126), Safari 3.1 (5525.13)
 Update: 1Password has released version 2.5.12 which supports Safari 3.1. Open your 1Password program and check for updates to install.
 
@@ -461,20 +461,20 @@ Apple today updated Safari to version 3.1, which breaks 1Password. I&#39;m sure 
     
     <item>
       <title>How to connect or disconnect a PPTP VPN session from the command line (terminal)</title>
-      <link>http://blog.rchapman.org/posts/how_to_connect_or_disconnect_a_pptp_vpn_session_from_the_command_line/</link>
+      <link>http://blog.rchapman.org/posts/How_To_Connect_or_Disconnect_a_PPTP_VPN_Session_From_the_Command_Line/</link>
       <pubDate>Sun, 20 Jan 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/how_to_connect_or_disconnect_a_pptp_vpn_session_from_the_command_line/</guid>
+      <guid>http://blog.rchapman.org/posts/How_To_Connect_or_Disconnect_a_PPTP_VPN_Session_From_the_Command_Line/</guid>
       <description>Mac OS X 10.5.1
 Below is how to establish a PPTP VPN session from the command line in OS X. Note you must first set up the VPN connection in System Preferences-&amp;gt;Network. I use this to connect to a Cisco 827H router running IOS. If there is any interest, I&#39;ll post instructions on how to setup an IOS router for PPTP or IPSEC VPN connections (your choice, but the IPSEC requires the Cisco VPN Client for Mac).</description>
     </item>
     
     <item>
       <title>Debugging Dialup Modem Connection Issues on Mac OS X</title>
-      <link>http://blog.rchapman.org/posts/debugging_dialup_modem_connection_issues_on_mac_os_x/</link>
+      <link>http://blog.rchapman.org/posts/Debugging_Dialup_Modem_Connection_Issues_on_Mac_OS_X/</link>
       <pubDate>Fri, 18 Jan 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/debugging_dialup_modem_connection_issues_on_mac_os_x/</guid>
+      <guid>http://blog.rchapman.org/posts/Debugging_Dialup_Modem_Connection_Issues_on_Mac_OS_X/</guid>
       <description>Mac OS 10.5.1
 Having troubles establishing a dialup (PPP) connection in Mac OS X and can&#39;t figure out where to find information on why it&#39;s failing? Below I tell you where the log files are kept and how to enable verbose logging.
 Enable Verbose Logging
@@ -486,10 +486,10 @@ Click the network on the left pane which is associated with the dialup connectio
     
     <item>
       <title>How to tether your phone to a Mac using Bluetooth</title>
-      <link>http://blog.rchapman.org/posts/how_to_tether_your_phone_to_a_mac_using_bluetooth/</link>
+      <link>http://blog.rchapman.org/posts/How_To_Tether_Your_Phone_To_a_Mac_Using_Bluetooth/</link>
       <pubDate>Fri, 18 Jan 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/how_to_tether_your_phone_to_a_mac_using_bluetooth/</guid>
+      <guid>http://blog.rchapman.org/posts/How_To_Tether_Your_Phone_To_a_Mac_Using_Bluetooth/</guid>
       <description>Mac OS X 10.5.1, Blackberry 8830 (CDMA)
 Update: This article is now obsolete. According to an email I received from Blutter, RIM has released a Blackberry Desktop Manager which allows easy tethering via USB and Bluetooth.
 
@@ -498,30 +498,30 @@ I have a Blackberry 8830 through Alltel, and wanted to be able to use it to acce
     
     <item>
       <title>How to print to a HP DeskJet 820Cxi (and 820Cse) from a Mac</title>
-      <link>http://blog.rchapman.org/posts/how_to_print_to_a_hp_deskjet_820cxi_and_820cse_from_a_mac/</link>
+      <link>http://blog.rchapman.org/posts/How_To_Print_To_a_HP_DeskJet_820Cxi_and_820Cse_From_a_Mac/</link>
       <pubDate>Wed, 16 Jan 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/how_to_print_to_a_hp_deskjet_820cxi_and_820cse_from_a_mac/</guid>
+      <guid>http://blog.rchapman.org/posts/How_To_Print_To_a_HP_DeskJet_820Cxi_and_820Cse_From_a_Mac/</guid>
       <description>Tested on Mac OS X Leopard 10.5.1 Also works with DeskJet 710C, DeskJet 712C, DeskJet 720C, DeskJet 722C, DeskJet 1000Cse, DeskJet 1000Cxi
 &amp;#13; Update: After using the 820 drivers on my Mac for a week, I found that some documents do not print at all. For this reason, I am now using the method described here to set up a Postscript converter on a Windows computer I have. Now on the Mac I have a printer set up as a HP Color LaserJet 4550 PS, which sends a postscript document to the windows box.</description>
     </item>
     
     <item>
       <title>How to Stream SiriusMac, StarPlayr, or XMac to your Airport Express</title>
-      <link>http://blog.rchapman.org/posts/how_to_stream_siriusmac_starplayr_or_xmac_to_your_airport_express/</link>
+      <link>http://blog.rchapman.org/posts/How_To_Stream_SiriusMac_StarPlayr_or_XMac_To_Your_Airport_Express/</link>
       <pubDate>Fri, 11 Jan 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/how_to_stream_siriusmac_starplayr_or_xmac_to_your_airport_express/</guid>
+      <guid>http://blog.rchapman.org/posts/How_To_Stream_SiriusMac_StarPlayr_or_XMac_To_Your_Airport_Express/</guid>
       <description>Mac only, but Airfoil is available for Windows also.
 Apple&#39;s Airport Express wireless router allows you to stream your iTunes music to your stereo, but what about other programs? I listen to Sirius all day, so I naturally wanted to stream it to my stereo. It required a little research to figure out how to do it, but in the end it just required holding down a key at the right time.</description>
     </item>
     
     <item>
       <title>Inside Story on the Creation of the iPhone</title>
-      <link>http://blog.rchapman.org/posts/inside_story_on_the_creation_of_the_iphone/</link>
+      <link>http://blog.rchapman.org/posts/Inside_Story_on_the_Creation_of_the_iPhone/</link>
       <pubDate>Fri, 11 Jan 2008 00:00:00 +0000</pubDate>
       
-      <guid>http://blog.rchapman.org/posts/inside_story_on_the_creation_of_the_iphone/</guid>
+      <guid>http://blog.rchapman.org/posts/Inside_Story_on_the_Creation_of_the_iPhone/</guid>
       <description>Wired has published a very interesting article on how Steve Jobs and Apple created the iPhone.
 
 While I&#39;m on the subject, Steve Jobs also gave a very good convocation address at Stanford a few years back, which is an excellent read.

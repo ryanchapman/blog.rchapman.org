@@ -5,6 +5,7 @@ languageCode = "en-us"
 copyright = "Ryan A. Chapman"
 googleAnalytics = "XXX"
 disqusShortname = "blog-rchapman-org"
+disablePathToLower = true
 
 [Author]
     name = "Ryan A. Chapman"
