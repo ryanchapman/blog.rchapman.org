@@ -7,10 +7,28 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Ryan A. Chapman</copyright>
-    <lastBuildDate>Wed, 22 Jun 2016 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 01 May 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="http://blog.rchapman.org/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>The Microservices Insanity</title>
+      <link>http://blog.rchapman.org/posts/The_Microservices_Insanity/</link>
+      <pubDate>Wed, 01 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.rchapman.org/posts/The_Microservices_Insanity/</guid>
+      <description> </description>
+    </item>
+    
+    <item>
+      <title>Google Cloud Build Sequential Build Numbers</title>
+      <link>http://blog.rchapman.org/posts/Google_Cloud_Build_Sequential_Build_Numbers/</link>
+      <pubDate>Wed, 12 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://blog.rchapman.org/posts/Google_Cloud_Build_Sequential_Build_Numbers/</guid>
+      <description>Sequential build numbers are useful for communication between humans. It&#39;s much easier to say &#34;build 845 went to production today&#34; versus &#34;cecce6da-3646-41c4-93ce-98069443d3c1 went to production today.&#34; Unfortunately, while Google Cloud Build is a great product, it doesn&#39;t yet have to ability to use seqential build numbers. As of this writing (December 2018), it is using UUIDs instead. Below is a workaround to get sequential build numbers. It uses Google&#39;s Datastore product, which is priced per operation as well as data stored, and supports transactions.</description>
+    </item>
     
     <item>
       <title>Import an existing ssh key into YubiKey NEO PIV applet</title>

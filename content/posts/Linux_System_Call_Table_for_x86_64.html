@@ -91,7 +91,7 @@ The results show that the implementation is in fs/read_write.c and that it takes
 <tr><td>53</td><td>sys_socketpair</td><td>int family</td><td>int type</td><td>int protocol</td><td>int *usockvec</td><td></td><td></td></tr>
 <tr><td>54</td><td>sys_setsockopt</td><td>int fd</td><td>int level</td><td>int optname</td><td>char *optval</td><td>int optlen</td><td></td></tr>
 <tr><td>55</td><td>sys_getsockopt</td><td>int fd</td><td>int level</td><td>int optname</td><td>char *optval</td><td>int *optlen</td><td></td></tr>
-<tr><td>56</td><td>sys_clone</td><td>unsigned long clone_flags</td><td>unsigned long newsp</td><td>void *parent_tid</td><td>void *child_tid</td><td></td><td></td></tr>
+<tr><td>56</td><td>sys_clone</td><td>unsigned long clone_flags</td><td>unsigned long newsp</td><td>void *parent_tid</td><td>void *child_tid</td><td>unsigned int tid</td><td></td></tr>
 <tr><td>57</td><td>sys_fork</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>58</td><td>sys_vfork</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>59</td><td>sys_execve</td><td>const char *filename</td><td>const char *const argv[]</td><td>const char *const envp[]</td><td></td><td></td><td></td></tr>
@@ -365,7 +365,13 @@ int flags</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>326</td><td>copy_file_range</td><td>int fd_in</td><td>loff_t __user *off_in</td><td>int fd_out</td><td>loff_t __user * off_out</td><td>size_t len</td><td>unsigned int flags</td></tr>
 <tr><td>327</td><td>preadv2</td><td>unsigned long fd</td><td>const struct iovec __user *vec</td><td>unsigned long vlen</td><td>unsigned long pos_l</td><td>unsigned long pos_h</td><td>int flags</td></tr>
 <tr><td>328</td><td>pwritev2</td><td>unsigned long fd</td><td>const struct iovec __user *vec</td><td>unsigned long vlen</td><td>unsigned long pos_l</td><td>unsigned long pos_h</td><td>int flags</td></tr>
-
+<tr><td>329</td><td>pkey_mprotect</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>330</td><td>pkey_alloc</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>331</td><td>pkey_free</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>332</td><td>statx</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>333</td><td>io_pgetevents</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>334</td><td>rseq</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>335</td><td>pkey_mprotect</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 
 </table>
 

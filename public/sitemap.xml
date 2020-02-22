@@ -3,6 +3,16 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>http://blog.rchapman.org/posts/The_Microservices_Insanity/</loc>
+    <lastmod>2019-05-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://blog.rchapman.org/posts/Google_Cloud_Build_Sequential_Build_Numbers/</loc>
+    <lastmod>2018-12-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://blog.rchapman.org/posts/Import_an_existing_ssh_key_into_Yubikey_NEO_applet/</loc>
     <lastmod>2016-12-03T00:00:00+00:00</lastmod>
   </url>
@@ -244,13 +254,13 @@
   
   <url>
     <loc>http://blog.rchapman.org/posts/</loc>
-    <lastmod>2016-12-03T00:00:00+00:00</lastmod>
+    <lastmod>2019-05-01T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>http://blog.rchapman.org/</loc>
-    <lastmod>2016-12-03T00:00:00+00:00</lastmod>
+    <lastmod>2019-05-01T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

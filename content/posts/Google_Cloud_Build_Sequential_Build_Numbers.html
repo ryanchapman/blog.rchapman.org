@@ -1,0 +1,21 @@
+---
+title: "Google Cloud Build Sequential Build Numbers"
+date: "2018-12-12"
+categories: 
+    - "Google Cloud Build"
+    - "Sequential Build Numbers"
+    - "Build Numbers"
+    - "GCB"
+    - "CI"
+---
+
+<p>
+  Sequential build numbers are useful for communication between humans.  It's much easier to say "build 845 went to production today" versus "cecce6da-3646-41c4-93ce-98069443d3c1 went to production today."  Unfortunately, while Google Cloud Build is a great product, it doesn't yet have to ability to use seqential build numbers.  As of this writing (December 2018), it is using UUIDs instead.
+</p>
+
+<p>Below is a workaround to get sequential build numbers.  It uses Google's Datastore product, which is priced per operation as well as data stored, and supports transactions.  That makes it cheap (probably less than $1 per month) and safe for this use case.  A program called `build_number` takes your Git repo name as an argument, and will atomically increment a counter in Google Datastore, then print the result to standard output.
+</p>
+
+<h3>Setup</h3>
+
+<p>

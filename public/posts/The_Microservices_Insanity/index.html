@@ -1,14 +1,10 @@
----
-redirect_from: 
-  - /post/132374666129/debugging-asa-and-radius
----
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>ASA: debugging AnyConnect and radius &middot; Ryan A. Chapman</title>
+        <title>The Microservices Insanity &middot; Ryan A. Chapman</title>
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
@@ -87,9 +83,9 @@ ga('send', 'pageview');
 <div class="container">
     <article class="post-container">
         <header class="post-header">
-    <h1 class="post-title">ASA: debugging AnyConnect and radius</h1>
+    <h1 class="post-title">The Microservices Insanity</h1>
     
-    Published Sun, Nov 1, 2015<br/>
+    Published Wed, May 1, 2019<br/>
     
 
 </header>
@@ -98,74 +94,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <p><em>Ubuntu 14.04 (Linux 3.13.0-48), freeradius 2.1.12, ASA 9.4.2 (which runs Lua 5.0.2), AnyConnect 4.2</em><br/><br/></p>
-
-<p>Setting up communications between an ASA and a radius server can be tricky, because it's hard to know what attributes the radius server is sending back and are being applied to a user session.  One method is to use wireshark to capture the communications between the ASA and radius server.  Another is to enable debugging on the ASA with <tt>debug dap trace</tt>. An easier way is to just have the attributes printed out on the end-user device when they log in.</p>
-
-<p>The dynamic access policy feature of the ASA will let you input Lua functions to get this information. Open ASDM and go to
-<ul>
-<li>Configuration</li>
-<li>Remote Access VPN</li>
-<li>Network (Client) Access</li>
-<li>Dynamic Access Policies</li>
-<li>Click Add</li>
-<li>Policy Name: debug</li>
-<li>Priority: 1 (or whatever works in your environment)</li>
-<li>In the Selection Criteria area, click Advanced</li>
-<li>Make sure AND is selected.  In the Logical Expressions box, enter:
-<pre>
-assert(function()
-
-  function print_table(tbl, prefix)
-     if (type(tbl) == "table") then
-       for k,v in pairs(tbl) do
-         if (type(v) == "table") then
-           print_table(v, prefix .. "." .. k)
-         else
-           CheckAndMsg(true, prefix .. "." .. k .. "=\"" .. v .. "\"", "")
-         end
-       end
-     end
-  end
-
-  CheckAndMsg(true, "============", "")
-  CheckAndMsg(true, "DEBUG", "")
-  print_table(aaa, "aaa")
-  print_table(endpoint, "endpoint")
-
-  return true
-
-end)()
-</pre>
-</li>
-<li>Click OK to close the Add Dynamic Access Policy window, then click Apply</li>
-</ul>
+    <p>
 </p>
-
-<p>
-Now, if you log in to AnyConnect on a device, you'll notice that a dropdown message box appears and shows you the values of the AV pairs.
-</p>
-<p>
-<a href="https://farm6.staticflickr.com/5709/22071016164_aeab29f3b8_b.jpg"><img src="https://farm6.staticflickr.com/5709/22071016164_aeab29f3b8.jpg"></a>
-</p>
-
-
-<p>
-You might want to be able to toggle the display of the debug message from a freeradius server.  That will allow you to turn it on when a user calls in and reports problems and you need to know what settings are being applied to their account.
-
-<ul>
-<li>On the freeradius server, change their user record and add <tt>Reply-Message = "debug_print"</tt>.  Note that you could use any attribute you want, but I know that Reply-Message does work.
-<pre>
-test            Cleartext-Password := "test123"
-                Class = "OU=Test_VPN;",
-                Reply-Message = "debug_print"
-</pre>
-<li>Back in ASDM, go to the debug policy you created earlier and change it so that it only fires when <tt>Reply-Message = "debug_print"</tt>
-<a href="https://farm6.staticflickr.com/5655/22074947183_2a499cb747_b.jpg"><img src="https://farm6.staticflickr.com/5655/22074947183_2a499cb747.jpg"></a></li>
-<li>OK and Apply</li>
-</ul>
-</p>
-
 
 </div>
 
@@ -174,19 +104,19 @@ test            Cleartext-Password := "test123"
     
 
     <div class="share">
-        <a class="icon-twitter" href="http://twitter.com/share?text=ASA%3a%20debugging%20AnyConnect%20and%20radius&url=http%3a%2f%2fblog.rchapman.org%2fposts%2fASA_debugging_AnyConnect_and_radius%2f"
+        <a class="icon-twitter" href="http://twitter.com/share?text=The%20Microservices%20Insanity&url=http%3a%2f%2fblog.rchapman.org%2fposts%2fThe_Microservices_Insanity%2f"
             onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
             <i class="fa fa-twitter"></i>
             <span class="hidden">Twitter</span>
         </a>
 
-        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.rchapman.org%2fposts%2fASA_debugging_AnyConnect_and_radius%2f"
+        <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fblog.rchapman.org%2fposts%2fThe_Microservices_Insanity%2f"
             onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
             <i class="fa fa-facebook"></i>
             <span class="hidden">Facebook</span>
         </a>
 
-        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.rchapman.org%2fposts%2fASA_debugging_AnyConnect_and_radius%2f"
+        <a class="icon-google-plus" href="https://plus.google.com/share?url=http%3a%2f%2fblog.rchapman.org%2fposts%2fThe_Microservices_Insanity%2f"
            onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
            <i class="fa fa-google-plus"></i>
             <span class="hidden">Google+</span>
