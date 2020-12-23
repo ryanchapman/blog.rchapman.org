@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <i>Tested with: Gmail (or Google Apps), Mac OS X 10.5.4, Mozilla Sunbird 0.8</i><br /><br />Google recently enabled CalDAV access to Google Calendars.  It works with Sunbird, but the documentation on doing this is hard to find.  So here is how to do it, step by step.<br /><br /><ol><br /><li><a href="http://www.mozilla.org/projects/calendar/sunbird/">Download</a> and install Sunbird on your Mac.<br /><li>Open Sunbird<br /><li>Click File, then "Subscribe to Remote Calendar..."<br /><li>When the "Create a new calendar" dialog box appears, select "On the Network" and click Continue<br /><li>For Format, select "CalDAV" and for Location, enter "https://www.google.com/calendar/dav/YOUR_GOOGLE_EMAIL/events" (without the quotes)<br />For example, assume your Gmail address is johndoe@gmail.com, then your Location would be https://www.google.com/calendar/dav/johndoe@gmail.com/events<br />Let's assume you have Google Apps and your email is bill.jones@jonescorp.com, then your Location would be:<br />https://www.google.com/calendar/dav/bill.jones@jonescorp.com/events<br /><li>Click Continue<br /><li>Next, your are asked to name your calendar.  For mine, I just typed my first name.  You can choose a color for calendar entries here and choose if your want alarms to go off in Sunbird.  Click Continue.<br /><li>Click Done.<br /></ol><br /><br /><br />That's it.  By default, Sunbird will refresh remote calendars every 30 minutes. If you want to change this, go into the Preferences (Command ,)<br /><br />Since Google CalDAV syncing is in beta, you should direct all your questions to <a href="http://groups.google.com/group/google-calendar-help-dataapi">Google Groups - Calendar Help Dataapi</a><div class="blogger-post-footer">&nbsp;</div>
+    
+<i>Tested with: Gmail (or Google Apps), Mac OS X 10.5.4, Mozilla Sunbird 0.8</i><br /><br />Google recently enabled CalDAV access to Google Calendars.  It works with Sunbird, but the documentation on doing this is hard to find.  So here is how to do it, step by step.<br /><br /><ol><br /><li><a href="http://www.mozilla.org/projects/calendar/sunbird/">Download</a> and install Sunbird on your Mac.<br /><li>Open Sunbird<br /><li>Click File, then "Subscribe to Remote Calendar..."<br /><li>When the "Create a new calendar" dialog box appears, select "On the Network" and click Continue<br /><li>For Format, select "CalDAV" and for Location, enter "https://www.google.com/calendar/dav/YOUR_GOOGLE_EMAIL/events" (without the quotes)<br />For example, assume your Gmail address is johndoe@gmail.com, then your Location would be https://www.google.com/calendar/dav/johndoe@gmail.com/events<br />Let's assume you have Google Apps and your email is bill.jones@jonescorp.com, then your Location would be:<br />https://www.google.com/calendar/dav/bill.jones@jonescorp.com/events<br /><li>Click Continue<br /><li>Next, your are asked to name your calendar.  For mine, I just typed my first name.  You can choose a color for calendar entries here and choose if your want alarms to go off in Sunbird.  Click Continue.<br /><li>Click Done.<br /></ol><br /><br /><br />That's it.  By default, Sunbird will refresh remote calendars every 30 minutes. If you want to change this, go into the Preferences (Command ,)<br /><br />Since Google CalDAV syncing is in beta, you should direct all your questions to <a href="http://groups.google.com/group/google-calendar-help-dataapi">Google Groups - Calendar Help Dataapi</a><div class="blogger-post-footer">&nbsp;</div>
 
 
 
@@ -131,7 +135,7 @@ ga('send', 'pageview');
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

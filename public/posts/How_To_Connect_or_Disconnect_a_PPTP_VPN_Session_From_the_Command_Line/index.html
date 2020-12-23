@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <i>Mac OS X 10.5.1</i><br /><br />Below is how to establish a PPTP VPN session from the command line in OS X.  Note you must first set up the VPN connection in System Preferences-&gt;Network.  I use this to connect to a Cisco 827H router running IOS.  If there is any interest, I'll post instructions on how to setup an IOS router for PPTP or IPSEC VPN connections (your choice, but the IPSEC requires the Cisco VPN Client for Mac).<br /><br />I'm saving everything to ~/bin in the example below.  Make modifications as you see fit.<br /><ol><br /><li>Open Script Editor and paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  if exists VPNservice then connect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.scpt<br /><br /><br /></li><li>In Script Editor, File-&gt;New, then paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  set isConnected to connected of current configuration of VPNservice<br />  if isConnected then disconnect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.scpt<br /><br /><br /></li><li>Open your favorite text editor, such as vi, and paste the following shell script:<br /><pre><br />#!/bin/sh -<br />osascript pptp_connect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.sh<br /><br /><br /></li><li>Paste the following shell script in a new text editor window:<br /><pre><br />#!/bin/sh -<br />osascript pptp_disconnect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.sh<br /><br /><br /></li><li>Execute the following command to make the scripts executable by everyone:<br /><pre><br />chmod +x ~/bin/pptp_*.sh<br /></pre><br /><br />Now in your terminal, you can execute <tt>~/bin/pptp_connect.sh</tt> or <tt>~/bin/pptp_disconnect.sh</tt> to establish or tear down your PPTP connection.<br /><br />This works with L2TP VPN connections also.  Where you see "VPN (PPTP)" simply change it to "VPN (L2TP)".<br /></li></ol><div class="blogger-post-footer">&nbsp;</div>
+    
+<i>Mac OS X 10.5.1</i><br /><br />Below is how to establish a PPTP VPN session from the command line in OS X.  Note you must first set up the VPN connection in System Preferences-&gt;Network.  I use this to connect to a Cisco 827H router running IOS.  If there is any interest, I'll post instructions on how to setup an IOS router for PPTP or IPSEC VPN connections (your choice, but the IPSEC requires the Cisco VPN Client for Mac).<br /><br />I'm saving everything to ~/bin in the example below.  Make modifications as you see fit.<br /><ol><br /><li>Open Script Editor and paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  if exists VPNservice then connect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.scpt<br /><br /><br /></li><li>In Script Editor, File-&gt;New, then paste the following script in:<br /><pre><br />tell application "System Events"<br /> tell current location of network preferences<br />  set VPNservice to service "VPN (PPTP)"<br />  set isConnected to connected of current configuration of VPNservice<br />  if isConnected then disconnect VPNservice<br /> end tell<br />end tell<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.scpt<br /><br /><br /></li><li>Open your favorite text editor, such as vi, and paste the following shell script:<br /><pre><br />#!/bin/sh -<br />osascript pptp_connect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_connect.sh<br /><br /><br /></li><li>Paste the following shell script in a new text editor window:<br /><pre><br />#!/bin/sh -<br />osascript pptp_disconnect.scpt<br /></pre><br /></li><li>Save as ~/bin/pptp_disconnect.sh<br /><br /><br /></li><li>Execute the following command to make the scripts executable by everyone:<br /><pre><br />chmod +x ~/bin/pptp_*.sh<br /></pre><br /><br />Now in your terminal, you can execute <tt>~/bin/pptp_connect.sh</tt> or <tt>~/bin/pptp_disconnect.sh</tt> to establish or tear down your PPTP connection.<br /><br />This works with L2TP VPN connections also.  Where you see "VPN (PPTP)" simply change it to "VPN (L2TP)".<br /></li></ol><div class="blogger-post-footer">&nbsp;</div>
 
 
 
@@ -131,7 +135,7 @@ ga('send', 'pageview');
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

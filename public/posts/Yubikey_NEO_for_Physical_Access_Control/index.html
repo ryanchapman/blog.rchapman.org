@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <p>
+    
+<p>
 After discovering that many physical access control systems are not secure (for example, proximity cards based on 125kHz), I wanted to figure out if there was a system based on public key crypto, which would be secure.  Turns out there is.  The U.S. Government has been using physical access control systems based on public key crypto for years.  NIST designed the system and called it PIV for Personal Identity Verification.  Unfortunately, information on this technology is extremely hard to come by.  I started by trying to get info from the PIV card manufacturers, but found they have no interest in speaking to anyone unless they are purchasing a large quantity of cards.  Even though I had $1000 in hand I was willing to spend to get a PIV card software dev kit, my requests went unanswered.
 </p>
 
@@ -162,7 +166,7 @@ Enjoy.  If you have questions or suggestions for improvement, please send me a m
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

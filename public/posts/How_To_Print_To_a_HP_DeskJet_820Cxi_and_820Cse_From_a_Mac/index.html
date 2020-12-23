@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <p><em>Tested on Mac OS X Leopard 10.5.1</em> <em>Also works with DeskJet 710C, DeskJet 712C, DeskJet 720C, DeskJet 722C, DeskJet 1000Cse, DeskJet 1000Cxi</em><br /><br /></p>&#13;
+    
+<p><em>Tested on Mac OS X Leopard 10.5.1</em> <em>Also works with DeskJet 710C, DeskJet 712C, DeskJet 720C, DeskJet 722C, DeskJet 1000Cse, DeskJet 1000Cxi</em><br /><br /></p>&#13;
 <p><strong><em>Update: After using the 820 drivers on my Mac for a week, I found that some documents do not print at all.  For this reason, I am now using the method described <a href="http://mywebpages.comcast.net/heretrythis/hp3100/psemuxp.html">here</a> to set up a Postscript converter on a Windows computer I have.  Now on the Mac I have a printer set up as a HP Color LaserJet 4550 PS, which sends a postscript document to the windows box.  The Windows machine receives it, converts it using Ghostscript, and then prints to the 820Cxi.</em></strong></p>&#13;
 <p><br /><br /></p>&#13;
 <p>I've been trying for weeks to get my Mac to print to an old HP DeskJet 820Cxi that is attached to a Windows box in the next room and today I was successful. Turns out the 820 series uses a protocol called PPA (Printer Performance Architecture), which is proprietary to Hewlett-Packard. I've confirmed that this method also works when the printer is attached to a JetDirect 300X print server.</p>&#13;
@@ -143,7 +147,7 @@ ga('send', 'pageview');
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

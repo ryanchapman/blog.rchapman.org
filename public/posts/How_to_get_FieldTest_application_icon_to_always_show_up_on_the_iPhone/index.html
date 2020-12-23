@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,9 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    Tags: iPhone
+    
+
+Tags: iPhone
 
 <i>iPhone 3G 2.2.1, jailbroken</i><br /><br />The preferred way to bring up the FieldTest application on the iPhone is to type <tt>*3001#12345#</tt> and press <b>Call</b>.  My iPhone always responds with the error "Error performing request. Unknown Error."  Here is a way to always have the FieldTest icon always appear on the Springboard.<br /><br /><ol><br /><li>Bring up a terminal on the iPhone, or ssh into the iPhone.<br /><li>Become root by typing <tt>su</tt> <b>[enter]</b>.  The default password for root is "alpine"<br /><li>Change to the FieldTest.app folder by typing: <tt>cd /Applications/FieldTest.app</tt> <b>[enter]</b><br /><li>Make a backup copy of Info.plist by typing: <tt>cp Info.plist Info.plist-factory</tt><br /><li>Change the Info.plist file to xml format by typing: <tt>plutil -c xml1 Info.plist</tt> <b>[enter]</b><br /><li>Edit Info.plist using vim or nano and delete the following lines:<br /><br><tt>&lt;key&gt;SBAppTags&lt;/key&gt;<br><br />&lt;array&gt;<br><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;string&gt;hidden&lt;/string&gt;<br><br />&lt;/array&gt;<br></tt><br /><li>Change the Info.plist file back to binary format by typing: <tt>plutil -c binary1 Info.plist</tt><br /><li>Restart Springboard by typing: <tt>killall -15 SpringBoard</tt><br /></ol><br /><br /><p>If you find yourself in a bind and want the old Info.plist back, you can restore the factory copy.<br /><ol><br /><li>Bring up a terminal or ssh into the iPhone.<br /><li>Become root by typing <tt>su</tt> <b>[enter]</b><br /><li>Change to the FieldTest.app folder by typing: <tt>cd /Applications/FieldTest.app</tt> <b>[enter]</b><br /><li>Restore the factory Info.plist file by typing: <tt>cp -f Info.plist-factory Info.plist</tt> <b>[enter]</b><br /><li>Restart SpringBoard by typing: <tt>killall -15 SpringBoard</tt> <b>[enter]</b><br /></ol><div class="blogger-post-footer">&nbsp;</div>
 
@@ -133,7 +138,7 @@ ga('send', 'pageview');
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     
