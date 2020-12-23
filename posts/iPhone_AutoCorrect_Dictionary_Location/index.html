@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <i>iPhone 3G 2.2.1</i><br /><br />I've been frustrated with the fact that the user cannot edit the autocorrect dictionary on the iPhone, so I looked around today and found the location of the US English database file to be:<br /><tt>/System/Library/TextInput/TextInput_en.bundle/Unigrams-en_US.dat</tt>.  There is also an index file with a file suffix of .idx in the same directory.<br /><br />I also found that someone has written a Java program called <a href="http://code.google.com/p/iphoneshop/">iphoneshop</a> to edit not only the dictionary, but also the keyboard artwork and layout.  If anyone knows of an application that runs on the iPhone (jailbreak apps are okay) and will allow me to edit the dictionary, please let me know.<br /><br /><b>Update: iphoneshop doesn't work with 2.x firmware.  Oh well.</b><div class="blogger-post-footer">&nbsp;</div>
+    
+<i>iPhone 3G 2.2.1</i><br /><br />I've been frustrated with the fact that the user cannot edit the autocorrect dictionary on the iPhone, so I looked around today and found the location of the US English database file to be:<br /><tt>/System/Library/TextInput/TextInput_en.bundle/Unigrams-en_US.dat</tt>.  There is also an index file with a file suffix of .idx in the same directory.<br /><br />I also found that someone has written a Java program called <a href="http://code.google.com/p/iphoneshop/">iphoneshop</a> to edit not only the dictionary, but also the keyboard artwork and layout.  If anyone knows of an application that runs on the iPhone (jailbreak apps are okay) and will allow me to edit the dictionary, please let me know.<br /><br /><b>Update: iphoneshop doesn't work with 2.x firmware.  Oh well.</b><div class="blogger-post-footer">&nbsp;</div>
 
 
 
@@ -131,7 +135,7 @@ ga('send', 'pageview');
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <i>Mac only, but Airfoil is available for Windows also.</i><br /><p>Apple's Airport Express wireless router allows you to stream your iTunes music to your stereo, but what about other programs?  I listen to Sirius all day, so I naturally wanted to stream it to my stereo.  It required a little research to figure out how to do it, but in the end it just required holding down a key at the right time.  In this article, I explain how to stream audio from Sirius, using either SiriusMac, StarPlayr, XMac, and probably others.<br /><br /></p><p><br /></p><ol><br /><li>Download and install a player, such as SiriusMac, StarPlayr or XMac.<br /></li><li>Make sure you are able to listen to Sirius/XM through the speakers on your computer.<br /></li><li>Download <a href="http://rogueamoeba.com/airfoil/mac/">Airfoil 2</a> (Leopard ready) and install. <br /></li><li>Open Airfoil and click Airfoil on the menubar, then click Install Extras.  Install Instant Hijack, then logoff and logon for the installation to complete. <br /></li><li>Start SiriusMac/StarPlayr/XMac and Airfoil.  Click on a channel in your satellite radio player program and your should hear audio on your computer speakers. <br /></li><li>In Airfoil, you cannot select SiriusMac, StarPlayr, or XMac.  Well, you can, but you will not hear anything on your stereo.  Instead, you must hold down <b>Option</b> when you click the application selector in Airfoil.  You then must select mplayer as the application you want to capture audio from. (see screenshots below)<br /><br /><a href="http://www.flickr.com/photo_zoom.gne?id=2185667534&amp;size=o" title="View 'SiriusMac.png' on Flickr.com"><img src="http://farm3.static.flickr.com/2017/2185667534_7f93209ae7_s.jpg" alt="SiriusMac.png" border="0" width="75" height="75" /></a> <br /><a href="http://www.flickr.com/photo_zoom.gne?id=2184882881&amp;size=o" title="View 'starplyr.png' on Flickr.com"><img src="http://farm3.static.flickr.com/2049/2184882881_d9a10f70a0_s.jpg" alt="starplyr.png" border="0" width="75" height="75" /></a> <br /><a href="http://www.flickr.com/photo_zoom.gne?id=2192162325&amp;size=o" title="View 'XMac.png' on Flickr.com"><img src="http://farm3.static.flickr.com/2154/2192162325_ed17070d43_s.jpg" alt="SiriusMac.png" border="0" width="75" height="75" /></a><br /></li></ol><br /><i>(Note: sometimes there may be more than one mplayer program listed.  In this case, it's just trial and error until you find the right one.)</i><br /><br /><p><br />The reason for this is XM and Sirius use Windows Media format to stream their channels over the internet.  All of these programs rely on mplayer to  decode and play the streams, so all the Sirus/XM player programs are doing is taking care of the login process, then giving the user a list of channels.  Once the user selects a channel, the Sirius/XM player passes the URL of the stream to mplayer, which takes care of the rest.  One annoying thing about this that every time you change the channel, a new process of mplayer is spawned by the Sirius/XM program, which causes the audio to stop.  You then must click the Speaker icon beside the name of your Airport Express to resume listening.  Maybe one day the makers of Airfoil will fix this. :)</p><div class="blogger-post-footer">&nbsp;</div>
+    
+<i>Mac only, but Airfoil is available for Windows also.</i><br /><p>Apple's Airport Express wireless router allows you to stream your iTunes music to your stereo, but what about other programs?  I listen to Sirius all day, so I naturally wanted to stream it to my stereo.  It required a little research to figure out how to do it, but in the end it just required holding down a key at the right time.  In this article, I explain how to stream audio from Sirius, using either SiriusMac, StarPlayr, XMac, and probably others.<br /><br /></p><p><br /></p><ol><br /><li>Download and install a player, such as SiriusMac, StarPlayr or XMac.<br /></li><li>Make sure you are able to listen to Sirius/XM through the speakers on your computer.<br /></li><li>Download <a href="http://rogueamoeba.com/airfoil/mac/">Airfoil 2</a> (Leopard ready) and install. <br /></li><li>Open Airfoil and click Airfoil on the menubar, then click Install Extras.  Install Instant Hijack, then logoff and logon for the installation to complete. <br /></li><li>Start SiriusMac/StarPlayr/XMac and Airfoil.  Click on a channel in your satellite radio player program and your should hear audio on your computer speakers. <br /></li><li>In Airfoil, you cannot select SiriusMac, StarPlayr, or XMac.  Well, you can, but you will not hear anything on your stereo.  Instead, you must hold down <b>Option</b> when you click the application selector in Airfoil.  You then must select mplayer as the application you want to capture audio from. (see screenshots below)<br /><br /><a href="http://www.flickr.com/photo_zoom.gne?id=2185667534&amp;size=o" title="View 'SiriusMac.png' on Flickr.com"><img src="http://farm3.static.flickr.com/2017/2185667534_7f93209ae7_s.jpg" alt="SiriusMac.png" border="0" width="75" height="75" /></a> <br /><a href="http://www.flickr.com/photo_zoom.gne?id=2184882881&amp;size=o" title="View 'starplyr.png' on Flickr.com"><img src="http://farm3.static.flickr.com/2049/2184882881_d9a10f70a0_s.jpg" alt="starplyr.png" border="0" width="75" height="75" /></a> <br /><a href="http://www.flickr.com/photo_zoom.gne?id=2192162325&amp;size=o" title="View 'XMac.png' on Flickr.com"><img src="http://farm3.static.flickr.com/2154/2192162325_ed17070d43_s.jpg" alt="SiriusMac.png" border="0" width="75" height="75" /></a><br /></li></ol><br /><i>(Note: sometimes there may be more than one mplayer program listed.  In this case, it's just trial and error until you find the right one.)</i><br /><br /><p><br />The reason for this is XM and Sirius use Windows Media format to stream their channels over the internet.  All of these programs rely on mplayer to  decode and play the streams, so all the Sirus/XM player programs are doing is taking care of the login process, then giving the user a list of channels.  Once the user selects a channel, the Sirius/XM player passes the URL of the stream to mplayer, which takes care of the rest.  One annoying thing about this that every time you change the channel, a new process of mplayer is spawned by the Sirius/XM program, which causes the audio to stop.  You then must click the Speaker icon beside the name of your Airport Express to resume listening.  Maybe one day the makers of Airfoil will fix this. :)</p><div class="blogger-post-footer">&nbsp;</div>
 
 
 
@@ -131,7 +135,7 @@ ga('send', 'pageview');
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

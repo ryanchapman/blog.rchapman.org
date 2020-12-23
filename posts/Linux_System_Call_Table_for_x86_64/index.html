@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <i>Linux 4.7 (pulled from github.com/torvalds/linux on Jul 20 2016), x86_64</i><br><br>
+    
+<i>Linux 4.7 (pulled from github.com/torvalds/linux on Jul 20 2016), x86_64</i><br><br>
 
 
 <p>Note: 64-bit x86 uses syscall instead of interrupt 0x80. The result value will be in %rax</p>
@@ -225,7 +229,7 @@ The results show that the implementation is in fs/read_write.c and that it takes
 <tr><td>97</td><td>sys_getrlimit</td><td>unsigned int resource</td><td>struct rlimit *rlim</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>98</td><td>sys_getrusage</td><td>int who</td><td>struct rusage *ru</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>99</td><td>sys_sysinfo</td><td>struct sysinfo *info</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>100</td><td>sys_times</td><td>struct sysinfo *info</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>100</td><td>sys_times</td><td>struct tms *tbuf</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>101</td><td>sys_ptrace</td><td>long request</td><td>long pid</td><td>unsigned long addr</td><td>unsigned long data</td><td></td><td></td></tr>
 <tr><td>102</td><td>sys_getuid</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>103</td><td>sys_syslog</td><td>int type</td><td>char *buf</td><td>int len</td><td></td><td></td><td></td></tr>
@@ -496,7 +500,7 @@ int flags</td><td></td><td></td><td></td><td></td></tr>
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

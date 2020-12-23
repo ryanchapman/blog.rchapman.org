@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <i>Tested with: Gmail (or Google Apps), Blackberry 8830, <a href="http://en.wikipedia.org/wiki/BlackBerry_Internet_Service">Blackberry Internet Service (BIS)</a></i><br /><br />This does not apply to <a href="http://en.wikipedia.org/wiki/BlackBerry_Enterprise_Server">Blackberry Enterprise Server (BES)</a>.  If your company has given you a Blackberry and it works with Exchange, Lotus Notes, or Groupwise, then you are operating in BES mode.  You'll need to make sure your cell company has set up BES <i>and</i> BIS on your Blackberry for this to work.<br /><br />I've used my Blackberry in many different scenarios: with Lotus Notes (BES), Microsoft Exchange (BES), and now I've moved to Google Apps, which allows me to receive mail for free at my address nospam@heatery.com.  This tip walks you through the steps I went through to make sure that all my email shows up on the Blackberry and all replies from the Blackberry show up in Gmail.  Also, new messages appear on your Blackberry as soon as they appear in your Google inbox (push email).<br /><br /><u>Step 1: Blackberry Setup</u><br /><ol><br /><li>Sign into your provider's Blackberry site (or create a new account):<br/><br />AT&T: <a href="http://www.att.blackberry.com/">http://www.att.blackberry.com</a><br/><br />Alltel: <a href="http://www.alltel.blackberry.com/">http://www.alltel.blackberry.com</a><br/><br />T-Mobile: <a href="http://bis.na.blackberry.com/html?brand=tmobile">http://bis.na.blackberry.com/html?brand=tmobile</a><br/><br />Verizon: <a href="http://bis.na.blackberry.com/html?brand=vzw">http://bis.na.blackberry.com/html?brand=vzw</a><br/><br /><li>On the email accounts screen, you'll see your blackberry email address (for example, johndoe@att.blackberry.com).  To the right, click Edit<br /><li>Change "Reply to:" to whatever your Gmail or Google Apps email is.  For me, this is johndoe@heatery.com.   This causes any mail you send from your Blackberry to look like it came from your Gmail or Google Apps account.  If you skip this step, email will appear to have come from johndoe@att.blackberry.com<br /><li>Change "Your name:" if you want to<br /><li>Change "Auto BCC:" to your Gmail or Google Apps email address.  Your "Reply-to:" and "Auto BCC:" fields should have the same address.  Auto BCC causes a copy of any messages you send from your Blackberry to be sent to your Gmail or Google Apps email.<br /><li>Click Save<br /></ol><br /><br /><u>Step 2: Gmail Setup</u><br /><ol><br /><li>Sign into Gmail<br /><li>Click Settings (in the top right hand corner of the screen)<br /><li>Click the Forwarding and POP/IMAP tab<br /><li>Select "Forward a copy of incoming mail to"<br /><li>Enter your Blackberry email address (like johndoe@att.blackberry.com)<br /><li>Make sure the option "keep ____ Mail's copy in the inbox" is selected<br /></ol><br /><br /><hr><br /><i>Interested in syncing your <a href="http://blog.heatery.com/2008/08/syncing-your-blackberry-calendar-with.html">Google Calendar with your Blackberry?</a><br/><br />How about syncing your <a href="http://www.google.com/support/calendar/bin/answer.py?answer=99358">Google Calendar with iCal on your Apple computer?</a><br/><br />You could also sync your <a href="http://blog.heatery.com/2008/08/enabling-google-caldav-for-mozilla.html">Google Calendar with Mozilla Sunbird</a><div class="blogger-post-footer">&nbsp;</div>
+    
+<i>Tested with: Gmail (or Google Apps), Blackberry 8830, <a href="http://en.wikipedia.org/wiki/BlackBerry_Internet_Service">Blackberry Internet Service (BIS)</a></i><br /><br />This does not apply to <a href="http://en.wikipedia.org/wiki/BlackBerry_Enterprise_Server">Blackberry Enterprise Server (BES)</a>.  If your company has given you a Blackberry and it works with Exchange, Lotus Notes, or Groupwise, then you are operating in BES mode.  You'll need to make sure your cell company has set up BES <i>and</i> BIS on your Blackberry for this to work.<br /><br />I've used my Blackberry in many different scenarios: with Lotus Notes (BES), Microsoft Exchange (BES), and now I've moved to Google Apps, which allows me to receive mail for free at my address nospam@heatery.com.  This tip walks you through the steps I went through to make sure that all my email shows up on the Blackberry and all replies from the Blackberry show up in Gmail.  Also, new messages appear on your Blackberry as soon as they appear in your Google inbox (push email).<br /><br /><u>Step 1: Blackberry Setup</u><br /><ol><br /><li>Sign into your provider's Blackberry site (or create a new account):<br/><br />AT&T: <a href="http://www.att.blackberry.com/">http://www.att.blackberry.com</a><br/><br />Alltel: <a href="http://www.alltel.blackberry.com/">http://www.alltel.blackberry.com</a><br/><br />T-Mobile: <a href="http://bis.na.blackberry.com/html?brand=tmobile">http://bis.na.blackberry.com/html?brand=tmobile</a><br/><br />Verizon: <a href="http://bis.na.blackberry.com/html?brand=vzw">http://bis.na.blackberry.com/html?brand=vzw</a><br/><br /><li>On the email accounts screen, you'll see your blackberry email address (for example, johndoe@att.blackberry.com).  To the right, click Edit<br /><li>Change "Reply to:" to whatever your Gmail or Google Apps email is.  For me, this is johndoe@heatery.com.   This causes any mail you send from your Blackberry to look like it came from your Gmail or Google Apps account.  If you skip this step, email will appear to have come from johndoe@att.blackberry.com<br /><li>Change "Your name:" if you want to<br /><li>Change "Auto BCC:" to your Gmail or Google Apps email address.  Your "Reply-to:" and "Auto BCC:" fields should have the same address.  Auto BCC causes a copy of any messages you send from your Blackberry to be sent to your Gmail or Google Apps email.<br /><li>Click Save<br /></ol><br /><br /><u>Step 2: Gmail Setup</u><br /><ol><br /><li>Sign into Gmail<br /><li>Click Settings (in the top right hand corner of the screen)<br /><li>Click the Forwarding and POP/IMAP tab<br /><li>Select "Forward a copy of incoming mail to"<br /><li>Enter your Blackberry email address (like johndoe@att.blackberry.com)<br /><li>Make sure the option "keep ____ Mail's copy in the inbox" is selected<br /></ol><br /><br /><hr><br /><i>Interested in syncing your <a href="http://blog.heatery.com/2008/08/syncing-your-blackberry-calendar-with.html">Google Calendar with your Blackberry?</a><br/><br />How about syncing your <a href="http://www.google.com/support/calendar/bin/answer.py?answer=99358">Google Calendar with iCal on your Apple computer?</a><br/><br />You could also sync your <a href="http://blog.heatery.com/2008/08/enabling-google-caldav-for-mozilla.html">Google Calendar with Mozilla Sunbird</a><div class="blogger-post-footer">&nbsp;</div>
 
 
 
@@ -131,7 +135,7 @@ ga('send', 'pageview');
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

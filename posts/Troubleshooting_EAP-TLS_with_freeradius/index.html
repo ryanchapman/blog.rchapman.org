@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <p><em>Ubuntu 14.04 (Linux 3.13.0-53), freeradius 2.1.12, wpa_supplicant 2.4, </em></p>
+    
+<p><em>Ubuntu 14.04 (Linux 3.13.0-53), freeradius 2.1.12, wpa_supplicant 2.4, </em></p>
 
 <p>I'm in the process of setting up wifi to use one of the more secure authentication methods, EAP-TLS (well, more secure than WPA-PSK or WPA2-PSK). WPA-Enterprise with 802.1x using EAP-TLS uses the same mechanism that protects web sites, TLS.  Anyway, I followed the great instructions Thomas Hruska put together at http://cubicspot.blogspot.com/2013/04/setting-up-wpa2-enterprise-aes-with.html but it wouldn't work.  After figuring out the problem, I set out to document here the troubleshooting steps.</p>
 
@@ -407,7 +411,7 @@ Yep, it works now.
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Ryan A. Chapman</title>
@@ -88,7 +88,7 @@ Using a YubiKey NEO to store your ssh private key  Install opensc using brew or 
       
       <guid>http://blog.rchapman.org/posts/ASA_DAP_Lua_function_list/</guid>
       <description>ASA 9.4.2 (which has Lua 5.0.2), AnyConnect 4.0 on iOS
- On the internets, I haven&#39;t been able to locate a list of Lua functions available for use with Dynamic Access Policies (DAP) on Cisco&#39;s ASA firewall. So I decided to just use Lua running on the ASA to tell me what functions and variables are in global scope. Not quite as good as documentation, but it works for now.  To set it up it, open ASDM and  Go to Configuration  Remote Access VPN  Dynamic Access Policies Add Policy Name: list_globals Description: prints a list of Lua globals to the ASA CLI ACL Priority: 50 (or whatever priority you want to assign) User had ALL of the following AAA Attribute values.</description>
+ On the internets, I haven&#39;t been able to locate a list of Lua functions available for use with Dynamic Access Policies (DAP) on Cisco&#39;s ASA firewall. So I decided to just use Lua running on the ASA to tell me what functions and variables are in global scope. Not quite as good as documentation, but it works for now.</description>
     </item>
     
     <item>
@@ -107,8 +107,8 @@ Setting up communications between an ASA and a radius server can be tricky, beca
       <pubDate>Wed, 28 Oct 2015 00:00:00 +0000</pubDate>
       
       <guid>http://blog.rchapman.org/posts/ASA_Deny_IP_due_to_Land_Attack_from_a_b_c_d_to_a_b_c_d/</guid>
-      <description>ASA 5516-X in HA pair, ASA 9.5(1)
-On an ASA I help manage, the logs were full of messages like &amp;ldquo;Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4&amp;rdquo;. A Land attack is defined as when a packet is received that has the same source and destination IP addresses. Some definitions also say that the source and destination ports will match, but that was not true in my case.</description>
+      <description>On an ASA I help manage, the logs were full of messages like &amp;ldquo;Deny IP due to Land Attack from 1.2.3.4 to 1.2.3.4&amp;rdquo;. A Land attack is defined as when a packet is received that has the same source and destination IP addresses. Some definitions also say that the source and destination ports will match, but that was not true in my case.
+Reproducing the issue To reproduce the issue, I first got my public IP address, which is 1.</description>
     </item>
     
     <item>
@@ -183,7 +183,7 @@ I&#39;m in the process of setting up wifi to use one of the more secure authenti
       <pubDate>Sun, 30 Mar 2014 00:00:00 +0000</pubDate>
       
       <guid>http://blog.rchapman.org/posts/Wireshark_tips_No4_do_not_let_tshark_fill_up_your_tmp_directory/</guid>
-      <description>TShark 1.2.15, Oracle Enterprise Linux 6.5  By default, tshark will write its capture data to the /tmp directory. If you do not have a large /tmp and run tshark for a long period of time, you may find that /tmp gets filled up. To tell tshark to write to a different directory, set the TMPDIR environment variable before starting it.
+      <description> TShark 1.2.15, Oracle Enterprise Linux 6.5  By default, tshark will write its capture data to the /tmp directory. If you do not have a large /tmp and run tshark for a long period of time, you may find that /tmp gets filled up. To tell tshark to write to a different directory, set the TMPDIR environment variable before starting it.
   env TMPDIR=/scratch/  </description>
     </item>
     
@@ -228,7 +228,7 @@ When the &#34;Create a new calendar&#34; dialog box appears, select &#34;</descr
       <guid>http://blog.rchapman.org/posts/Using_fstatfs_from_a_32-bit_program_on_a_64-bit_system/</guid>
       <description>CentOS 5.9, Linux 2.6.18-308.24.1.el5.centos.plus, glibc 2.5-107
 Recently at work, Zack Dannar and I ran into an issue on a 64-bit system where a 32-bit process was making a call to fstatfs() which was failing. An strace of the process showed the following:
-  ... 01:00:28.335337 fstatfs(3, 0xffccebf0) = -1 EOVERFLOW (Value too large for defined data type) ...   The call was failing with an errno of EOVERFLOW. Odd.</description>
+  ... 01:00:28.335337 fstatfs(3, 0xffccebf0) = -1 EOVERFLOW (Value too large for defined data type) ...   The call was failing with an errno of EOVERFLOW.</description>
     </item>
     
     <item>
@@ -249,7 +249,7 @@ Recently at work, Zack Dannar and I ran into an issue on a 64-bit system where a
       <description>Linux 4.7 (pulled from github.com/torvalds/linux on Jul 20 2016), x86_64
 Note: 64-bit x86 uses syscall instead of interrupt 0x80. The result value will be in %rax
 To find the implementation of a system call, grep the kernel tree for SYSCALL_DEFINE.\?(syscall,
-For example, to find the read system call:  illusion:/usr/src/linux-source-3.19$ grep -rA3 &#39;SYSCALL_DEFINE.\?(read,&#39; * fs/read_write.c:SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count) fs/read_write.c-{ fs/read_write.c- struct file *file; fs/read_write.c- ssize_t ret = -EBADF;  The results show that the implementation is in fs/read_write.</description>
+For example, to find the read system call:  illusion:/usr/src/linux-source-3.19$ grep -rA3 &#39;SYSCALL_DEFINE.\?(read,&#39; * fs/read_write.c:SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count) fs/read_write.c-{ fs/read_write.c- struct file *file; fs/read_write.</description>
     </item>
     
     <item>
@@ -312,7 +312,7 @@ Put that in your .screenrc and you should be all set.</description>
       <pubDate>Thu, 30 Sep 2010 00:00:00 +0000</pubDate>
       
       <guid>http://blog.rchapman.org/posts/Getting_Line_Drawing_to_Work_with_putty/</guid>
-      <description>putty
+      <description> putty
 If you are having trouble getting solid lines to draw in your putty session, you may need to change the following:
 
 Open putty
@@ -522,7 +522,7 @@ Apple&#39;s Airport Express wireless router allows you to stream your iTunes mus
       <pubDate>Fri, 11 Jan 2008 00:00:00 +0000</pubDate>
       
       <guid>http://blog.rchapman.org/posts/Inside_Story_on_the_Creation_of_the_iPhone/</guid>
-      <description>Wired has published a very interesting article on how Steve Jobs and Apple created the iPhone.
+      <description> Wired has published a very interesting article on how Steve Jobs and Apple created the iPhone.
 
 While I&#39;m on the subject, Steve Jobs also gave a very good convocation address at Stanford a few years back, which is an excellent read.
 &amp;nbsp; </description>

@@ -12,7 +12,7 @@ redirect_from:
         <meta name="description" content="">
         <meta name="HandheldFriendly" content="True">
         <meta name="MobileOptimized" content="320">
-        <meta name="generator" content="Hugo 0.32.2" />
+        <meta name="generator" content="Hugo 0.67.1" />
         <meta name="robots" content="index,follow">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="http://blog.rchapman.org/css/normalize.css">
@@ -23,14 +23,17 @@ redirect_from:
     </head>
     <body>
         
-<script>
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'XXX', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'XXX', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
 
 
@@ -98,7 +101,8 @@ ga('send', 'pageview');
         <div class="post-content clearfix">
     
 
-    <i>Mac OS X 10.5.4</i><br /><br />For some reason, Wireshark keeps crashing X11 on my machine, so it isn't an option.  If you have the same problem, here is how to capture and decode HTTP traffic from the command line, using tcpdump:<br /><br /><tt>tcpdump -n -i en1 -s 0 -A port 80 and host www.yahoo.com</tt><br /><br /><p>Options:<br/><br /><table border=0><br /><tr><td>-n</td><td>Don't convert addresses to hostnames</td></tr><br /><tr><td>-i en1</td><td>Interface to listen on. en0 is the wired interface and en1 is the wireless on a MacBook Pro</td></tr><br /><tr><td>-s 0</td><td>Snarf the required length to catch whole packets</td></tr><br /><tr><td>-A</td><td>Print each packet (minus its link level header) in ASCII</td></tr><br /><tr><td>&lt;expr&gt;</td><td>Packet match expression.  My example of <tt>port 80 and host www.yahoo.com</tt> says to only print packets that have a source or destination port of 80 and a source or destination host of www.yahoo.com.  There are many other qualifiers, such as portrange, net, src, dst, inbound, outbound, ether, fddi, ip, ip6, arp, tcp, udp.  See the <a href="http://www.tcpdump.org/tcpdump_man.html">manual page</a> for more info. </td></tr><br /></table><br /><br />For more info, at the terminal, type <tt>man tcpdump</tt>&nbsp;</div>
+    
+<i>Mac OS X 10.5.4</i><br /><br />For some reason, Wireshark keeps crashing X11 on my machine, so it isn't an option.  If you have the same problem, here is how to capture and decode HTTP traffic from the command line, using tcpdump:<br /><br /><tt>tcpdump -n -i en1 -s 0 -A port 80 and host www.yahoo.com</tt><br /><br /><p>Options:<br/><br /><table border=0><br /><tr><td>-n</td><td>Don't convert addresses to hostnames</td></tr><br /><tr><td>-i en1</td><td>Interface to listen on. en0 is the wired interface and en1 is the wireless on a MacBook Pro</td></tr><br /><tr><td>-s 0</td><td>Snarf the required length to catch whole packets</td></tr><br /><tr><td>-A</td><td>Print each packet (minus its link level header) in ASCII</td></tr><br /><tr><td>&lt;expr&gt;</td><td>Packet match expression.  My example of <tt>port 80 and host www.yahoo.com</tt> says to only print packets that have a source or destination port of 80 and a source or destination host of www.yahoo.com.  There are many other qualifiers, such as portrange, net, src, dst, inbound, outbound, ether, fddi, ip, ip6, arp, tcp, udp.  See the <a href="http://www.tcpdump.org/tcpdump_man.html">manual page</a> for more info. </td></tr><br /></table><br /><br />For more info, at the terminal, type <tt>man tcpdump</tt>&nbsp;</div>
 
 
 
@@ -131,7 +135,7 @@ ga('send', 'pageview');
 
             <div class="comments">
         <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     
